@@ -1,0 +1,35 @@
+{
+  "name": "electronchat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "watch": "webpack --config webpack.common.js --watch"
+  },
+  "author": "Petru Catana",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.16.12",
+    "electron": "^16.0.7",
+    "electron-reload": "^2.0.0-alpha.1"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@makerdao/dai-ui-theme-maker": "^0.0.66",
+    "babel-loader": "^8.2.3",
+    "dotenv": "^15.0.0",
+    "googleapis": "^92.0.0",
+    "mongodb": "^4.3.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.6",
+    "react-router-dom": "^6.2.1",
+    "redux": "^4.1.2",
+    "redux-thunk": "^2.4.1",
+    "theme-ui": "^0.13.1",
+    "webpack": "^5.67.0",
+    "webpack-cli": "^4.9.2"
+  }
+}
