@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
-import { Card, Button, Label, Input, Text, Grid, Box, Container } from "theme-ui"
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Label, Input, Text, Grid, Box, Container, Form } from "theme-ui"
+import { useSelector, useDispatch } from 'react-redux';
+import { storeAuthObject } from '../actions/googleAuth';
 
 
 export default function Table() {
 
-    const authClient = useSelector(state => state.googleAuth.auth);
-    console.log('AuthClient in Tables', authClient)
+    const dispatch = useDispatch();
 
-    const [sheetId, setSheetId] = useState('');
-    const [range, setRange] = useState('');
-    const [sheets, setSheets] = useState([])
+    useEffect(async () => {
+        const { state, authClient } = await electron.checkToken();
+        dispatch(storeAuthObject(authClient));
+
+    }, [electron.checkToken])
+
+    const authClientRedux = useSelector(state => state.googleAuth.auth);
+    // console.log('autClient', authClientRedux)
+
+
+    const [inputSheetValue, setInputSheetValue] = useState('');
+    const [sheets, setSheets] = useState('')
+
+
+
+    const handleAddSheet = (event) => {
+        event.preventDefault()
+        setSheets(inputSheetValue);
+        setInputSheetValue('')
+    }
 
     return (
         <Container>
@@ -65,27 +82,29 @@ export default function Table() {
                 {/* <Grid columns={[2, "4fr 0.5fr"]}> */}
                 <Box
                 >
-                    <Label>Google SpreadSheet ID</Label>
+                    <Label>Google SpreadSheet Link</Label>
                     <Input
                         // variant="inputError"
-                        defaultValue={'2W5kcF0TiMmDlKE4K5TLT7jw48h1-nEgDelSIexT34EA'}
+                        placeholder='spreadsheet link'
+                        name='spreadsheetLink'
+                        type='text'
+                        value={inputSheetValue}
+                        onChange={e => setInputSheetValue(e.target.value)}
                     ></Input>
                     {/* <Text sx={{ m: 0 }} variant="smallError">
                             Error message goes here
                         </Text> */}
-                    <Label>Sheet Name + Range </Label>
-                    <Input
-                        defaultValue={'Sheet Name!A11:X38'}
-                    ></Input>
                 </Box>
                 <Box>
                     <Button
                         sx={{
-                            mt: '40px'
+                            mt: '10px'
                         }}
+                        disabled={!inputSheetValue ? true : false}
+                        onClick={handleAddSheet}
                     >Add Sheet</Button>
                 </Box>
-                {/* </Grid> */}
+                {sheets}
             </Card>
         </Container>
 
