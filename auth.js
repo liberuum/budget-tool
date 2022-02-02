@@ -77,26 +77,50 @@ async function storeToken(token) {
 }
 
 
-async function fetchData(auth) {
+async function fetchData(spreadsheetId, sheetName) {
     try {
+        const auth = await authorize();
         const sheets = google.sheets('v4');
-        const spreadsheetId = '1N4kcF0TiMmDlKE4K5TLT7jw48h1-nEgDelSIexT93EA'
-        const range = 'Payment Forecast!A11:X38'
+        const range = `${sheetName}!A11:X38`
         const response = await sheets.spreadsheets.values.get({ auth, spreadsheetId, range })
         const rows = response.data.values
         if (rows.length == 0) {
             console.log('No data found.')
             return
         }
-        // return rows;
-        console.log(rows);
+        return rows;
+        // console.log(rows);
     } catch (err) {
         console.log(`The API returned an error: ${err}`)
         return
     }
 }
 
+async function parseSpreadSheetLink({ link }) {
+    try {
+        const auth = await authorize();
+        const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
+        let result = pattern.exec(link)
+        const spreadsheetId = result[1];
+        const sheetId = Number(result[2])
+        // Getting Sheet Name
+        const sheets = google.sheets('v4');
+        const sheetNameResponse = await sheets.spreadsheets.get({ auth, spreadsheetId });
+        const spreadSheetTitle = sheetNameResponse.data.properties.title;
+        const sheetData = sheetNameResponse.data.sheets.filter(item => {
+            if (item.properties.sheetId == sheetId)
+                return item.properties.title
+        })
+        const sheetName = sheetData[0].properties.title;
+
+        return {spreadSheetTitle, sheetName, spreadsheetId}
+    } catch (error) {
+        console.log(`The API returned an error ${error}`)
+    }
+}
+
 module.exports = {
-    getSheetData,
-    authorize
+    authorize,
+    parseSpreadSheetLink,
+    fetchData
 }

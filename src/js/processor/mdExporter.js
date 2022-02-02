@@ -1,6 +1,6 @@
-import { get } from './mongodb.js';
+// import { get } from './mongodb.js';
 import Mustache from 'mustache';
-import fs from 'fs';
+// import fs from 'fs';
 
 
 export default class MdExporter {
@@ -21,16 +21,18 @@ export default class MdExporter {
     tableRows = '';
     item = ''
 
-    async fetchActuals() {
-        this.actuals = await get('novemberActuals');
+    // async fetchActuals() {
+    //     this.actuals = await get('novemberActuals');
+    // }
+
+    getActuals(actuals) {
+        this.actuals = actuals;
     }
 
     buildTableRowObject() {
         this.expenseTags.forEach(tag => {
-            // console.log(item += `|${tag}|`);
             this.item += `|${tag}|`
             this.iterate(tag)
-            // console.log('item', item)
             this.item += '\n'
             this.tableRows += this.item;
             this.item = ''
@@ -43,8 +45,6 @@ export default class MdExporter {
 
         this.template += this.tableRows;
     }
-
-    // console.log('item', item)
 
 
 
@@ -63,74 +63,15 @@ export default class MdExporter {
         }
     }
 
-
-    exportToMd() {
+    getMdData() {
         let output = Mustache.render(this.template);
-        fs.writeFileSync('./actuals.md', output);
-        console.log('Created/Updated actuals.md')
+        console.log('output', output)
     }
 
-
+    // exportToMd() {
+    //     let output = Mustache.render(this.template);
+    //     fs.writeFileSync('./actuals.md', output);
+    //     console.log('Created/Updated actuals.md')
+    // }
 
 }
-
-
-// const actuals = await get('novemberActuals');
-
-
-// console.log('expenseTags', expenseTags);
-
-// console.log('Actuals', actuals);
-
-
-// let template = `
-// | Budget Category               | Forecast           | Actuals            | Difference          | Payments       |
-// | ---------------------------   | -----------------: | -----------------: | ------------------: | -------------: |
-// |                               | -                  | -                  | -                   |                |
-// `;
-
-
-// let tableRows = '';
-// let item = ''
-
-// export function buildTableRowObject(expenseTags) {
-//     expenseTags.forEach(tag => {
-//         // console.log(item += `|${tag}|`);
-//         item += `|${tag}|`
-//         iterate(tag)
-//         // console.log('item', item)
-//         item += '\n'
-//         tableRows += item;
-//         item = ''
-//     });
-
-//     item += '| **Total** |';
-//     iterate('total')
-//     tableRows += item;
-//     item = ''
-
-//     template += tableRows;
-// }
-
-// console.log('item', item)
-
-
-
-// function iterate(expenseTag) {
-//     for (const obj of actuals) {
-//         // console.log(obj)
-//         for (const key in obj) {
-//             if (key === expenseTag)
-//                 // console.log(obj[key].toString())
-//                 item += ` ${obj[key].toString()} |`
-//         }
-//     }
-// }
-
-
-// buildTableRowObject();
-// console.log('tableRow', tableRows);
-
-// console.log(template)
-
-

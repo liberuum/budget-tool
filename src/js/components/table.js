@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Label, Input, Text, Grid, Box, Container, Form } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
 import { storeAuthObject } from '../actions/googleAuth';
+import processData from '../processor/index';
 
 
 export default function Table() {
@@ -14,19 +15,18 @@ export default function Table() {
 
     }, [electron.checkToken])
 
-    const authClientRedux = useSelector(state => state.googleAuth.auth);
-    // console.log('autClient', authClientRedux)
-
 
     const [inputSheetValue, setInputSheetValue] = useState('');
     const [sheets, setSheets] = useState('')
 
 
 
-    const handleAddSheet = (event) => {
+    const handleAddSheet = async (event) => {
         event.preventDefault()
         setSheets(inputSheetValue);
         setInputSheetValue('')
+        const { rawData } = await electron.getSheetInfo(inputSheetValue);
+        processData(rawData);
     }
 
     return (

@@ -1,5 +1,4 @@
-import { getSheetData } from "./auth.js";
-import { addData } from './mongodb.js';
+// import { addData } from './mongodb.js';
 
 
 export default class Processor {
@@ -39,10 +38,11 @@ export default class Processor {
         this.clearRawData()
         this.buildJson()
         this.parseTypes()
+        return this.parsedData
     }
 
-    getRawData = async () => {
-        this.rawData = await getSheetData()
+    getRawData =  (data) => {
+        this.rawData = data;
     }
 
     clearRawData = () => {
@@ -122,14 +122,14 @@ export default class Processor {
         // console.log('parsedData', this.parsedData)
     }
 
-    addDataToDb = async () => {
-        if (this.parsedData.length !== 0) {
-            console.log('Adding data to MongoDB')
-            await addData(this.parsedData, 'budgetLineItems');
-            console.log('finished adding parsed data to DB', this.parsedData.length)
-        } else {
-            console.log('no data found in parsedData', this.parsedData)
-        }
-    }
+    // addDataToDb = async () => {
+    //     if (this.parsedData.length !== 0) {
+    //         console.log('Adding data to MongoDB')
+    //         await addData(this.parsedData, 'budgetLineItems');
+    //         console.log('finished adding parsed data to DB', this.parsedData.length)
+    //     } else {
+    //         console.log('no data found in parsedData', this.parsedData)
+    //     }
+    // }
 
 }

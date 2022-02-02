@@ -12,4 +12,5 @@ contextBridge.exposeInMainWorld('electron', {
 
   checkCredentials: () => ipcRenderer.invoke('checkCredentials'),
   checkToken: () => ipcRenderer.invoke('checkToken'),
+  getSheetInfo: ( link) => ipcRenderer.invoke('getSheetInfo', { link })
 })

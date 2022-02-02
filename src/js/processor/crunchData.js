@@ -1,4 +1,4 @@
-import { addData, get } from './mongodb.js';
+// import { addData, get } from './mongodb.js';
 
 export default class CrunchData {
     dbData = [];
@@ -93,24 +93,27 @@ export default class CrunchData {
     }
 
 
-    crunchData() {
+    crunchData(processedData) {
+        this.dbData = processedData;
+        this.expenseTags = this.getExpenseTags();
         this.setForecastByExpenseTag();
         this.setActualsByExpenseTag();
         this.setDifferenceByExpenseTag();
         this.setPaymentsByExpenseTag();
-        console.log('Preocessing actuals', this.actuals.length)
+        console.log('Crunched Data', this.actuals)
+        return this.actuals;
     }
 
-    async uploadData() {
-        console.log('Storing Actuals');
-        await addData(this.actuals, 'novemberActuals')
-    }
+    // async uploadData() {
+    //     console.log('Storing Actuals');
+    //     await addData(this.actuals, 'novemberActuals')
+    // }
 
-    async fetchDbData() {
-        this.dbData = await get('budgetLineItems');
-        this.expenseTags = this.getExpenseTags()
-        console.log('fetched dbData: ', this.dbData.length)
-    }
+    // async fetchDbData() {
+    //     this.dbData = await get('budgetLineItems');
+    //     this.expenseTags = this.getExpenseTags()
+    //     console.log('fetched dbData: ', this.dbData.length)
+    // }
 
     // console.log(await get('novemberActuals')); 
 

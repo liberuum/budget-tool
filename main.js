@@ -3,7 +3,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const isDev = !app.isPackaged;
 const fs = require('fs/promises');
-const { getSheetData, authorize } = require('./auth.js');
+const { fetchData, authorize, parseSpreadSheetLink } = require('./auth.js');
 
 
 function createWindow() {
@@ -78,4 +78,11 @@ ipcMain.handle('checkToken', async (event, args) => {
     } catch (err) {
         return { state: false, authClient: null }
     }
+})
+
+ipcMain.handle('getSheetInfo', async (evemt, args) => {
+    // console.log('Getting Link in Main:', await args)
+    const { spreadSheetTitle, sheetName, spreadsheetId } = await parseSpreadSheetLink(args);
+    const rawData = await fetchData(spreadsheetId, sheetName);
+    return { spreadSheetTitle, sheetName, spreadsheetId, rawData }
 })
