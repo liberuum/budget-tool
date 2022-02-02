@@ -65,7 +65,7 @@ export default class MdExporter {
 
     getMdData() {
         let output = Mustache.render(this.template);
-        console.log('output', output)
+        return output;
     }
 
     // exportToMd() {

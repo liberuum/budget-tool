@@ -100,7 +100,6 @@ export default class CrunchData {
         this.setActualsByExpenseTag();
         this.setDifferenceByExpenseTag();
         this.setPaymentsByExpenseTag();
-        console.log('Crunched Data', this.actuals)
         return this.actuals;
     }
 

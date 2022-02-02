@@ -10,6 +10,7 @@ export default function Table() {
 
     const dispatch = useDispatch();
     const tableData = useSelector((tableData) => tableData.tableData.links);
+    console.log('tableData', tableData)
 
     useEffect(async () => {
         const { state, authClient } = await electron.checkToken();
@@ -24,8 +25,8 @@ export default function Table() {
         event.preventDefault()
         setInputSheetValue('')
         const { rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
-        dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId }))
-        processData(rawData);
+        const { actuals, mdText } = await processData(rawData);
+        dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actuals, mdText }))
     }
 
     const handleTableRowDelete = (e) => {
