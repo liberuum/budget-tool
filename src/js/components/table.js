@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Label, Input, Text, Grid, Box, Container, Form } from "theme-ui"
+import { Card, Button, Label, Input, Text, Grid, Box, Container, Link } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
 import { storeAuthObject } from '../actions/googleAuth';
 import processData from '../processor/index';
@@ -18,6 +18,7 @@ export default function Table() {
 
     const [inputSheetValue, setInputSheetValue] = useState('');
     const [sheets, setSheets] = useState('')
+    const [tableRows, setTableRows] = useState([]);
 
 
 
@@ -25,9 +26,22 @@ export default function Table() {
         event.preventDefault()
         setSheets(inputSheetValue);
         setInputSheetValue('')
-        const { rawData } = await electron.getSheetInfo(inputSheetValue);
+        const { rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
+        setTableRows([
+            ...tableRows,
+            { spreadSheetTitle, sheetName, spreadsheetId }
+        ])
         processData(rawData);
     }
+
+    const handleTableRowDelete = (e) => {
+        console.log('sheetName', e.target.getAttribute('name'))
+        const newArr = tableRows.filter(item => item.sheetName !== e.target.getAttribute('name'))
+        console.log('newArr', newArr)
+        setTableRows(newArr)
+    }
+
+    console.log('tableRows', tableRows)
 
     return (
         <Container>
@@ -37,7 +51,7 @@ export default function Table() {
                     sx={{
                         borderBottom: "1px solid",
                         borderColor: "muted",
-                        px: 2,
+                        px: 1,
                         py: 1
                     }}
                 >
@@ -56,26 +70,28 @@ export default function Table() {
 
                     }}
                 >
-                    {[
-                        ["SES Budget Sheet", "Permanent Team", "Export MD Export JSON Delete"],
-                        ["SES Budget Sheet", "Incubation Program", "Export MD Export JSON Delete"],
-                        ["SES Budget Sheet", "Grants Program", "Export MD Export JSON Delete"],
-                    ].map((row, key) => (
-                        <Grid
-                            columns={3}
-                            key={key}
-                            sx={{
-                                borderBottom: "1px solid",
-                                borderColor: "muted",
-                                my: "2",
-                                py: "2"
-                            }}
-                        >
-                            {row.map((cell, key) => (
-                                <Text key={key}>{cell}</Text>
-                            ))}
-                        </Grid>
-                    ))}
+                    {tableRows.map((row, key) => {
+                        return (
+                            <Grid
+                                columns={3}
+                                key={key}
+                                sx={{
+                                    borderBottom: "1px solid",
+                                    borderColor: "muted",
+                                    my: "2",
+                                    py: "1"
+                                }}
+                            >
+                                <Text >{row.spreadSheetTitle}</Text>
+                                <Text >{row.sheetName}</Text>
+                                <Text >
+                                    <Button variant="smallOutline">ExportMD </Button>
+                                    <Button variant="smallOutline">Export JSON </Button>
+                                    <Button bg='red' variant='small' name={row.sheetName} onClick={handleTableRowDelete}>Delete</Button>
+                                </Text>
+                            </Grid>
+                        )
+                    })}
                 </Box>
             </Card>
             <Card sx={{ my: 4, p: 2, pb: 3, maxWidth: "100%" }}>
