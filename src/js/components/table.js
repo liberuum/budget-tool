@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Label, Input, Text, Grid, Box, Container, Link } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
 import { storeAuthObject } from '../actions/googleAuth';
+import { storeLinkData, removeLinkData } from '../actions/tableData';
 import processData from '../processor/index';
 
 
 export default function Table() {
 
     const dispatch = useDispatch();
+    const tableData = useSelector((tableData) => tableData.tableData.links);
 
     useEffect(async () => {
         const { state, authClient } = await electron.checkToken();
@@ -17,31 +19,18 @@ export default function Table() {
 
 
     const [inputSheetValue, setInputSheetValue] = useState('');
-    const [sheets, setSheets] = useState('')
-    const [tableRows, setTableRows] = useState([]);
-
-
 
     const handleAddSheet = async (event) => {
         event.preventDefault()
-        setSheets(inputSheetValue);
         setInputSheetValue('')
         const { rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
-        setTableRows([
-            ...tableRows,
-            { spreadSheetTitle, sheetName, spreadsheetId }
-        ])
+        dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId }))
         processData(rawData);
     }
 
     const handleTableRowDelete = (e) => {
-        console.log('sheetName', e.target.getAttribute('name'))
-        const newArr = tableRows.filter(item => item.sheetName !== e.target.getAttribute('name'))
-        console.log('newArr', newArr)
-        setTableRows(newArr)
+        dispatch(removeLinkData(e.target.getAttribute('name')))
     }
-
-    console.log('tableRows', tableRows)
 
     return (
         <Container>
@@ -70,7 +59,7 @@ export default function Table() {
 
                     }}
                 >
-                    {tableRows.map((row, key) => {
+                    {tableData.map((row, key) => {
                         return (
                             <Grid
                                 columns={3}
@@ -120,7 +109,6 @@ export default function Table() {
                         onClick={handleAddSheet}
                     >Add Sheet</Button>
                 </Box>
-                {sheets}
             </Card>
         </Container>
 
