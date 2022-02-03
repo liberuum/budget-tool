@@ -103,6 +103,29 @@ export default class CrunchData {
         return this.actuals;
     }
 
+    prepJson() {
+        let json = ""
+        let arr = this.actuals
+        let newArr = [];
+        for (const obj of arr) {
+            console.log(obj)
+            let newObj = {}
+            for (const key in obj) {
+                if (typeof obj[key] === 'number') {
+                    newObj[key] = obj[key].toString()
+                } else {
+                    newObj[key] = obj[key];
+                }
+            }
+            newArr.push(newObj);
+            newObj = {};
+        }
+
+        let outputObj = { actuals: newArr };
+        json = JSON.stringify(outputObj);
+
+        return json;
+    }
     // async uploadData() {
     //     console.log('Storing Actuals');
     //     await addData(this.actuals, 'novemberActuals')

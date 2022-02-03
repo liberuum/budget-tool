@@ -1,7 +1,7 @@
 {
-  "name": "electronchat",
-  "version": "1.0.0",
-  "description": "",
+  "name": "budgettool",
+  "version": "0.0.1",
+  "description": "Get monthly actuals in MD and JSON format",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -25,6 +25,7 @@
     "mustache": "^4.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-markdown": "^8.0.0",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.1",
     "redux": "^4.1.2",

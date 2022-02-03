@@ -15,10 +15,11 @@ export default function Settings() {
 		const crd = await electron.checkCredentials();
 		setCredentials(crd);
 		const { state, authClient } = await electron.checkToken();
-		dispatch(storeAuthObject(authClient));
-		console.log('token', state)
 		setToken(state)
-	}, [electron.checkCredentials, electron.checkToken])
+		if (state) {
+			dispatch(storeAuthObject());
+		}
+	}, [electron.checkCredentials, token])
 
 	const handleGoogleCredButton = async (event) => {
 		event.preventDefault();
@@ -30,10 +31,15 @@ export default function Settings() {
 	const handleGoogleTokenAuth = async (event) => {
 		event.preventDefault();
 		await electron.fileApi.authenticate();
-		const { state, authClient } = await electron.checkToken();
-		dispatch(storeAuthObject(authClient));
-		console.log('token', state)
-		setToken(state);
+		setTimeout(async () => {
+			const { state, authClient } = await electron.checkToken();
+			setToken(state);
+			if (state) {
+				dispatch(storeAuthObject());
+			}
+		}, 5000)
+
+
 	}
 
 	return (

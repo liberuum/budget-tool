@@ -1,7 +1,6 @@
 
-export const storeAuthObject = (auth) => dispatch => {
+export const storeAuthObject = () => dispatch => {
     dispatch({
         type: 'GAUTH_ON_SUCCESS',
-        auth
     })
 }

@@ -1,20 +1,38 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { getLinkData } from '../actions/tableData';
+import { useSelector } from 'react-redux';
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm';
+import { Card, Divider, Label, Container, Textarea } from "theme-ui"
+
 
 export default function MDView() {
-    const { spreadSheetId } = useParams();
-    console.log('data in mdView', spreadSheetId)
-
-    const dispatch = useDispatch();
+    const { spreadsheetId } = useParams();
     const tableData = useSelector((tableData) => tableData.tableData.links);
-    console.log('linkData in MDView', tableData)
-    dispatch(getLinkData(spreadSheetId));
+    const filtered = tableData.filter(item => {
+        if (item.spreadsheetId == spreadsheetId)
+            return item
+    })
 
-    // useEffect(async () => {
-    // })
+    let md;
+    if(filtered.length !== 0) {
+        md = filtered[0].mdText;
+    } else {
+        md = ''
+    }
+    
     return (
-        <h1>MD View</h1>
+        <Container >
+            <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
+                <Label>MarkDown View</Label>
+                <Divider />
+                <ReactMarkdown children={md} remarkPlugins={[remarkGfm]} />
+            </Card>
+            <Card sx={{ mx: 'auto' }}>
+                <Label>MarkDown Raw Text</Label>
+                <Divider />
+                <Textarea rows={16} defaultValue={md} />
+            </Card>
+        </Container>
     )
 }

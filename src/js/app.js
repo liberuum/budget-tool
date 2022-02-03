@@ -16,8 +16,8 @@ export default function App() {
                 <Routes>
                     <Route path='/' element={<BudgetSheet />} />
                     <Route path='/settings' element={<Settings />} />
-                    <Route path='/json/:spreadSheetId' element={<JSONView />} />
-                    <Route path='/md/:spreadSheetId' element={<MDView />} />
+                    <Route path='/json/:spreadsheetId' element={<JSONView />} />
+                    <Route path='/md/:spreadsheetId' element={<MDView />} />
                 </Routes>
 
             </Router>

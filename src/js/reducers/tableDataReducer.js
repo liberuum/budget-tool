@@ -13,6 +13,7 @@ export default function googleAuthReducer(state = INITIAL_STATE, action) {
             }
         case 'GET_LINK':
             return { 
+                ...state,
                 links: state.links.filter(item => item.spreadSheetId == action.spreadSheetId)
             }
         default: {

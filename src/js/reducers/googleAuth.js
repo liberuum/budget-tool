@@ -1,11 +1,12 @@
 const INITIAL_STATE = {
-    auth: null
+    auth: false
 }
 
 export default function googleAuthReducer(state = INITIAL_STATE, action) {
     switch (action.type) {
         case 'GAUTH_ON_SUCCESS':
-            return { auth: action.auth }
+            // console.log('reducer', action.auth)
+            return {...state,  auth: true }
         default: {
             return state
         }
