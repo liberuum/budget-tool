@@ -10,7 +10,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "make:linux": "electron-builder --linux",
-    "make:macos": "electron-builder --max",
+    "make:macos": "electron-builder --mac",
     "make:win": "electron-builder --win --x64"
   },
   "author": "Petru Catana",
