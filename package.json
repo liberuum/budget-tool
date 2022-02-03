@@ -6,13 +6,67 @@
   "scripts": {
     "start": "electron .",
     "watch": "webpack --config webpack.common.js --watch",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "make:linux": "electron-builder --linux",
+    "make:macos": "electron-builder --max",
+    "make:win": "electron-builder --win --x64"
   },
   "author": "Petru Catana",
   "license": "ISC",
+  "build": {
+    "productName": "Budget-Tool",
+    "appId": "com.catana.budgetTool",
+    "files": [
+      "build/**/*",
+      "assets/**/*",
+      "utils/**/*",
+      "index.html",
+      "splash.html",
+      "splash.css",
+      "main.js",
+      "preload.js"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "assets/images/budgetToolLogo.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 810,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "icon": "assets/images/budgetToolLogo.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
+      "category": "Development"
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.16.12",
     "electron": "^16.0.7",
+    "electron-builder": "^22.14.5",
     "electron-reload": "^2.0.0-alpha.1",
     "webpack-merge": "^5.8.0"
   },
