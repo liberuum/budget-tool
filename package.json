@@ -26,7 +26,8 @@
       "splash.html",
       "splash.css",
       "main.js",
-      "preload.js"
+      "preload.js",
+      "auth.js"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",
@@ -41,7 +42,7 @@
           "y": 220
         },
         {
-          "x": 810,
+          "x": 420,
           "y": 220,
           "type": "link",
           "path": "/Applications"
