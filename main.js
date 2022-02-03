@@ -1,17 +1,40 @@
 // Main Process
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, Tray } = require('electron');
 const path = require('path');
 const isDev = !app.isPackaged;
 const fs = require('fs/promises');
 const { fetchData, authorize, parseSpreadSheetLink } = require('./auth.js');
 
+const dockIcon = path.join(__dirname, 'assets', 'images', 'budgetToolLogo.png');
+const trayIcon = path.join(__dirname, 'assets', 'images', 'budget_icon.jpg');
+
+
+function createSplashWindow() {
+    const win = new BrowserWindow({
+        width: 400,
+        height: 200,
+        backgroundColor: '#6e707e',
+        frame: false,
+        webPreferences: {
+            nodeIntegration: false,
+            worldSafeExecuteJavaScript: true,
+            //is a feature that ensures that both, your preload scripts and Electron
+            //internal logic run in seperate context
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js')
+        }
+    })
+    win.loadFile('splash.html');
+    // win.webContents.openDevTools();
+    return win;
+}
 
 function createWindow() {
-    // Browser Window <-- Renderer Process
     const win = new BrowserWindow({
         width: 1200,
         height: 800,
         backgroundColor: 'white',
+        show: false,
         webPreferences: {
             nodeIntegration: false,
             worldSafeExecuteJavaScript: true,
@@ -23,6 +46,7 @@ function createWindow() {
     })
     win.loadFile('index.html');
     // win.webContents.openDevTools();
+    return win;
 }
 
 if (isDev) {
@@ -31,11 +55,29 @@ if (isDev) {
     })
 }
 
+if (process.platform === 'darwin') {
+    app.dock.setIcon(dockIcon);
+}
+
+let tray = null;
+
 app.whenReady().then(async () => {
-    createWindow();
-    // await getSheetData();
+    const template = require('./utils/menu').createTemplate(app);
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
 
+    tray = new Tray(trayIcon)
+    tray.setContextMenu(menu)
 
+    const splash = createSplashWindow()
+    const mainApp = createWindow();
+
+    mainApp.once('ready-to-show', () => {
+        setTimeout(() => {
+            splash.destroy();
+            mainApp.show()
+        }, 2000)
+    })
 });
 
 app.on('window-all-closed', () => {
