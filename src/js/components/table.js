@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Label, Input, Text, Grid, Box, Container, Link } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { storeAuthObject } from '../actions/googleAuth';
 import { storeLinkData, removeLinkData } from '../actions/tableData';
 import processData from '../processor/index';
@@ -8,6 +9,7 @@ import processData from '../processor/index';
 
 export default function Table() {
 
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const tableData = useSelector((tableData) => tableData.tableData.links);
     console.log('tableData', tableData)
@@ -24,9 +26,9 @@ export default function Table() {
     const handleAddSheet = async (event) => {
         event.preventDefault()
         setInputSheetValue('')
-        const { rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
+        const { rawData, spreadSheetTitle, sheetName, spreadSheetId } = await electron.getSheetInfo(inputSheetValue);
         const { actuals, mdText } = await processData(rawData);
-        dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actuals, mdText }))
+        dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadSheetId, actuals, mdText }))
     }
 
     const handleTableRowDelete = (e) => {
@@ -75,8 +77,8 @@ export default function Table() {
                                 <Text >{row.spreadSheetTitle}</Text>
                                 <Text >{row.sheetName}</Text>
                                 <Text >
-                                    <Button variant="smallOutline">ExportMD </Button>
-                                    <Button variant="smallOutline">Export JSON </Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}`)}>ExportMD </Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}`)}>Export JSON </Button>
                                     <Button bg='red' variant='small' name={row.sheetName} onClick={handleTableRowDelete}>Delete</Button>
                                 </Text>
                             </Grid>

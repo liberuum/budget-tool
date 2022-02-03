@@ -12,3 +12,10 @@ export const removeLinkData = (sheetName) => dispatch => {
         sheetName
     })
 }
+
+export const getLinkData = (spreadSheetId) => dispatch => {
+    dispatch({
+        type: 'GET_LINK',
+        spreadSheetId
+    })
+}
