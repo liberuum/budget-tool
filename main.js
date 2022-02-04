@@ -45,7 +45,7 @@ function createWindow() {
         }
     })
     win.loadFile('index.html');
-    // win.webContents.openDevTools();
+    isDev && win.webContents.openDevTools();
     return win;
 }
 
