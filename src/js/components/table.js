@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Label, Input, Text, Grid, Box, Container, Link } from "theme-ui"
+import { Card, Button, Label, Input, Text, Grid, Box, Container, Badge } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { storeAuthObject } from '../actions/googleAuth';
@@ -21,10 +21,27 @@ export default function Table() {
 
 
     const [inputSheetValue, setInputSheetValue] = useState('');
+    const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false });
+
+    const handleInput = (value) => {
+        const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
+        let result = pattern.exec(value);
+        if (result == null) {
+            setValidatedInput({ variant: 'inputError', })
+        } else {
+            if (result[0] !== undefined && result[1] !== undefined && result[2] !== undefined) {
+                setValidatedInput({ variant: null, valid: true })
+            } else {
+                setValidatedInput({ variant: 'inputError', })
+            }
+        }
+        setInputSheetValue(value)
+    }
 
     const handleAddSheet = async (event) => {
         event.preventDefault()
         setInputSheetValue('')
+        setValidatedInput({ variant: null, })
         const { rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
         const { actuals, mdText } = await processData(rawData);
         dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actuals, mdText }))
@@ -86,31 +103,34 @@ export default function Table() {
                 </Box>
             </Card>
             <Card sx={{ my: 4, p: 2, pb: 3, maxWidth: "100%" }}>
-                {/* <Grid columns={[2, "4fr 0.5fr"]}> */}
                 <Box
                 >
                     <Label>Enter Google SpreadSheet Link</Label>
                     <Input
-                        sx={{"::placeholder": {color: '#D3D3D3'}}}
-                        // variant="inputError"
+                        sx={{ "::placeholder": { color: '#D3D3D3' } }}
+                        variant={validatedInput.variant}
                         placeholder='https://docs.google.com/spreadsheets/d/1N4kcF0TiMmDlKE4K5TLT7jw48h1-nEgDelSIexT93EA/edit#gid=1845449681'
                         name='spreadsheetLink'
                         type='text'
                         value={inputSheetValue}
-                        onChange={e => setInputSheetValue(e.target.value)}
+                        onChange={e => handleInput(e.target.value)}
                     ></Input>
-                    {/* <Text sx={{ m: 0 }} variant="smallError">
-                            Error message goes here
-                        </Text> */}
+                    {
+                        !validatedInput.valid && inputSheetValue ?  (<Text sx={{ m: 0 }} variant="smallError">
+                        Link is not valid, make sure to copy full link
+                    </Text>) : ''
+                    }
+                    
                 </Box>
                 <Box>
                     <Button
                         sx={{
                             mt: '10px'
                         }}
-                        disabled={!inputSheetValue ? true : false}
+                        disabled={!validatedInput.valid ? true : false}
                         onClick={handleAddSheet}
                     >Add Sheet</Button>
+                    {validatedInput.valid ? (<Badge sx={{mx: '2'}}>Link is valid</Badge>) : ''}
                 </Box>
             </Card>
         </Container>
