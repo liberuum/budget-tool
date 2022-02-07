@@ -89,10 +89,11 @@ export default function Table() {
                 {/* <Grid columns={[2, "4fr 0.5fr"]}> */}
                 <Box
                 >
-                    <Label>Google SpreadSheet Link</Label>
+                    <Label>Enter Google SpreadSheet Link</Label>
                     <Input
+                        sx={{"::placeholder": {color: '#D3D3D3'}}}
                         // variant="inputError"
-                        placeholder='spreadsheet link'
+                        placeholder='https://docs.google.com/spreadsheets/d/1N4kcF0TiMmDlKE4K5TLT7jw48h1-nEgDelSIexT93EA/edit#gid=1845449681'
                         name='spreadsheetLink'
                         type='text'
                         value={inputSheetValue}

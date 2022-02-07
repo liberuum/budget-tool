@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Card, Label, Grid } from 'theme-ui';
+import { Container, Button, Card, Label, Grid, Text, Link } from 'theme-ui';
 import { useDispatch } from 'react-redux';
 import { storeAuthObject, resetAuthSettings } from '../actions/googleAuth';
+
 
 export default function Settings() {
 
@@ -50,6 +51,10 @@ export default function Settings() {
 		}
 	}
 
+	const handleOpenLink = () => {
+		electron.openLink()
+	}
+
 	return (
 		<Container>
 			<h1>Settings View</h1>
@@ -61,7 +66,7 @@ export default function Settings() {
 					}}
 				>
 					<div>
-						<Label>{credentials ? 'Credentials are set' : 'Set Credentials'}</Label>
+						<Label>{credentials ? 'Credentials are set' : <Text>Set Credentials <Link sx={{cursor: 'pointer'}} onClick={handleOpenLink} >learn more</Link></Text>}</Label>
 						<Button
 							onClick={handleGoogleCredButton}
 							disabled={credentials}
@@ -88,3 +93,4 @@ export default function Settings() {
 		</Container>
 	)
 }
+

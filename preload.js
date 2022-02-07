@@ -6,5 +6,6 @@ contextBridge.exposeInMainWorld('electron', {
   resetCredentials: () => ipcRenderer.invoke('reset-credentials'),
   checkCredentials: () => ipcRenderer.invoke('checkCredentials'),
   checkToken: () => ipcRenderer.invoke('checkToken'),
-  getSheetInfo: (link) => ipcRenderer.invoke('getSheetInfo', { link })
+  getSheetInfo: (link) => ipcRenderer.invoke('getSheetInfo', { link }),
+  openLink: () => ipcRenderer.send('open-link')
 })

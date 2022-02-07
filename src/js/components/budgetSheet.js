@@ -4,6 +4,7 @@ import Table from './table';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { storeAuthObject } from '../actions/googleAuth';
+import NotAuthenticated from './notAuthenticated';
 
 export default function BudgetSheet() {
 
@@ -21,7 +22,7 @@ export default function BudgetSheet() {
 
     return (
         <Container>
-            {gAuth ? <Table /> : <p>Authenticate in Settings</p>}
+            {gAuth ? <Table /> : <NotAuthenticated />}
         </Container>
     )
 }

@@ -124,3 +124,7 @@ ipcMain.handle('reset-credentials', async () => {
         return false;
     }
 })
+
+ipcMain.on('open-link', () => {
+    require('electron').shell.openExternal('https://developers.google.com/workspace/guides/create-credentials#oauth-client-id')
+})
