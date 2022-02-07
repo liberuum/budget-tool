@@ -9,34 +9,11 @@ const settings = require('electron-settings');
 const dockIcon = path.join(__dirname, 'assets', 'images', 'budgetToolLogo.png');
 const trayIcon = path.join(__dirname, 'assets', 'images', 'budget_icon.jpg');
 
-const userPath = app.getAppPath('userData')
-
-function createSplashWindow() {
-    const win = new BrowserWindow({
-        width: 400,
-        height: 200,
-        backgroundColor: '#6e707e',
-        frame: false,
-        webPreferences: {
-            nodeIntegration: false,
-            worldSafeExecuteJavaScript: true,
-            //is a feature that ensures that both, your preload scripts and Electron
-            //internal logic run in seperate context
-            contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
-    })
-    win.loadFile('splash.html');
-    // win.webContents.openDevTools();
-    return win;
-}
-
 function createWindow() {
     const win = new BrowserWindow({
         width: 1200,
         height: 800,
         backgroundColor: 'white',
-        show: false,
         webPreferences: {
             nodeIntegration: false,
             worldSafeExecuteJavaScript: true,
@@ -72,13 +49,8 @@ app.whenReady().then(async () => {
     tray = new Tray(trayIcon)
     tray.setContextMenu(menu)
 
-    const splash = createSplashWindow()
-    const mainApp = createWindow();
+    createWindow();
 
-    mainApp.once('ready-to-show', async () => {
-        splash.destroy();
-        mainApp.show()
-    })
 });
 
 app.on('window-all-closed', () => {
@@ -107,9 +79,6 @@ ipcMain.on('authorize-google', async () => {
 
 ipcMain.handle('checkCredentials', async (event, args) => {
     try {
-        // await fs.stat(path.resolve(userPath, 'credentials.json'));
-
-        console.log('checking credentials', await settings.has('credentials'))
         return await settings.has('credentials');
     } catch (err) {
         return false
@@ -118,7 +87,6 @@ ipcMain.handle('checkCredentials', async (event, args) => {
 
 ipcMain.handle('checkToken', async (event, args) => {
     try {
-        // await fs.stat(path.resolve(userPath, 'token.json'));
         const state = await settings.has('token');
         let auth = null;
         if (state)

@@ -17,9 +17,7 @@ const getSheetData = async () => {
 
 async function getCredentials() {
     try {
-        // const credentials = await fs.readFile(path.resolve(userPath, 'credentials.json'), 'utf-8');
         const credentials = await settings.get('credentials');
-        console.log('getting credentials:')
         return JSON.parse(credentials);
     } catch (error) {
         throw error;
@@ -59,7 +57,6 @@ const authorize = async () => {
 
     // check if we have previously stored a token
     try {
-        // token = JSON.parse(await fs.readFile(path.resolve(userPath, TOKEN_PATH), 'utf-8'));
         token = JSON.parse(await settings.get('token'));
         if (!token)
             throw new Error
@@ -79,17 +76,13 @@ const authorize = async () => {
             throw err
         }
     }
-    // console.log('Token in credentials:', token)
     oauth2Client.setCredentials(token);
     return oauth2Client
 }
 
 async function storeToken(token) {
     try {
-        // await fs.writeFile(path.resolve(userPath, TOKEN_PATH), JSON.stringify(token))
-        // console.log(`Token stored to ${userPath}`)
         await settings.set('token', JSON.stringify(token));
-        console.log('Token stored in settings')
     } catch (error) {
         throw error;
     }
@@ -108,7 +101,6 @@ async function fetchData(spreadsheetId, sheetName) {
             return
         }
         return rows;
-        // console.log(rows);
     } catch (err) {
         console.log(`The API returned an error: ${err}`)
         return
