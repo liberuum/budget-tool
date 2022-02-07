@@ -29,10 +29,10 @@ function createWindow() {
 }
 
 if (isDev) {
-    if (!process.platform === 'darwin')
-        require('electron-reload')(__dirname, {
-            electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
-        })
+    // if (!process.platform === 'darwin')
+    require('electron-reload')(__dirname, {
+        electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
+    })
 }
 
 if (process.platform === 'darwin') {
@@ -65,15 +65,26 @@ app.on('activate', () => {
     }
 });
 
-ipcMain.on('save-credentials', async () => {
-    const gSecretsPath = await dialog.showOpenDialog({ properties: ['openFile'] })
-    const gSecrets = JSON.parse(await fs.readFile(gSecretsPath.filePaths[0], 'utf-8'));
-    // await fs.writeFile(path.resolve(userPath, 'credentials.json'), JSON.stringify(gSecrets))
-    await settings.set('credentials', JSON.stringify(gSecrets))
+ipcMain.handle('save-credentials', async () => {
+    try {
+        const gSecretsPath = await dialog.showOpenDialog({ properties: ['openFile'] })
+        const gSecrets = JSON.parse(await fs.readFile(gSecretsPath.filePaths[0], 'utf-8'));
+        await settings.set('credentials', JSON.stringify(gSecrets))
+        return true;
+    } catch (error) {
+        console.error(error)
+        return false;
+    }
 })
 
-ipcMain.on('authorize-google', async () => {
-    await authorize()
+ipcMain.handle('authorize-google', async () => {
+    try {
+        await authorize()
+        return true;
+    } catch (error) {
+        console.error(error)
+        return false;
+    }
 })
 
 
@@ -102,4 +113,14 @@ ipcMain.handle('getSheetInfo', async (evemt, args) => {
     const { spreadSheetTitle, sheetName, spreadsheetId } = await parseSpreadSheetLink(args);
     const rawData = await fetchData(spreadsheetId, sheetName);
     return { spreadSheetTitle, sheetName, spreadsheetId, rawData }
+})
+
+ipcMain.handle('reset-credentials', async () => {
+    try {
+        await settings.unset();
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
 })

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Button, Card, Label, Grid } from 'theme-ui';
 import { useDispatch } from 'react-redux';
-import { storeAuthObject } from '../actions/googleAuth';
+import { storeAuthObject, resetAuthSettings } from '../actions/googleAuth';
 
 export default function Settings() {
 
@@ -19,27 +19,35 @@ export default function Settings() {
 		if (state) {
 			dispatch(storeAuthObject());
 		}
-	}, [electron.checkCredentials, token])
+	}, [electron.checkCredentials, token, credentials])
 
 	const handleGoogleCredButton = async (event) => {
 		event.preventDefault();
-		electron.fileApi.saveOAuthCredentials();
-		const crd = await electron.checkCredentials()
-		setCredentials(crd);
+		const credStatus = await electron.saveOAuthCredentials();
+		if (credStatus) {
+			setCredentials(credStatus);
+		}
 	}
 
 	const handleGoogleTokenAuth = async (event) => {
 		event.preventDefault();
-		await electron.fileApi.authenticate();
-		setTimeout(async () => {
+		const authStatus = await electron.authenticate();
+		if (authStatus) {
 			const { state, authClient } = await electron.checkToken();
 			setToken(state);
 			if (state) {
 				dispatch(storeAuthObject());
 			}
-		}, 5000)
+		}
+	}
 
-
+	const handleResetCredentials = () => {
+		const resetStatus = electron.resetCredentials();
+		if (resetStatus) {
+			setCredentials(false);
+			setToken(false);
+			dispatch(resetAuthSettings())
+		}
 	}
 
 	return (
@@ -47,7 +55,7 @@ export default function Settings() {
 			<h1>Settings View</h1>
 			<Card>
 				<Grid
-					columns={2}
+					columns={3}
 					sx={{
 
 					}}
@@ -69,6 +77,10 @@ export default function Settings() {
 						>
 							Log In
 						</Button>
+					</div>
+					<div>
+						<Label>Reset Settings</Label>
+						<Button onClick={handleResetCredentials}>Reset</Button>
 					</div>
 				</Grid>
 			</Card>
