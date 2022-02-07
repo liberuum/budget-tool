@@ -1,9 +1,13 @@
-const { BrowserWindow } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const { google } = require('googleapis');
 const fs = require('fs/promises');
 const path = require('path');
+const settings = require('electron-settings');
 
-const TOKEN_PATH = 'token.json'
+const TOKEN_PATH = 'token.json';
+
+// console.log(app.getAppPath('userData'));
+const userPath = app.getAppPath('userData')
 
 const getSheetData = async () => {
     const auth = await authorize();
@@ -12,8 +16,12 @@ const getSheetData = async () => {
 };
 
 async function getCredentials() {
-    const credentials = await fs.readFile(path.resolve(__dirname, 'credentials.json'), 'utf-8');
-    return JSON.parse(credentials);
+    try {
+        const credentials = await settings.get('credentials');
+        return JSON.parse(credentials);
+    } catch (error) {
+        throw error;
+    }
 }
 
 const getOAuthCodeByInteraction = (interactionWindow, authPageURL) => {
@@ -49,7 +57,9 @@ const authorize = async () => {
 
     // check if we have previously stored a token
     try {
-        token = JSON.parse(await fs.readFile(path.resolve(__dirname, TOKEN_PATH), 'utf-8'));
+        token = JSON.parse(await settings.get('token'));
+        if (!token)
+            throw new Error
     } catch (err) {
         const url = oauth2Client.generateAuthUrl({
             scope: ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -66,14 +76,16 @@ const authorize = async () => {
             throw err
         }
     }
-    // console.log('Token in credentials:', token)
     oauth2Client.setCredentials(token);
     return oauth2Client
 }
 
 async function storeToken(token) {
-    await fs.writeFile(path.resolve(__dirname, TOKEN_PATH), JSON.stringify(token))
-    // console.log(`Token stored to ${TOKEN_PATH}`)
+    try {
+        await settings.set('token', JSON.stringify(token));
+    } catch (error) {
+        throw error;
+    }
 }
 
 
@@ -89,7 +101,6 @@ async function fetchData(spreadsheetId, sheetName) {
             return
         }
         return rows;
-        // console.log(rows);
     } catch (err) {
         console.log(`The API returned an error: ${err}`)
         return
@@ -113,7 +124,7 @@ async function parseSpreadSheetLink({ link }) {
         })
         const sheetName = sheetData[0].properties.title;
 
-        return {spreadSheetTitle, sheetName, spreadsheetId}
+        return { spreadSheetTitle, sheetName, spreadsheetId }
     } catch (error) {
         console.log(`The API returned an error ${error}`)
     }

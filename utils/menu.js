@@ -2,19 +2,59 @@ exports.createTemplate = app => {
     return [
         {
             label: process.platform === 'darwin' ? app.getName() : 'Menu',
-            submenu: [{
-                label: 'Exit',
-                click: () => {
-                    app.quit();
-                }
-            }]
+            submenu: [
+                {
+                    label: "New",
+                    accelerator: "Command+N",
+                    click: () => {
+                        if (win === null) {
+                            createWindow()
+                        }
+                    }
+                },
+                {
+                    label: 'Exit',
+                    click: () => {
+                        app.quit();
+                    }
+                }]
         }, {
             label: 'Edit',
-            submenu: [{
-                label: 'Undo',
-                accelerator: 'CmdOrCtrl+Z',
-                role: 'undo'
-            }]
+            submenu: [
+                {
+                    label: "Undo",
+                    accelerator: "CmdOrCtrl+Z",
+                    selector: "undo:"
+                },
+                {
+                    label: "Redo",
+                    accelerator: "Shift+CmdOrCtrl+Z",
+                    selector: "redo:"
+                },
+                {
+                    type: "separator"
+                },
+                {
+                    label: "Cut",
+                    accelerator: "CmdOrCtrl+X",
+                    selector: "cut:"
+                },
+                {
+                    label: "Copy",
+                    accelerator: "CmdOrCtrl+C",
+                    selector: "copy:"
+                },
+                {
+                    label: "Paste",
+                    accelerator: "CmdOrCtrl+V",
+                    selector: "paste:"
+                },
+                {
+                    label: "Select All",
+                    accelerator: "CmdOrCtrl+A",
+                    selector: "selectAll:"
+                }
+            ]
         }, {
             label: 'View',
             submenu: [{
