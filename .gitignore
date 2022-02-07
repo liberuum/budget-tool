@@ -6,3 +6,4 @@ credentials_copy.json
 token.json
 .env
 /dist
+.DS_Store

@@ -52,9 +52,10 @@ function createWindow() {
 }
 
 if (isDev) {
-    require('electron-reload')(__dirname, {
-        electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
-    })
+    if (!process.platform === 'darwin')
+        require('electron-reload')(__dirname, {
+            electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
+        })
 }
 
 if (process.platform === 'darwin') {
