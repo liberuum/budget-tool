@@ -2,12 +2,22 @@ exports.createTemplate = app => {
     return [
         {
             label: process.platform === 'darwin' ? app.getName() : 'Menu',
-            submenu: [{
-                label: 'Exit',
-                click: () => {
-                    app.quit();
-                }
-            }]
+            submenu: [
+                {
+                    label: "New",
+                    accelerator: "Command+N",
+                    click: () => {
+                        if (win === null) {
+                            createWindow()
+                        }
+                    }
+                },
+                {
+                    label: 'Exit',
+                    click: () => {
+                        app.quit();
+                    }
+                }]
         }, {
             label: 'Edit',
             submenu: [{
