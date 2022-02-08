@@ -21,7 +21,7 @@ export default function Table() {
 
 
     const [inputSheetValue, setInputSheetValue] = useState('');
-    const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false });
+    const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false, duplicate: false });
 
     const handleInput = (value) => {
         const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
@@ -30,7 +30,7 @@ export default function Table() {
             setValidatedInput({ variant: 'inputError', })
         } else {
             if (result[0] !== undefined && result[1] !== undefined && result[2] !== undefined) {
-                setValidatedInput({ variant: null, valid: true })
+                setValidatedInput({ variant: null, valid: true, duplicate: isDuplicateLink(result[1]) })
             } else {
                 setValidatedInput({ variant: 'inputError', })
             }
@@ -49,6 +49,17 @@ export default function Table() {
 
     const handleTableRowDelete = (e) => {
         dispatch(removeLinkData(e.target.getAttribute('name')))
+    }
+
+    const isDuplicateLink = (sheetId) => {
+        let response = tableData.filter(row => {
+            return row.spreadsheetId === sheetId
+        })
+        if (response.length == 0) {
+            return false
+        } else {
+            return true
+        }
     }
 
     return (
@@ -116,21 +127,28 @@ export default function Table() {
                         onChange={e => handleInput(e.target.value)}
                     ></Input>
                     {
-                        !validatedInput.valid && inputSheetValue ?  (<Text sx={{ m: 0 }} variant="smallError">
-                        Link is not valid, make sure to copy full link
-                    </Text>) : ''
+                        !validatedInput.valid && inputSheetValue ? (<Text sx={{ m: 0 }} variant="smallError">
+                            Link is not valid, make sure to copy full link
+                        </Text>) : ''
                     }
-                    
+
                 </Box>
                 <Box>
                     <Button
                         sx={{
                             mt: '10px'
                         }}
-                        disabled={!validatedInput.valid ? true : false}
+                        disabled={validatedInput.valid && !validatedInput.duplicate ? false : true}
                         onClick={handleAddSheet}
                     >Add Sheet</Button>
-                    {validatedInput.valid ? (<Badge sx={{mx: '2'}}>Link is valid</Badge>) : ''}
+                    {validatedInput.valid ?
+                        (
+                            validatedInput.duplicate ?
+                                <Badge sx={{ mx: '2', bg: 'orange', color: 'black' }}>Duplicate Link</Badge>
+                                :
+                                <Badge sx={{ mx: '2' }}>Valid Link</Badge>
+                        )
+                        : ''}
                 </Box>
             </Card>
         </Container>
