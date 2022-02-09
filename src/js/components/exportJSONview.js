@@ -11,8 +11,6 @@ export default function JSONView() {
         if (item.spreadsheetId == spreadsheetId)
         return item
     })
-    
-
     const prepJson = () => {
         let json = ""
         if (filtered.length !== 0) {
@@ -32,11 +30,11 @@ export default function JSONView() {
             }
 
             let outputObj = { actuals: newArr };
-            json = JSON.stringify(outputObj);
+            json = JSON.stringify(outputObj, null, 2);
         } else {
             json = ''
         }
-        return json;
+        return json
     }
 
     let result = prepJson()
