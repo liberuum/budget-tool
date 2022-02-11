@@ -21,7 +21,7 @@ export default function Table() {
 
 
     const [inputSheetValue, setInputSheetValue] = useState('');
-    const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false, duplicate: false });
+    const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false, duplicate: false, linkError: false });
 
     const handleInput = (value) => {
         const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
@@ -42,9 +42,13 @@ export default function Table() {
         event.preventDefault()
         setInputSheetValue('')
         setValidatedInput({ variant: null, })
-        const { rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
-        const { actuals, mdText } = await processData(rawData);
-        dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actuals, mdText }))
+        const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
+        if (error) {
+            setValidatedInput({ linkError: true })
+        } else {
+            const { actuals, mdText } = await processData(rawData);
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actuals, mdText }))
+        }
     }
 
     const handleTableRowDelete = (e) => {
@@ -129,6 +133,11 @@ export default function Table() {
                     {
                         !validatedInput.valid && inputSheetValue ? (<Text sx={{ m: 0 }} variant="smallError">
                             Link is not valid, make sure to copy full link
+                        </Text>) : ''
+                    }
+                    {
+                        validatedInput.linkError ? (<Text sx={{ m: 0 }} variant="smallError">
+                            Can't access link, make sure you have access to your spreadsheet
                         </Text>) : ''
                     }
 

@@ -109,10 +109,15 @@ ipcMain.handle('checkToken', async (event, args) => {
 })
 
 ipcMain.handle('getSheetInfo', async (evemt, args) => {
-    // console.log('Getting Link in Main:', await args)
-    const { spreadSheetTitle, sheetName, spreadsheetId } = await parseSpreadSheetLink(args);
-    const rawData = await fetchData(spreadsheetId, sheetName);
-    return { spreadSheetTitle, sheetName, spreadsheetId, rawData }
+    try {
+        // console.log('Getting Link in Main:', await args)
+        const { spreadSheetTitle, sheetName, spreadsheetId } = await parseSpreadSheetLink(args);
+        const rawData = await fetchData(spreadsheetId, sheetName);
+        return { spreadSheetTitle, sheetName, spreadsheetId, rawData }
+
+    } catch (error) {
+        return { error };
+    }
 })
 
 ipcMain.handle('reset-credentials', async () => {
