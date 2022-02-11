@@ -43,6 +43,7 @@ export default function Table() {
         setInputSheetValue('')
         setValidatedInput({ variant: null, })
         const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
+        console.log('raw data:', rawData)
         if (error) {
             setValidatedInput({ linkError: true })
         } else {

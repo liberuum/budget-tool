@@ -93,7 +93,7 @@ async function fetchData(spreadsheetId, sheetName) {
     try {
         const auth = await authorize();
         const sheets = google.sheets('v4');
-        const range = `${sheetName}!A11:X38`
+        const range = `${sheetName}`
         const response = await sheets.spreadsheets.values.get({ auth, spreadsheetId, range })
         const rows = response.data.values
         if (rows.length == 0) {
