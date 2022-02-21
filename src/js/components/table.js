@@ -13,6 +13,8 @@ export default function Table() {
     const dispatch = useDispatch();
     const tableData = useSelector((tableData) => tableData.tableData.links);
 
+    console.log('tableData:', tableData)
+
     useEffect(async () => {
         const { state, authClient } = await electron.checkToken();
         dispatch(storeAuthObject(authClient));
@@ -46,8 +48,8 @@ export default function Table() {
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
-            const { actuals, mdText } = await processData(rawData);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actuals, mdText }))
+            const { actualsByMonth, mdTextByMonth } = await processData(rawData);
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, mdTextByMonth }))
         }
     }
 
