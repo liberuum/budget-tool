@@ -17,9 +17,9 @@ export default function MDView() {
     const [md, setMd] = useState('')
 
     useEffect(() => {
+        getMonth(selectedMonth)
 
-
-    }, [md])
+    }, [getMonth, md])
 
     let keys = []
     if (monthsArr !== undefined) {
@@ -42,13 +42,18 @@ export default function MDView() {
 
 
     const getMonth = (selectedMonth) => {
-        let mdFormat = ' '
-        let md = monthsArr.mdTextByMonth.filter(month => {
-            return Object.entries(month)[0][0] === selectedMonth
-        })
-        mdFormat = md[0][selectedMonth];
-        setMd(mdFormat);
+        if (selectedMonth !== undefined) {
+            let mdFormat = ' '
+            let md = monthsArr.mdTextByMonth.filter(month => {
+                return Object.entries(month)[0][0] === selectedMonth
+            })
+            mdFormat = md[0][selectedMonth];
+            setMd(mdFormat);
+        }
+
     }
+
+
 
     return (
         <Container >

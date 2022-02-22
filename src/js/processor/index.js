@@ -28,7 +28,7 @@ export default async function processData(rawData) {
     for (const month in actualsByMonth) {
         const mdExporter = new MdExporter(expenseTagsByMonth[month]);
         mdExporter.getActuals(actualsByMonth[month]);
-        console.log('actuals in md', mdExporter.actuals)
+        // console.log('actuals in md', mdExporter.actuals)
         // console.log('expenseTags in md', mdExporter.expenseTags)
         mdExporter.buildTableRowObject();
         mdTextObj[month] = mdExporter.getMdData();
