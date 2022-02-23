@@ -21,13 +21,11 @@ export default class MdExporter {
     tableRows = '';
     item = ''
 
-    // async fetchActuals() {
-    //     this.actuals = await get('novemberActuals');
-    // }
-
     getActuals(actuals) {
         this.actuals = actuals;
     }
+
+
 
     buildTableRowObject() {
         this.expenseTags.forEach(tag => {

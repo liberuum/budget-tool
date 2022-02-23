@@ -5,15 +5,37 @@ import MdExporter from './mdExporter.js';
 export default async function processData(rawData) {
     const processor = new Processor();
     processor.getRawData(rawData);
-    const processedData = processor.processData()
+    processor.processData()
 
+    // Getting actuals by month
     const crunchData = new CrunchData();
-    const actuals = crunchData.crunchData(processedData);
+    const actualsByMonth = {};
+    const expenseTagsByMonth = {}
 
-    const mdExporter = new MdExporter(crunchData.expenseTags);
-    mdExporter.getActuals(actuals)
-    mdExporter.buildTableRowObject();
-    const mdText = mdExporter.getMdData()
-    
-    return { actuals, mdText };
+    for (const month in processor.filteredByMonth) {
+        crunchData.getData(processor.filteredByMonth[month])
+        actualsByMonth[month] = crunchData.crunchData();
+        expenseTagsByMonth[month] = crunchData.expenseTags
+        crunchData.actuals = []
+        crunchData.data = []
+    }
+
+    //Getting MDText by month
+    let mdTextObj = {}
+    const mdTextByMonth = []
+
+
+    for (const month in actualsByMonth) {
+        const mdExporter = new MdExporter(expenseTagsByMonth[month]);
+        mdExporter.getActuals(actualsByMonth[month]);
+        // console.log('actuals in md', mdExporter.actuals)
+        // console.log('expenseTags in md', mdExporter.expenseTags)
+        mdExporter.buildTableRowObject();
+        mdTextObj[month] = mdExporter.getMdData();
+        mdTextByMonth.push(mdTextObj);
+        mdTextObj = {}
+    }
+
+
+    return { actualsByMonth, mdTextByMonth };
 }
