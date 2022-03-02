@@ -23,11 +23,16 @@ export default class Processor {
         }
     }
 
-    selectNextFilter() {
+    selectNextFilter(addNewIfNeeded = true) {
         if (this.filters.length < 1 || this.filterIndex === this.filters.length - 1) {
-            this.addNewFilter()
+            if (addNewIfNeeded) {
+                this.addNewFilter()
+                return true;
+            }
+            return false;
         } else {
             this.filterIndex++;
+            return true;
         }
     }
 
@@ -43,55 +48,64 @@ export default class Processor {
             column: null,
             index: null,
             certain: false,
-            labels: ['!direct', 'Direct']
+            labels: ['!direct', 'Direct'],
+            parseFunction: null
         },
         forecast: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!forecast', 'Forecast']
+            labels: ['!forecast', 'Forecast'],
+            parseFunction: 'tryParseNumber'
         },
         estimate: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!estimate', 'Estimate']
+            labels: ['!estimate', 'Estimate'],
+            parseFunction: 'tryParseNumber'
         },
         actual: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!actual', 'Actual']
+            labels: ['!actual', 'Actual'],
+            parseFunction: 'tryParseNumber'
         },
         owed: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!owed', 'Owed']
+            labels: ['!owed', 'Owed'],
+            parseFunction: 'tryParseNumber'
         },
         paid: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!paid', 'Paid (Dai)']
+            labels: ['!paid', 'Paid (Dai)'],
+            parseFunction: 'tryParseNumber'
         },
         category: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!category', 'Budget Category']
+            labels: ['!category', 'Budget Category'],
+            parseFunction: null
         },
         month: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!month', 'Month']
+            labels: ['!month', 'Month'],
+            parseFunction: null
         },
         transaction: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!transaction', 'Transaction']
+            labels: ['!transaction', 'Transaction'],
+            parseFunction: null
         }
     }
 
@@ -106,7 +120,7 @@ export default class Processor {
         Month: 'String'
     };
     rawData = [];
-    cleanedSheet = [];
+    parsedRows = [];
     monthList = []
     dataObjects = [];
     parsedData = [];
@@ -115,7 +129,7 @@ export default class Processor {
     // function calls are done in sequence
     processData = () => {
         this.updateFilter()
-        this.clearRawData()
+        this.parseRowData()
         this.buildJson()
         this.getListOfMonths()
         this.parseTypes()
@@ -134,29 +148,59 @@ export default class Processor {
         console.log('updated filters', this.filters)
     }
 
-    clearRawData = () => {
-        let arrFilter = Object.entries(this.currentFilter());
-        let arr = []
 
-        for (let i = 7; i < this.rawData.length; i++) {
-            for (let item = 0; item < arrFilter.length; item++) {
-                let rowItem = this.rawData[i][arrFilter[item][1].column]
-                if (rowItem === undefined) {
-                    arr = []
-                    break;
-                }
-                arr.push(rowItem)
-            }
-            this.cleanedSheet.push(arr)
-            arr = []
+    isValidMonth(month) {
+        if (typeof month != "string") return false // we only process strings!  
+        return month.length > 0;
+    }
+
+    isValidNumber(actual) {
+        return typeof actual === 'number';
+    }
+
+    isValidExpenseRow(rowCandidate) {
+        let result = this.isValidMonth(rowCandidate.month) && (this.isValidNumber(rowCandidate.actual) || this.isValidNumber(rowCandidate.forecast) || this.isValidNumber(rowCandidate.estimate) || this.isValidNumber(rowCandidate.paid))
+        if (result == false) {
+            console.log('rejected rowCandidate', rowCandidate, this.isValidMonth(rowCandidate.month), this.isValidNumber(rowCandidate.actual), this.isValidNumber(rowCandidate.forecast), this.isValidNumber(rowCandidate.estimate))
         }
+        return result;
+    }
 
-        console.log('cleaned Sheet:', this.cleanedSheet)
+    parseRowData = () => {
+        this.resetFilterIndex();
+        do {
+            let arrFilter = Object.entries(this.currentFilter());
+            let arr = {}
+            console.log('Parsing with filter,', this.currentFilter())
+            for (let i = 0; i < this.rawData.length; i++) {
+                for (let item = 0; item < arrFilter.length; item++) {
+                    // console.log('this.rawData[i]', this.rawData[i])
+                    // console.log('arrFilter', arrFilter[item][1])
+                    if (arrFilter[item][1].certain) {
+                        let cellValue = this.rawData[i][arrFilter[item][1].column]
+                        if (arrFilter[item][1].parseFunction) {
+                            arr[arrFilter[item][0]] = this[arrFilter[item][1].parseFunction](cellValue)
+                        } else {
+                            arr[arrFilter[item][0]] = cellValue;
+                        }
+                    }
+                }
+                // need wrap arounf if 
+                if (this.isValidExpenseRow(arr)) {
+                    this.parsedRows.push(arr)
+                    arr = []
+                }
+            }
+
+            console.log('parsedRows:', this.parsedRows)
+        }
+        while (this.selectNextFilter(false))
+
     }
 
     buildJson = () => {
         Object.entries(this.currentFilter())[0][1].labels[1]
-        for (const arr of this.cleanedSheet) {
+        for (const arr of this.parsedRows) {
             let rowObject = {};
             for (let i = 0; i < arr.length; i++) {
                 rowObject[Object.entries(this.currentFilter())[i][1].labels[1]] = arr[i]
@@ -242,15 +286,16 @@ export default class Processor {
         // console.log('parsedData', this.parsedData)
     }
 
+    tryParseNumber(numberString) {
+        const regex = /[^,]*/g;
+        if (typeof numberString !== 'string' || numberString.length < 1) {
+            return numberString;
+        }
+        let result = parseFloat(numberString.match(regex).join(''));
+        return isNaN(result) ? numberString : result;
+    }
 
-    // addDataToDb = async () => {
-    //     if (this.parsedData.length !== 0) {
-    //         console.log('Adding data to MongoDB')
-    //         await addData(this.parsedData, 'budgetLineItems');
-    //         console.log('finished adding parsed data to DB', this.parsedData.length)
-    //     } else {
-    //         console.log('no data found in parsedData', this.parsedData)
-    //     }
-    // }
+
+    // parse the direct into boolean
 
 }
