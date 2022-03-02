@@ -3,7 +3,42 @@
 export default class Processor {
     constructor() { };
 
-    filters = {
+    filterIndex = null;
+
+    // having multiple filter templates
+    filters = [];
+
+    //deep copy
+    addNewFilter() {
+        let copy = JSON.parse(JSON.stringify(this.filterTemplate));
+        this.filters.push(copy);
+        this.filterIndex = this.filters.length - 1; // sets the index to filter 
+    }
+
+    resetFilterIndex() {
+        if (this.filters.length < 1) {
+            this.addNewFilter();
+        } else {
+            this.filterIndex = 0;
+        }
+    }
+
+    selectNextFilter() {
+        if (this.filters.length < 1 || this.filterIndex === this.filters.length - 1) {
+            this.addNewFilter()
+        } else {
+            this.filterIndex++;
+        }
+    }
+
+    currentFilter() {
+        if (this.filters.length < 1) {
+            this.selectNextFilter()
+        }
+        return this.filters[this.filterIndex]
+    }
+
+    filterTemplate = {
         direct: {
             column: null,
             index: null,
@@ -51,6 +86,12 @@ export default class Processor {
             index: null,
             certain: false,
             labels: ['!month', 'Month']
+        },
+        transaction: {
+            column: null,
+            index: null,
+            certain: false,
+            labels: ['!transaction', 'Transaction']
         }
     }
 
@@ -82,18 +123,19 @@ export default class Processor {
     }
 
     getRawData = (data) => {
+        console.log('raw data', data)
         this.rawData = data;
     }
 
     updateFilter = () => {
         for (let i = 0; i < this.rawData.length; i++) {
-            this.isFilterRow(this.rawData[i], i)
+            this.tryParseFilterRow(this.rawData[i], i)
         }
-        // console.log('updated filters', this.filters)
+        console.log('updated filters', this.filters)
     }
 
     clearRawData = () => {
-        let arrFilter = Object.entries(this.filters);
+        let arrFilter = Object.entries(this.currentFilter());
         let arr = []
 
         for (let i = 7; i < this.rawData.length; i++) {
@@ -109,15 +151,15 @@ export default class Processor {
             arr = []
         }
 
-        // console.log('cleaned Sheet:', this.cleanedSheet)
+        console.log('cleaned Sheet:', this.cleanedSheet)
     }
 
     buildJson = () => {
-        Object.entries(this.filters)[0][1].labels[1]
+        Object.entries(this.currentFilter())[0][1].labels[1]
         for (const arr of this.cleanedSheet) {
             let rowObject = {};
             for (let i = 0; i < arr.length; i++) {
-                rowObject[Object.entries(this.filters)[i][1].labels[1]] = arr[i]
+                rowObject[Object.entries(this.currentFilter())[i][1].labels[1]] = arr[i]
             }
             this.dataObjects.push(rowObject)
         }
@@ -146,17 +188,30 @@ export default class Processor {
     }
 
 
-    isFilterRow = (arr, index) => {
-        let filterArr = Object.entries(this.filters)
-        for (let i = 0; i < filterArr.length; i++) {
-            if (arr.includes(filterArr[i][1]['labels'][0])) {
-                this.filters[filterArr[i][0]].column = arr.indexOf(filterArr[i][1]['labels'][0]);
-                this.filters[filterArr[i][0]].certain = true;
-                this.filters[filterArr[i][0]].index = index;
-                // console.log(`Found Index nr: ${arr.indexOf(filterArr[i][1]['labels'][0])} of Column with label: ${filterArr[i][1]['labels'][0]}`);
+    matchesFilterTag(cellData, tag) {
+        let t = cellData.toLowerCase().trim();
+        return t == tag
+
+    }
+
+    tryParseFilterRow = (arr, rowIndex) => {
+        // console.log('arr in tryParse', arr)
+        this.resetFilterIndex();
+        for (let i = 0; i < arr.length; i++) {
+            if (this.matchesFilterTag(arr[i], '!next')) {
+                this.selectNextFilter();
+                console.log('selecting next Filter', this.filterIndex)
+            }
+            let filterArr = Object.entries(this.currentFilter())
+            for (let j = 0; j < filterArr.length; j++) {
+                if (this.matchesFilterTag(arr[i], filterArr[j][1]['labels'][0])) {
+                    this.currentFilter()[filterArr[j][0]].certain = true;
+                    this.currentFilter()[filterArr[j][0]].column = i;
+                    this.currentFilter()[filterArr[j][0]].index = rowIndex;
+                    console.log('Matched column', this.currentFilter()[filterArr[j][0]])
+                }
             }
         }
-        // return true;
     }
 
     // coerce data types
