@@ -94,7 +94,7 @@ async function fetchData(spreadsheetId, sheetName) {
         const auth = await authorize();
         const sheets = google.sheets('v4');
         const range = `${sheetName}`
-        const response = await sheets.spreadsheets.values.get({ auth, spreadsheetId, range })
+        const response = await sheets.spreadsheets.values.get({ auth, spreadsheetId, range, valueRenderOption: 'UNFORMATTED_VALUE', dateTimeRenderOption: 'SERIAL_NUMBER' })
         const rows = response.data.values
         if (rows.length == 0) {
             console.log('No data found.')

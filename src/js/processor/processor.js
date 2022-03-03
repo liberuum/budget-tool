@@ -49,7 +49,7 @@ export default class Processor {
             index: null,
             certain: false,
             labels: ['!direct', 'Direct'],
-            parseFunction: null
+            parseFunction: 'tryParseBoolean'
         },
         forecast: {
             column: null,
@@ -83,7 +83,7 @@ export default class Processor {
             column: null,
             index: null,
             certain: false,
-            labels: ['!paid', 'Paid (Dai)'],
+            labels: ['!paid', 'Paid'],
             parseFunction: 'tryParseNumber'
         },
         category: {
@@ -98,7 +98,7 @@ export default class Processor {
             index: null,
             certain: false,
             labels: ['!month', 'Month'],
-            parseFunction: null
+            parseFunction: 'tryParseMonth'
         },
         transaction: {
             column: null,
@@ -109,49 +109,48 @@ export default class Processor {
         }
     }
 
-    parserConfig = {
-        Direct: 'Number',
-        Forecast: 'Number',
-        Estimate: 'Number',
-        Actual: 'Number',
-        Owed: 'Number',
-        'Paid (Dai)': 'Number',
-        'Budget Category': 'String',
-        Month: 'String'
-    };
+    // parserConfig = {
+    //     Direct: 'Number',
+    //     Forecast: 'Number',
+    //     Estimate: 'Number',
+    //     Actual: 'Number',
+    //     Owed: 'Number',
+    //     'Paid (Dai)': 'Number',
+    //     'Budget Category': 'String',
+    //     Month: 'String'
+    // };
     rawData = [];
     parsedRows = [];
     monthList = []
-    dataObjects = [];
-    parsedData = [];
+    // dataObjects = [];
+    // parsedData = [];
     filteredByMonth = {}
 
     // function calls are done in sequence
     processData = () => {
         this.updateFilter()
         this.parseRowData()
-        this.buildJson()
+        // this.buildJson()
         this.getListOfMonths()
-        this.parseTypes()
+        // this.parseTypes()
         this.filterByMonth()
     }
 
     getRawData = (data) => {
-        console.log('raw data', data)
         this.rawData = data;
+        console.log('rawData', this.rawData)
     }
 
     updateFilter = () => {
         for (let i = 0; i < this.rawData.length; i++) {
             this.tryParseFilterRow(this.rawData[i], i)
         }
-        console.log('updated filters', this.filters)
+        // console.log('updated filters', this.filters)
     }
 
 
     isValidMonth(month) {
-        if (typeof month != "string") return false // we only process strings!  
-        return month.length > 0;
+        return month instanceof Date;
     }
 
     isValidNumber(actual) {
@@ -161,7 +160,7 @@ export default class Processor {
     isValidExpenseRow(rowCandidate) {
         let result = this.isValidMonth(rowCandidate.month) && (this.isValidNumber(rowCandidate.actual) || this.isValidNumber(rowCandidate.forecast) || this.isValidNumber(rowCandidate.estimate) || this.isValidNumber(rowCandidate.paid))
         if (result == false) {
-            console.log('rejected rowCandidate', rowCandidate, this.isValidMonth(rowCandidate.month), this.isValidNumber(rowCandidate.actual), this.isValidNumber(rowCandidate.forecast), this.isValidNumber(rowCandidate.estimate))
+            // console.log('rejected rowCandidate', rowCandidate, this.isValidMonth(rowCandidate.month), this.isValidNumber(rowCandidate.actual), this.isValidNumber(rowCandidate.forecast), this.isValidNumber(rowCandidate.estimate))
         }
         return result;
     }
@@ -171,7 +170,8 @@ export default class Processor {
         do {
             let arrFilter = Object.entries(this.currentFilter());
             let arr = {}
-            console.log('Parsing with filter,', this.currentFilter())
+            // console.log('Parsing with filter,', this.currentFilter())
+            // 0 should be replaced by first row where it has valid values
             for (let i = 0; i < this.rawData.length; i++) {
                 for (let item = 0; item < arrFilter.length; item++) {
                     // console.log('this.rawData[i]', this.rawData[i])
@@ -186,9 +186,10 @@ export default class Processor {
                     }
                 }
                 // need wrap arounf if 
+                console.log('arr', arr.month)
                 if (this.isValidExpenseRow(arr)) {
-                    this.parsedRows.push(arr)
-                    arr = []
+                    this.parsedRows.push(this.cleanRecord(arr, this.currentFilter()))
+                    arr = {}
                 }
             }
 
@@ -196,44 +197,66 @@ export default class Processor {
         }
         while (this.selectNextFilter(false))
 
+        // for (let i = 0; i < this.parsedRows.length; i++) {
+        //     if (this.parsedRows[i].actual === '')
+        //         this.parsedRows[i].actual = 0;
+        //     if (this.parsedRows[i].estimate === '')
+        //         this.parsedRows[i].estimate = 0;
+        //     if (this.parsedRows[i].forecast === '')
+        //         this.parsedRows[i].forecast = 0;
+        //     if (this.parsedRows[i].owed === '')
+        //         this.parsedRows[i].owed = 0;
+        //     if (this.parsedRows[i].paid === '')
+        //         this.parsedRows[i].paid = 0;
+
+        // }
+
     }
 
-    buildJson = () => {
-        Object.entries(this.currentFilter())[0][1].labels[1]
-        for (const arr of this.parsedRows) {
-            let rowObject = {};
-            for (let i = 0; i < arr.length; i++) {
-                rowObject[Object.entries(this.currentFilter())[i][1].labels[1]] = arr[i]
-            }
-            this.dataObjects.push(rowObject)
+    cleanRecord(parsedRecord, filter) {
+        //Cleaning Month
+        let leading0 = parsedRecord.month.getMonth() + 1 < 10 ? '0' : ''
+        parsedRecord.monthString = `${parsedRecord.month.getFullYear()}-${leading0}${parsedRecord.month.getMonth() + 1}`
+
+        // checking on direct
+        if (!filter.direct.certain) {
+            parsedRecord.direct = true;
         }
 
-        // console.log('dataObjects', this.dataObjects)
+        // parsing empty string values
+        parsedRecord.actual = this.parseNumber(parsedRecord.actual)
+        parsedRecord.estimate = this.parseNumber(parsedRecord.estimate)
+        parsedRecord.owed = this.parseNumber(parsedRecord.owed)
+        parsedRecord.paid = this.parseNumber(parsedRecord.paid)
+        parsedRecord.forecast = this.parseNumber(parsedRecord.forecast)
+        return parsedRecord
     }
 
+
     filterByMonth = () => {
+        // console.log('months', this.monthList)
         for (let i = 0; i < this.monthList.length; i++) {
-            let month = this.parsedData.filter(object => {
-                return object.Month === this.monthList[i]
+            let month = this.parsedRows.filter(object => {
+                return object.monthString === this.monthList[i]
             })
             this.filteredByMonth[this.monthList[i]] = month;
         }
-        // console.log('filteredByMonth', this.filteredByMonth)
+        console.log('filteredByMonth', this.filteredByMonth)
 
     }
 
     getListOfMonths = () => {
         let duplicateTags = [];
-        for (const object of this.dataObjects) {
-            if (object.Month !== undefined)
-                duplicateTags.push(object.Month)
+        for (const object of this.parsedRows) {
+            if (object.monthString !== undefined)
+                duplicateTags.push(object.monthString)
         }
         this.monthList = [...new Set(duplicateTags)];
     }
 
 
     matchesFilterTag(cellData, tag) {
-        let t = cellData.toLowerCase().trim();
+        let t = cellData.toString().toLowerCase().trim();
         return t == tag
 
     }
@@ -244,7 +267,7 @@ export default class Processor {
         for (let i = 0; i < arr.length; i++) {
             if (this.matchesFilterTag(arr[i], '!next')) {
                 this.selectNextFilter();
-                console.log('selecting next Filter', this.filterIndex)
+                // console.log('selecting next Filter', this.filterIndex)
             }
             let filterArr = Object.entries(this.currentFilter())
             for (let j = 0; j < filterArr.length; j++) {
@@ -252,7 +275,7 @@ export default class Processor {
                     this.currentFilter()[filterArr[j][0]].certain = true;
                     this.currentFilter()[filterArr[j][0]].column = i;
                     this.currentFilter()[filterArr[j][0]].index = rowIndex;
-                    console.log('Matched column', this.currentFilter()[filterArr[j][0]])
+                    // console.log('Matched column', this.currentFilter()[filterArr[j][0]])
                 }
             }
         }
@@ -260,9 +283,12 @@ export default class Processor {
 
     // coerce data types
     parseNumber = (stringNumber) => {
-        const regex = /[^,]/g;
+        const regex = /[^,]*/g;
         let number = stringNumber;
         // console.log(`number ${number} state: ${number === ''}`)
+        if (!isNaN(stringNumber)) {
+            return stringNumber
+        }
         if (number === '') {
             return 0
         } else {
@@ -270,32 +296,74 @@ export default class Processor {
         }
     }
 
-    parseTypes = () => {
-        for (const object of this.dataObjects) {
-            let parsedObject = {};
-            for (const item in object) {
-                if (this.parserConfig[item] === 'Number') {
-                    parsedObject[item] = this.parseNumber(object[item])
-                }
-                else {
-                    parsedObject[item] = object[item]
-                }
-            }
-            this.parsedData.push(parsedObject);
-        }
-        // console.log('parsedData', this.parsedData)
-    }
+    // parseTypes = () => {
+    //     for (const object of this.dataObjects) {
+    //         let parsedObject = {};
+    //         for (const item in object) {
+    //             if (this.parserConfig[item] === 'Number') {
+    //                 parsedObject[item] = this.parseNumber(object[item])
+    //             }
+    //             else {
+    //                 parsedObject[item] = object[item]
+    //             }
+    //         }
+    //         this.parsedData.push(parsedObject);
+    //     }
+    //     // console.log('parsedData', this.parsedData)
+    // }
+
 
     tryParseNumber(numberString) {
         const regex = /[^,]*/g;
         if (typeof numberString !== 'string' || numberString.length < 1) {
-            return numberString;
+            return numberString
         }
+
         let result = parseFloat(numberString.match(regex).join(''));
         return isNaN(result) ? numberString : result;
+
     }
 
 
     // parse the direct into boolean
+    tryParseBoolean(directValue) {
+        if (!isNaN(directValue)) {
+            return directValue > 0
+        }
+        if (directValue === '1') {
+            return true
+        }
+        return false
+    }
+
+    tryParseMonth(serialNum) {
+        // console.log('input date ', serialNum)
+        serialNum = String(serialNum).split(".");
+        var ogDate;
+        var oneDay = 24 * 60 * 60 * 1000;
+        var firstDate = new Date(1899, 11, 30);
+        // console.log('serialNum[0]', serialNum)
+        var days = parseFloat(serialNum[0]);
+        if (isNaN(days) || days < 40000 || days > 50000) {
+            return null;
+        }
+        var ms = 0;
+        if (serialNum.length > 1) {
+            ms = parseFloat(serialNum[1]) * oneDay;
+            ms = String(ms).substring(0, 8);
+        }
+
+        // console.log('firstDate', firstDate.getDate(), firstDate.getDate() + days, days)
+
+        firstDate.setDate(firstDate.getDate() + days);
+
+
+        ogDate = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate(), 0, 0, 0, ms);
+        // console.log(ogDate);
+        return ogDate;
+    }
 
 }
+
+
+// it should only match rows after the tag is applied

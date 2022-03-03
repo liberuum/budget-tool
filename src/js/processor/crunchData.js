@@ -11,7 +11,7 @@ export default class CrunchData {
     sumValues(keyName, expenseTag, dataObject) {
         let total = 0;
         for (const object of dataObject) {
-            if (object['Budget Category'] === expenseTag) {
+            if (object['category'] === expenseTag) {
                 total += object[keyName]
             }
             // console.log(object[keyName])
@@ -33,8 +33,8 @@ export default class CrunchData {
     getTotalPaidDaiByEmptyBudgetCategory() {
         let total = 0;
         for (const obj of this.data) {
-            if (obj['Budget Category'] === '' && obj['Paid (Dai)'] !== 0) {
-                total += obj['Paid (Dai)']
+            if (obj['category'] === '' && obj['paid'] !== 0) {
+                total += obj['paid']
             }
         }
         return total;
@@ -44,8 +44,8 @@ export default class CrunchData {
         let duplicateTags = [];
         let expenseTags = []
         for (const object of this.data) {
-            if (object['Budget Category'] !== "") {
-                duplicateTags.push(object['Budget Category'])
+            if (object['category'] !== "") {
+                duplicateTags.push(object['category'])
 
             }
         }
@@ -56,19 +56,20 @@ export default class CrunchData {
     }
 
     setForecastByExpenseTag() {
-        const type = 'Forecast';
+        const type = 'forecast';
         let totalByExpenseTag = {};
         totalByExpenseTag.type = type;
 
         for (const expenseTag of this.expenseTags) {
             totalByExpenseTag[expenseTag] = this.sumValues(type, expenseTag, this.data)
         }
+        // console.log('total forecast', totalByExpenseTag)
         totalByExpenseTag.total = this.getTotalByBudgetVariance(totalByExpenseTag)
         this.actuals.push(totalByExpenseTag)
     }
 
     setActualsByExpenseTag() {
-        const type = 'Actual';
+        const type = 'actual';
         let totalByExpenseTag = {};
         totalByExpenseTag.type = type;
 
@@ -80,7 +81,7 @@ export default class CrunchData {
     }
 
     setDifferenceByExpenseTag() {
-        const type = 'Difference';
+        const type = 'difference';
         let totalByExpenseTag = {};
         totalByExpenseTag.type = type;
 
@@ -92,7 +93,7 @@ export default class CrunchData {
     }
 
     setPaymentsByExpenseTag() {
-        const type = 'Paid (Dai)'
+        const type = 'paid'
         let totalByExpenseTag = {};
         totalByExpenseTag.type = type;
 
@@ -107,7 +108,7 @@ export default class CrunchData {
     getActAndDiff() {
         let actAndDiff = {};
         // extract actual and forecast object
-        for (const type of ['Actual', 'Forecast'])
+        for (const type of ['actual', 'forecast'])
             for (const actual of this.actuals) {
                 if (actual.type === type)
                     actAndDiff[type] = actual;
@@ -120,12 +121,12 @@ export default class CrunchData {
     calcDifference() {
         let actAndDiff = this.getActAndDiff()
         let differenceObj = {
-            type: 'Difference'
+            type: 'difference'
         }
         for (const tag of this.expenseTags) {
-            differenceObj[tag] = actAndDiff.Actual[tag] - actAndDiff.Forecast[tag];
+            differenceObj[tag] = actAndDiff.actual[tag] - actAndDiff.forecast[tag];
         }
-        differenceObj.total = actAndDiff.Actual.total - actAndDiff.Forecast.total;
+        differenceObj.total = actAndDiff.actual.total - actAndDiff.forecast.total;
 
         this.actuals.push(differenceObj)
     }
@@ -139,16 +140,16 @@ export default class CrunchData {
         return this.actuals;
     }
 
-    async uploadData() {
-        console.log('Storing Actuals');
-        await addData(this.actuals, 'novemberActuals')
-    }
+    // async uploadData() {
+    //     console.log('Storing Actuals');
+    //     await addData(this.actuals, 'novemberActuals')
+    // }
 
     async getData(filteredByMonth) {
         this.data = []
         this.data = filteredByMonth
-        // console.log(this.data['June 2021'])
         this.expenseTags = this.getExpenseTags()
+        // console.log('raw data for crunching',this.data)
 
     }
 
