@@ -109,21 +109,9 @@ export default class Processor {
         }
     }
 
-    // parserConfig = {
-    //     Direct: 'Number',
-    //     Forecast: 'Number',
-    //     Estimate: 'Number',
-    //     Actual: 'Number',
-    //     Owed: 'Number',
-    //     'Paid (Dai)': 'Number',
-    //     'Budget Category': 'String',
-    //     Month: 'String'
-    // };
     rawData = [];
     parsedRows = [];
     monthList = []
-    // dataObjects = [];
-    // parsedData = [];
     filteredByMonth = {}
 
     // function calls are done in sequence
@@ -138,7 +126,7 @@ export default class Processor {
 
     getRawData = (data) => {
         this.rawData = data;
-        console.log('rawData', this.rawData)
+        // console.log('rawData', this.rawData)
     }
 
     updateFilter = () => {
@@ -185,31 +173,16 @@ export default class Processor {
                         }
                     }
                 }
-                // need wrap arounf if 
-                console.log('arr', arr.month)
+                // console.log('arr', arr.month)
                 if (this.isValidExpenseRow(arr)) {
                     this.parsedRows.push(this.cleanRecord(arr, this.currentFilter()))
                     arr = {}
                 }
             }
 
-            console.log('parsedRows:', this.parsedRows)
+            // console.log('parsedRows:', this.parsedRows)
         }
         while (this.selectNextFilter(false))
-
-        // for (let i = 0; i < this.parsedRows.length; i++) {
-        //     if (this.parsedRows[i].actual === '')
-        //         this.parsedRows[i].actual = 0;
-        //     if (this.parsedRows[i].estimate === '')
-        //         this.parsedRows[i].estimate = 0;
-        //     if (this.parsedRows[i].forecast === '')
-        //         this.parsedRows[i].forecast = 0;
-        //     if (this.parsedRows[i].owed === '')
-        //         this.parsedRows[i].owed = 0;
-        //     if (this.parsedRows[i].paid === '')
-        //         this.parsedRows[i].paid = 0;
-
-        // }
 
     }
 
@@ -218,17 +191,22 @@ export default class Processor {
         let leading0 = parsedRecord.month.getMonth() + 1 < 10 ? '0' : ''
         parsedRecord.monthString = `${parsedRecord.month.getFullYear()}-${leading0}${parsedRecord.month.getMonth() + 1}`
 
-        // checking on direct
+        // console.log('parsed record', parsedRecord)
         if (!filter.direct.certain) {
-            parsedRecord.direct = true;
+            parsedRecord.direct = true
         }
 
         // parsing empty string values
-        parsedRecord.actual = this.parseNumber(parsedRecord.actual)
-        parsedRecord.estimate = this.parseNumber(parsedRecord.estimate)
-        parsedRecord.owed = this.parseNumber(parsedRecord.owed)
-        parsedRecord.paid = this.parseNumber(parsedRecord.paid)
-        parsedRecord.forecast = this.parseNumber(parsedRecord.forecast)
+        if (parsedRecord.actual === !undefined)
+            parsedRecord.actual = this.parseNumber(parsedRecord.actual)
+        if (parsedRecord.estimate === !undefined)
+            parsedRecord.estimate = this.parseNumber(parsedRecord.estimate)
+        if (parsedRecord.owed === !undefined)
+            parsedRecord.owed = this.parseNumber(parsedRecord.owed)
+        if (parsedRecord.paid === !undefined)
+            parsedRecord.paid = this.parseNumber(parsedRecord.paid)
+        if (parsedRecord.forecast === !undefined)
+            parsedRecord.forecast = this.parseNumber(parsedRecord.forecast)
         return parsedRecord
     }
 
@@ -296,26 +274,11 @@ export default class Processor {
         }
     }
 
-    // parseTypes = () => {
-    //     for (const object of this.dataObjects) {
-    //         let parsedObject = {};
-    //         for (const item in object) {
-    //             if (this.parserConfig[item] === 'Number') {
-    //                 parsedObject[item] = this.parseNumber(object[item])
-    //             }
-    //             else {
-    //                 parsedObject[item] = object[item]
-    //             }
-    //         }
-    //         this.parsedData.push(parsedObject);
-    //     }
-    //     // console.log('parsedData', this.parsedData)
-    // }
-
-
     tryParseNumber(numberString) {
         const regex = /[^,]*/g;
         if (typeof numberString !== 'string' || numberString.length < 1) {
+            if (numberString === '')
+                return 0
             return numberString
         }
 
