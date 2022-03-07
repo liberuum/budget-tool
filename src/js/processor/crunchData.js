@@ -133,10 +133,10 @@ export default class CrunchData {
 
 
     crunchData() {
-        this.setForecastByExpenseTag();
-        this.setActualsByExpenseTag();
-        this.calcDifference()
-        this.setPaymentsByExpenseTag();
+        // this.setForecastByExpenseTag();
+        // this.setActualsByExpenseTag();
+        // this.calcDifference()
+        // this.setPaymentsByExpenseTag();
         return this.actuals;
     }
 
@@ -149,13 +149,46 @@ export default class CrunchData {
         this.data = []
         this.data = filteredByMonth
         this.expenseTags = this.getExpenseTags()
-        // console.log('raw data for crunching',this.data)
+
+        // console.log('iteraing', this.data)
+        // for (let key in this.data[0]) {
+        //     console.log(key)
+        // }
+
+        this.checkKeys()
 
     }
 
     // console.log(await get('novemberActuals')); 
 
+    // check if there's actuals, forecast, estimate, owed or paid in data. Then calculate.
+
+    checkKeys() {
+        const budgetKeys = ['forecast', 'actual', 'paid'];
+
+        for (let i = 0; i < budgetKeys.length; i++) {
+            if (this.data[0].hasOwnProperty(budgetKeys[i])) {
+                this.setTotalsByExpenseTag(budgetKeys[i])
+            }
+        }
+
+        // this.calcDifference()
+        console.log('logging actuals', this.actuals)
+    }
+
+    setTotalsByExpenseTag(type) {
+        let totalByExpenseTag = {};
+        totalByExpenseTag.type = type;
+
+        for (const expenseTag of this.expenseTags) {
+            totalByExpenseTag[expenseTag] = this.sumValues(type, expenseTag, this.data)
+        }
+        // console.log('total forecast', totalByExpenseTag)
+        totalByExpenseTag.total = this.getTotalByBudgetVariance(totalByExpenseTag);
+        if (type === 'paid')
+            totalByExpenseTag.total += this.getTotalPaidDaiByEmptyBudgetCategory()
+        this.actuals.push(totalByExpenseTag)
+    }
+
 }
-
-
 
