@@ -120,15 +120,21 @@ export default class CrunchData {
 
     calcDifference() {
         let actAndDiff = this.getActAndDiff()
-        let differenceObj = {
-            type: 'difference'
-        }
-        for (const tag of this.expenseTags) {
-            differenceObj[tag] = actAndDiff.actual[tag] - actAndDiff.forecast[tag];
-        }
-        differenceObj.total = actAndDiff.actual.total - actAndDiff.forecast.total;
+        if (actAndDiff.actual === undefined || actAndDiff.forecast === undefined ) {
+            return
+        } else {
+            let differenceObj = {
+                type: 'difference'
+            }
+            for (const tag of this.expenseTags) {
+                differenceObj[tag] = actAndDiff.actual[tag] - actAndDiff.forecast[tag];
+            }
+            differenceObj.total = actAndDiff.actual.total - actAndDiff.forecast.total;
 
-        this.actuals.push(differenceObj)
+            // this.actuals.push(differenceObj)
+            this.actuals.splice(this.actuals.length - 1, 0, differenceObj)
+        }
+
     }
 
 
@@ -164,16 +170,15 @@ export default class CrunchData {
     // check if there's actuals, forecast, estimate, owed or paid in data. Then calculate.
 
     checkKeys() {
-        const budgetKeys = ['forecast', 'actual', 'paid'];
+        const budgetKeys = ['forecast', 'estimate', 'actual', 'owed', 'paid'];
 
         for (let i = 0; i < budgetKeys.length; i++) {
             if (this.data[0].hasOwnProperty(budgetKeys[i])) {
                 this.setTotalsByExpenseTag(budgetKeys[i])
             }
         }
-
-        // this.calcDifference()
-        console.log('logging actuals', this.actuals)
+        this.calcDifference()
+        // console.log('logging actuals', this.actuals)
     }
 
     setTotalsByExpenseTag(type) {

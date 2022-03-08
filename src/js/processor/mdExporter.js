@@ -23,9 +23,23 @@ export default class MdExporter {
 
     getActuals(actuals) {
         this.actuals = actuals;
+        this.getTableColumns()
     }
 
-
+    getTableColumns() {
+        let table = `| Budget Category               |`;
+        for (let obj of this.actuals) {
+            table += `${obj.type}|`
+        }
+        table += `\n`
+        table += `| --------------------------- |`
+        for (let obj of this.actuals) {
+            table += ` ---------------------------: |`
+        }
+        table += `\n`
+        this.template = table;
+        // console.log('table', table)
+    }
 
     buildTableRowObject() {
         this.expenseTags.forEach(tag => {
