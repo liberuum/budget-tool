@@ -12,11 +12,11 @@ export default class MdExporter {
 
     actuals = []
 
-    template = `
-| Budget Category               | Forecast           | Actuals            | Difference          | Payments       |
-| ---------------------------   | -----------------: | -----------------: | ------------------: | -------------: |
-|                               | -                  | -                  | -                   |                |
-`;
+    //template = `
+    // | Budget Category               | Forecast           | Actuals            | Difference          | Payments       |
+    // | ---------------------------   | -----------------: | -----------------: | ------------------: | -------------: |
+    // |                               | -                  | -                  | -                   |                |
+    // `;
 
     tableRows = '';
     item = ''
@@ -79,11 +79,4 @@ export default class MdExporter {
         let output = Mustache.render(this.template);
         return output;
     }
-
-    // exportToMd() {
-    //     let output = Mustache.render(this.template);
-    //     fs.writeFileSync('./actuals.md', output);
-    //     console.log('Created/Updated actuals.md')
-    // }
-
 }

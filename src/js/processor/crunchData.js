@@ -55,56 +55,6 @@ export default class CrunchData {
 
     }
 
-    setForecastByExpenseTag() {
-        const type = 'forecast';
-        let totalByExpenseTag = {};
-        totalByExpenseTag.type = type;
-
-        for (const expenseTag of this.expenseTags) {
-            totalByExpenseTag[expenseTag] = this.sumValues(type, expenseTag, this.data)
-        }
-        // console.log('total forecast', totalByExpenseTag)
-        totalByExpenseTag.total = this.getTotalByBudgetVariance(totalByExpenseTag)
-        this.actuals.push(totalByExpenseTag)
-    }
-
-    setActualsByExpenseTag() {
-        const type = 'actual';
-        let totalByExpenseTag = {};
-        totalByExpenseTag.type = type;
-
-        for (const expenseTag of this.expenseTags) {
-            totalByExpenseTag[expenseTag] = this.sumValues(type, expenseTag, this.data)
-        }
-        totalByExpenseTag.total = this.getTotalByBudgetVariance(totalByExpenseTag)
-        this.actuals.push(totalByExpenseTag)
-    }
-
-    setDifferenceByExpenseTag() {
-        const type = 'difference';
-        let totalByExpenseTag = {};
-        totalByExpenseTag.type = type;
-
-        for (const expenseTag of this.expenseTags) {
-            totalByExpenseTag[expenseTag] = this.sumValues(type, expenseTag, this.data)
-        }
-        totalByExpenseTag.total = this.getTotalByBudgetVariance(totalByExpenseTag)
-        this.actuals.push(totalByExpenseTag)
-    }
-
-    setPaymentsByExpenseTag() {
-        const type = 'paid'
-        let totalByExpenseTag = {};
-        totalByExpenseTag.type = type;
-
-        for (const expenseTag of this.expenseTags) {
-            totalByExpenseTag[expenseTag] = this.sumValues(type, expenseTag, this.data)
-        }
-        totalByExpenseTag.total = this.getTotalByBudgetVariance(totalByExpenseTag)
-        totalByExpenseTag.total += this.getTotalPaidDaiByEmptyBudgetCategory()
-        this.actuals.push(totalByExpenseTag)
-    }
-
     getActAndDiff() {
         let actAndDiff = {};
         // extract actual and forecast object
@@ -139,27 +89,14 @@ export default class CrunchData {
 
 
     crunchData() {
-        // this.setForecastByExpenseTag();
-        // this.setActualsByExpenseTag();
-        // this.calcDifference()
-        // this.setPaymentsByExpenseTag();
         return this.actuals;
     }
 
-    // async uploadData() {
-    //     console.log('Storing Actuals');
-    //     await addData(this.actuals, 'novemberActuals')
-    // }
 
     async getData(filteredByMonth) {
         this.data = []
         this.data = filteredByMonth
         this.expenseTags = this.getExpenseTags()
-
-        // console.log('iteraing', this.data)
-        // for (let key in this.data[0]) {
-        //     console.log(key)
-        // }
 
         this.checkKeys()
 
