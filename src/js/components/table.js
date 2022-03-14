@@ -110,8 +110,8 @@ export default function Table() {
                                 <Text >{row.spreadSheetTitle}</Text>
                                 <Text >{row.sheetName}</Text>
                                 <Text >
-                                    <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}`)}>ExportMD </Button>
-                                    <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}`)}>Export JSON </Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}`)}>To MD </Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}`)}>To JSON </Button>
                                     <Button bg='red' variant='small' name={row.sheetName} onClick={handleTableRowDelete}>Delete</Button>
                                 </Text>
                             </Grid>

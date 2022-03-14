@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm';
-import { Card, Divider, Label, Container, Textarea, Select } from "theme-ui"
+import { Card, Divider, Label, Container, Textarea, Select, Button} from "theme-ui"
 
 
 export default function MDView() {
@@ -64,6 +64,11 @@ export default function MDView() {
                         return <option key={month}>{`${month}`}</option>
                     })}
                 </Select>
+            </Card>
+            <Card>
+                <Label>Choose Tyoe of View</Label>
+                <Button variant="smallOutline" >SF View</Button>
+                <Button variant="smallOutline" >SES View</Button>
             </Card>
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>MarkDown View for {selectedMonth}</Label>
