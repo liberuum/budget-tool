@@ -1,7 +1,4 @@
-// import { get } from './mongodb.js';
 import Mustache from 'mustache';
-// import fs from 'fs';
-
 
 export default class MdExporter {
     expenseTags = []

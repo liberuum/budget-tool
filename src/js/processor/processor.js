@@ -86,6 +86,13 @@ export default class Processor {
             labels: ['!paid', 'Paid'],
             parseFunction: 'tryParseNumber'
         },
+        budget: {
+            column: null,
+            index: null,
+            certain: false,
+            labels: ['!budget', 'Budget'],
+            parseFunction: 'tryParseNumber'
+        },
         category: {
             column: null,
             index: null,
@@ -111,8 +118,9 @@ export default class Processor {
 
     rawData = [];
     parsedRows = [];
-    monthList = []
-    filteredByMonth = {}
+    monthList = [];
+    filteredByMonth = {};
+    budgets = {};
 
     // function calls are done in sequence
     processData = () => {
@@ -153,7 +161,13 @@ export default class Processor {
         return result;
     }
 
+    isValidBudgetRow(rowCandidate) {
+        let result = this.isValidMonth(rowCandidate.month) && this.isValidNumber(rowCandidate.budget);
+        return result;
+    }
+
     parseRowData = () => {
+        this.budgets = {}
         this.resetFilterIndex();
         do {
             let arrFilter = Object.entries(this.currentFilter());
@@ -175,18 +189,26 @@ export default class Processor {
                 }
                 // console.log('arr', arr.month)
                 if (this.isValidExpenseRow(arr)) {
-                    this.parsedRows.push(this.cleanRecord(arr, this.currentFilter()))
+                    this.parsedRows.push(this.cleanRecord(arr, this.currentFilter(), this.budgets))
                     arr = {}
+                } else if (this.isValidBudgetRow(arr)) {
+                    this.processBudgetRow(arr, this.currentFilter(), this.budgets)
                 }
             }
 
             // console.log('parsedRows:', this.parsedRows)
+            console.log('budgets', this.budgets)
         }
         while (this.selectNextFilter(false))
 
     }
 
-    cleanRecord(parsedRecord, filter) {
+    processBudgetRow(parsedRecord, filter, budgets) {
+        this.cleanRecord(parsedRecord, filter, budgets)
+        console.log('mathed budget row', parsedRecord, this.budgets)
+    }
+
+    cleanRecord(parsedRecord, filter, budgets) {
         //Cleaning Month
         let leading0 = parsedRecord.month.getMonth() + 1 < 10 ? '0' : ''
         parsedRecord.monthString = `${parsedRecord.month.getFullYear()}-${leading0}${parsedRecord.month.getMonth() + 1}`
@@ -197,16 +219,42 @@ export default class Processor {
         }
 
         // parsing empty string values
-        if (parsedRecord.actual === !undefined)
-            parsedRecord.actual = this.parseNumber(parsedRecord.actual)
-        if (parsedRecord.estimate === !undefined)
+        let calculatedOwed = null;
+        if (parsedRecord.estimate !== undefined) {
             parsedRecord.estimate = this.parseNumber(parsedRecord.estimate)
-        if (parsedRecord.owed === !undefined)
+            calculatedOwed = parsedRecord.estimate
+        }
+        if (parsedRecord.actual !== undefined) {
+            parsedRecord.actual = this.parseNumber(parsedRecord.actual)
+            calculatedOwed = parsedRecord.actual
+        }
+        if (parsedRecord.owed !== undefined) {
             parsedRecord.owed = this.parseNumber(parsedRecord.owed)
-        if (parsedRecord.paid === !undefined)
+        } else {
+            parsedRecord.owed = calculatedOwed
+        }
+        if (!filter.paid.certain) {
+            parsedRecord.paid = parsedRecord.actual
+        } else if (parsedRecord.paid !== undefined) {
             parsedRecord.paid = this.parseNumber(parsedRecord.paid)
-        if (parsedRecord.forecast === !undefined)
+        }
+        if (parsedRecord.forecast !== undefined) {
             parsedRecord.forecast = this.parseNumber(parsedRecord.forecast)
+        }
+        if (parsedRecord.category === '') {
+            parsedRecord.category = 'payment topup';
+        }
+        if (parsedRecord.budget !== undefined) {
+            parsedRecord.budget = this.parseNumber(parsedRecord.budget)
+            if (budgets[parsedRecord.monthString] === undefined) {
+                budgets[parsedRecord.monthString] = {}
+            }
+            if (budgets[parsedRecord.monthString][parsedRecord.category] === undefined) {
+                budgets[parsedRecord.monthString][parsedRecord.category] = 0;
+            }
+            budgets[parsedRecord.monthString][parsedRecord.category] += parsedRecord.budget
+        }
+
         return parsedRecord
     }
 
