@@ -121,6 +121,7 @@ export default class Processor {
     monthList = [];
     filteredByMonth = {};
     budgets = {};
+    filteredByCategoryMonth = {}
 
     // function calls are done in sequence
     processData = () => {
@@ -130,6 +131,8 @@ export default class Processor {
         this.getListOfMonths()
         // this.parseTypes()
         this.filterByMonth()
+        this.filterByCategoryByMonth()
+        console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
     }
 
     getRawData = (data) => {
@@ -189,31 +192,32 @@ export default class Processor {
                 }
                 // console.log('arr', arr.month)
                 if (this.isValidExpenseRow(arr)) {
-                    this.parsedRows.push(this.cleanRecord(arr, this.currentFilter(), this.budgets))
+                    this.parsedRows.push(this.cleanRecord(arr, this.currentFilter(), this.budgets, this.filteredByCategoryMonth))
                     arr = {}
                 } else if (this.isValidBudgetRow(arr)) {
-                    this.processBudgetRow(arr, this.currentFilter(), this.budgets)
+                    this.processBudgetRow(arr, this.currentFilter(), this.budgets, this.filteredByCategoryMonth)
                 }
             }
 
-            // console.log('parsedRows:', this.parsedRows)
-            console.log('budgets', this.budgets)
+            // console.log('budgets', this.budgets)
         }
         while (this.selectNextFilter(false))
 
+        // console.log('parsedRows:', this.parsedRows)
+        // console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
+
     }
 
-    processBudgetRow(parsedRecord, filter, budgets) {
-        this.cleanRecord(parsedRecord, filter, budgets)
+    processBudgetRow(parsedRecord, filter, budgets, byCategoryMonth) {
+        this.cleanRecord(parsedRecord, filter, budgets, byCategoryMonth)
         // console.log('matched budget row', parsedRecord, this.budgets)
     }
 
-    cleanRecord(parsedRecord, filter, budgets) {
+    cleanRecord(parsedRecord, filter, budgets, byCategoryMonth) {
         //Cleaning Month
         let leading0 = parsedRecord.month.getMonth() + 1 < 10 ? '0' : ''
         parsedRecord.monthString = `${parsedRecord.month.getFullYear()}-${leading0}${parsedRecord.month.getMonth() + 1}`
 
-        // console.log('parsed record', parsedRecord)
         if (!filter.direct.certain) {
             parsedRecord.direct = true
         }
@@ -255,7 +259,37 @@ export default class Processor {
             budgets[parsedRecord.monthString][parsedRecord.category] += parsedRecord.budget
         }
 
+
+
+        // console.log('budgets', this.budgets)
         return parsedRecord
+    }
+
+    filterByCategoryByMonth = () => {
+
+        for (let row of this.parsedRows) {
+            if (!this.filteredByCategoryMonth.hasOwnProperty(row.category)) {
+                this.filteredByCategoryMonth[row.category] = {}
+            }
+
+            this.filteredByCategoryMonth[row.category][row.monthString] = {}
+            this.filteredByCategoryMonth[row.category][row.monthString]['actual'] = 0
+            this.filteredByCategoryMonth[row.category][row.monthString]['forecast'] = 0
+            this.filteredByCategoryMonth[row.category][row.monthString]['budget'] = 0
+            // console.log(`month ${parsedRecord.monthString} category: ${parsedRecord.category} ${parsedRecord.actual}`)
+
+
+            if (row.actual !== undefined) {
+                this.filteredByCategoryMonth[row.category][row.monthString]['actual'] += row.actual
+            }
+            if (row.forecast !== undefined) {
+                this.filteredByCategoryMonth[row.category][row.monthString]['forecast'] += row.forecast
+            }
+            if (row.budget !== undefined) {
+                this.filteredByCategoryMonth[row.category][row.monthString]['budget'] += row.budget
+            }
+            // console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
+        }
     }
 
 
