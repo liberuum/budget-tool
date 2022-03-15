@@ -132,7 +132,7 @@ export default class Processor {
         // this.parseTypes()
         this.filterByMonth()
         this.filterByCategoryByMonth()
-        console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
+        // console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
     }
 
     getRawData = (data) => {

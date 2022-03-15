@@ -1,6 +1,7 @@
 import Processor from './processor.js'
 import CrunchData from './crunchData.js';
 import MdExporter from './mdExporter.js';
+import SfMdExporter from './sfMdExporter.js';
 
 export default async function processData(rawData) {
     const processor = new Processor();
@@ -23,6 +24,9 @@ export default async function processData(rawData) {
     //Getting MDText by month
     let mdTextObj = {}
     const mdTextByMonth = []
+
+    const sfMdExporter = new SfMdExporter()
+    sfMdExporter.getCategoriesByMonth(processor.filteredByCategoryMonth)
 
 
     for (const month in actualsByMonth) {
