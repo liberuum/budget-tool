@@ -131,8 +131,8 @@ export default class Processor {
         this.getListOfMonths()
         // this.parseTypes()
         this.filterByMonth()
-        this.filterByCategoryByMonth()
-        // console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
+        this.filteredByCategoryMonth = this.filterByCategoryByMonth(this.parsedRows)
+        console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
     }
 
     getRawData = (data) => {
@@ -265,33 +265,75 @@ export default class Processor {
         return parsedRecord
     }
 
-    filterByCategoryByMonth = () => {
-
-        for (let row of this.parsedRows) {
-            if (!this.filteredByCategoryMonth.hasOwnProperty(row.category)) {
-                this.filteredByCategoryMonth[row.category] = {}
+    filterByCategoryByMonth = (parsedRows) => {
+        let result = {}
+        for (let i = 0; i < parsedRows.length; i++) {
+            let row = parsedRows[i]
+            if (!result.hasOwnProperty(row.category)) {
+                result[row.category] = {}
             }
 
-            this.filteredByCategoryMonth[row.category][row.monthString] = {}
-            this.filteredByCategoryMonth[row.category][row.monthString]['actual'] = 0
-            this.filteredByCategoryMonth[row.category][row.monthString]['forecast'] = 0
-            this.filteredByCategoryMonth[row.category][row.monthString]['budget'] = 0
-            // console.log(`month ${parsedRecord.monthString} category: ${parsedRecord.category} ${parsedRecord.actual}`)
-
+            if (!result[row.category].hasOwnProperty(row.monthString)) {
+                result[row.category][row.monthString] = {
+                    actual: 0,
+                    forecast: 0,
+                    budget: 0
+                }
+            }
 
             if (row.actual !== undefined) {
-                this.filteredByCategoryMonth[row.category][row.monthString]['actual'] += row.actual
+                result[row.category][row.monthString]['actual'] += row.actual
             }
             if (row.forecast !== undefined) {
-                this.filteredByCategoryMonth[row.category][row.monthString]['forecast'] += row.forecast
+                result[row.category][row.monthString]['forecast'] += row.forecast
             }
             if (row.budget !== undefined) {
-                this.filteredByCategoryMonth[row.category][row.monthString]['budget'] += row.budget
+                result[row.category][row.monthString]['budget'] += row.budget
             }
-            // console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
+
         }
+        console.log('result', result)
+        this.test(result)
+        return result;
     }
 
+    test(indexByCategoryByMonth) {
+        let result = {};
+        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-06');
+        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-07');
+        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-08');
+        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-09');
+    }
+
+    addSfTableSection(sfTable, indexByCategoryByMonth, month) {
+        let result = JSON.parse(JSON.stringify(sfTable));
+
+        if (result._newRow === undefined) {
+            result._newRow = {}
+        }
+
+        result._newRow[month] = {
+            actual: 0,
+            forecast: 0,
+            budget: 0
+        }
+
+      
+            for (const category in indexByCategoryByMonth) {
+                console.log('category', category);
+                if (result[category] === undefined) {
+                    result[category] = JSON.parse(JSON.stringify(result._newRow))
+                }
+                result[category][month].actual = indexByCategoryByMonth[month][category].actual
+                result[category][month].forecast = indexByCategoryByMonth[month][category].forecast
+                result[category][month].budget = indexByCategoryByMonth[month][category].budget
+            }
+        
+
+        console.log('new sfTable', result)
+
+        return result;
+    }
 
     filterByMonth = () => {
         // console.log('months', this.monthList)
