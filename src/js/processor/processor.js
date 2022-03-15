@@ -300,9 +300,10 @@ export default class Processor {
     test(indexByCategoryByMonth) {
         let result = {};
         result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-06');
-        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-07');
-        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-08');
-        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-09');
+        console.log('result in test', result)
+        // result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-07');
+        // result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-08');
+        // result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-09');
     }
 
     addSfTableSection(sfTable, indexByCategoryByMonth, month) {
@@ -318,19 +319,22 @@ export default class Processor {
             budget: 0
         }
 
-      
-            for (const category in indexByCategoryByMonth) {
-                console.log('category', category);
-                if (result[category] === undefined) {
-                    result[category] = JSON.parse(JSON.stringify(result._newRow))
-                }
-                result[category][month].actual = indexByCategoryByMonth[month][category].actual
-                result[category][month].forecast = indexByCategoryByMonth[month][category].forecast
-                result[category][month].budget = indexByCategoryByMonth[month][category].budget
+        // not all categories have same month
+        for (const category in indexByCategoryByMonth) {
+            // console.log('category', category);
+            if (result[category] === undefined) {
+                result[category] = JSON.parse(JSON.stringify(result._newRow))
             }
-        
 
-        console.log('new sfTable', result)
+            console.log('result[categry][month]',category,month, indexByCategoryByMonth)
+            // console.log('result[categry][month]', result[category][month]['actual'])
+            // result[category][month]['actual'] = indexByCategoryByMonth[category][month]['actual']
+            // result[category][month].forecast = indexByCategoryByMonth[category][month]['forecast']
+            // result[category][month].budget = indexByCategoryByMonth[category][month]['budget']
+        }
+
+
+        // console.log('new sfTable', result)
 
         return result;
     }
