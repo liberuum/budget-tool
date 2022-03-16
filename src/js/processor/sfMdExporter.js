@@ -76,7 +76,7 @@ export default class SfMdExporter {
             this.mdByMonth[month] = Mustache.render(monthTemplate);
 
         })
-        // console.log('mdByMonth', this.mdByMonth)
+        console.log('mdByMonth', this.mdByMonth)
     }
 
 
