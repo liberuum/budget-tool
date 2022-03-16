@@ -135,6 +135,7 @@ export default class Processor {
         this.getMonths()
         this.leveledMonthsByCategory = this.levelMonthsByCategory(this.filteredByCategoryMonth)
         console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
+        console.log('filteredByMonth', this.filteredByMonth)
     }
 
     getRawData = (data) => {
@@ -215,7 +216,7 @@ export default class Processor {
         // console.log('matched budget row', parsedRecord, this.budgets)
     }
 
-    cleanRecord(parsedRecord, filter, budgets, byCategoryMonth) {
+    cleanRecord(parsedRecord, filter, budgets) {
         //Cleaning Month
         let leading0 = parsedRecord.month.getMonth() + 1 < 10 ? '0' : ''
         parsedRecord.monthString = `${parsedRecord.month.getFullYear()}-${leading0}${parsedRecord.month.getMonth() + 1}`
@@ -299,14 +300,15 @@ export default class Processor {
     }
 
     levelMonthsByCategory(indexByCategoryByMonth) {
-        let months = JSON.parse(JSON.stringify(this.accountedMonths));
+        let monthsArr = JSON.parse(JSON.stringify(this.accountedMonths));
+        let months = this.addThreeMonths(monthsArr)
         let result = {};
 
         months.forEach(month => {
             result = this.addSfTableSection(result, indexByCategoryByMonth, month);
         })
         delete result._newRow
-        
+
         return result;
     }
 
@@ -367,6 +369,42 @@ export default class Processor {
             }
         })
         this.accountedMonths = [...new Set(months)]
+    }
+
+    addThreeMonths(monthsArr) {
+        let months = [...monthsArr]
+        let lastMonth = months[months.length - 1]
+        let toNumber = lastMonth.split('-');
+        let year = Number(toNumber[0])
+        let month = Number(toNumber[1])
+
+        let leading0 = month < 10 ? '0' : '';
+
+        let monthString = leading0 + String(month);
+        let yearString = String(year);
+
+
+        for (let i = 1; i <= 3; i++) {
+            let newMonth = month + i;
+            monthString = String(newMonth)
+
+            if (newMonth > 12) {
+                yearString = String(year + 1)
+            }
+            if (newMonth === 13) {
+                monthString = '01'
+            }
+            if (newMonth === 14) {
+                monthString = '02'
+            }
+            if (newMonth === 15) {
+                monthString = '03'
+            }
+
+            let result = yearString.concat('-').concat(monthString)
+            months.push(result)
+        }
+        return months;
     }
 
     filterByMonth = () => {

@@ -26,7 +26,7 @@ export default async function processData(rawData) {
     const mdTextByMonth = []
 
     const sfMdExporter = new SfMdExporter()
-    sfMdExporter.getCategoriesByMonth(processor.filteredByCategoryMonth)
+    sfMdExporter.getCategoriesByMonth(processor.leveledMonthsByCategory)
 
 
     for (const month in actualsByMonth) {
