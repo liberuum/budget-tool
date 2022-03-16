@@ -121,18 +121,20 @@ export default class Processor {
     monthList = [];
     filteredByMonth = {};
     budgets = {};
-    filteredByCategoryMonth = {}
+    filteredByCategoryMonth = {};
+    accountedMonths = [];
+    leveledMonthsByCategory = {}
 
     // function calls are done in sequence
     processData = () => {
         this.updateFilter()
         this.parseRowData()
-        // this.buildJson()
         this.getListOfMonths()
-        // this.parseTypes()
         this.filterByMonth()
         this.filteredByCategoryMonth = this.filterByCategoryByMonth(this.parsedRows)
-        console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
+        this.getMonths()
+        this.leveledMonthsByCategory = this.levelMonthsByCategory(this.filteredByCategoryMonth)
+        console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
     }
 
     getRawData = (data) => {
@@ -292,18 +294,20 @@ export default class Processor {
             }
 
         }
-        console.log('result', result)
-        this.test(result)
+        // console.log('result', result)
         return result;
     }
 
-    test(indexByCategoryByMonth) {
+    levelMonthsByCategory(indexByCategoryByMonth) {
+        let months = JSON.parse(JSON.stringify(this.accountedMonths));
         let result = {};
-        result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-06');
-        console.log('result in test', result)
-        // result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-07');
-        // result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-08');
-        // result = this.addSfTableSection(result, indexByCategoryByMonth, '2021-09');
+
+        months.forEach(month => {
+            result = this.addSfTableSection(result, indexByCategoryByMonth, month);
+        })
+        delete result._newRow
+        
+        return result;
     }
 
     addSfTableSection(sfTable, indexByCategoryByMonth, month) {
@@ -325,18 +329,44 @@ export default class Processor {
             if (result[category] === undefined) {
                 result[category] = JSON.parse(JSON.stringify(result._newRow))
             }
+            if (result[category][month] === undefined) {
+                result[category][month] = {}
+            }
 
-            console.log('result[categry][month]',category,month, indexByCategoryByMonth)
-            // console.log('result[categry][month]', result[category][month]['actual'])
-            // result[category][month]['actual'] = indexByCategoryByMonth[category][month]['actual']
-            // result[category][month].forecast = indexByCategoryByMonth[category][month]['forecast']
-            // result[category][month].budget = indexByCategoryByMonth[category][month]['budget']
+            if (indexByCategoryByMonth[category][month] === undefined) {
+                result[category][month]['actual'] = 0
+                result[category][month]['forecast'] = 0
+                result[category][month]['budget'] = 0
+            } else {
+                result[category][month].actual = indexByCategoryByMonth[category][month]['actual']
+                result[category][month].forecast = indexByCategoryByMonth[category][month]['forecast']
+                result[category][month].budget = indexByCategoryByMonth[category][month]['budget']
+
+            }
+
         }
 
 
         // console.log('new sfTable', result)
 
         return result;
+    }
+
+    getMonths() {
+        let filteredByMonth = JSON.parse(JSON.stringify(this.filteredByCategoryMonth));
+        let arrCategoriesByMonth = Object.entries(filteredByMonth);
+        let expenseTags = []
+        for (let [key, value] of arrCategoriesByMonth) {
+            expenseTags.push(key);
+        }
+
+        let months = [];
+        expenseTags.forEach(tag => {
+            for (let [key, value] of Object.entries(filteredByMonth[tag])) {
+                months.push(key)
+            }
+        })
+        this.accountedMonths = [...new Set(months)]
     }
 
     filterByMonth = () => {
@@ -347,7 +377,7 @@ export default class Processor {
             })
             this.filteredByMonth[this.monthList[i]] = month;
         }
-        console.log('filteredByMonth', this.filteredByMonth)
+        // console.log('filteredByMonth', this.filteredByMonth)
 
     }
 
