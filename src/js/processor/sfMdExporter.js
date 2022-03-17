@@ -22,7 +22,7 @@ export default class SfMdExporter {
         this.getExpenseTags()
         this.getMonths()
         this.totals = this.getTotalsByMonth();
-        console.log('totals', this.totals)
+        // console.log('totals', this.totals)
         this.loopOverExpenseTags()
     }
 
@@ -132,7 +132,7 @@ export default class SfMdExporter {
 
 
 
-        console.log('mdByMonth', this.mdByMonth)
+        // console.log('mdByMonth', this.mdByMonth)
     }
 
 

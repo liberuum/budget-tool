@@ -23,11 +23,11 @@ export default async function processData(rawData) {
 
     //Getting MDText by month
     let mdTextObj = {}
-    const mdTextByMonth = []
+    const mdTextByMonth = [];
 
     const sfMdExporter = new SfMdExporter()
     sfMdExporter.getCategoriesByMonth(processor.leveledMonthsByCategory)
-
+    const sfSummary = sfMdExporter.mdByMonth;
 
     for (const month in actualsByMonth) {
         const mdExporter = new MdExporter(expenseTagsByMonth[month]);
@@ -40,6 +40,7 @@ export default async function processData(rawData) {
         mdTextObj = {}
     }
 
+    // console.log('sfSummary', sfSummary)
 
-    return { actualsByMonth, mdTextByMonth };
+    return { actualsByMonth, mdTextByMonth, sfSummary };
 }

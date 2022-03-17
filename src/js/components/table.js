@@ -48,8 +48,8 @@ export default function Table() {
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
-            const { actualsByMonth, mdTextByMonth } = await processData(rawData);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, mdTextByMonth }))
+            const { actualsByMonth, mdTextByMonth, sfSummary } = await processData(rawData);
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, mdTextByMonth, sfSummary }))
         }
     }
 

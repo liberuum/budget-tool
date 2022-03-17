@@ -134,8 +134,8 @@ export default class Processor {
         this.filteredByCategoryMonth = this.filterByCategoryByMonth(this.parsedRows)
         this.getMonths()
         this.leveledMonthsByCategory = this.levelMonthsByCategory(this.filteredByCategoryMonth)
-        console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
-        console.log('filteredByMonth', this.filteredByMonth)
+        // console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
+        // console.log('filteredByMonth', this.filteredByMonth)
     }
 
     getRawData = (data) => {
