@@ -373,7 +373,6 @@ export default class Processor {
 
     addThreeMonths(monthsArr) {
         let months = [...monthsArr]
-        console.log('months', months)
         let lastMonth = months[months.length - 1]
         let toNumber = lastMonth.split('-');
         let year = Number(toNumber[0])

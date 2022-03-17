@@ -10,7 +10,7 @@ export default class SfMdExporter {
     tableRows = '';
     item = '';
     mdByMonth = {}
-
+    totals = {}
     template = `
 | Expense Category| Actual | Forecast | Budget  |Actual | Forecast  | Budget  |Actual | Forecast | Budget  |Actual | Forecast  | Budget  |
 | ----------------| -----: | -------: | ------: |-----: | --------: | ------: |-----: | -------: | ------: |-----: | --------: | ------: |
@@ -21,7 +21,32 @@ export default class SfMdExporter {
         // console.log('categories by month', this.categoriesByMonth)
         this.getExpenseTags()
         this.getMonths()
+        this.totals = this.getTotalsByMonth();
+        console.log('totals', this.totals)
         this.loopOverExpenseTags()
+    }
+
+    //Sum actual, forecast, budget by month
+    getTotalsByMonth() {
+        let totalObject = {}
+        let months = [...this.months];
+        months.forEach(month => {
+            let totalActual = 0;
+            let totalForecast = 0;
+            let totalBudget = 0;
+            this.expenseTags.forEach(tag => {
+                totalActual += this.categoriesByMonth[tag][month].actual;
+                totalForecast += this.categoriesByMonth[tag][month].forecast;
+                totalBudget += this.categoriesByMonth[tag][month].budget;
+            })
+            totalObject[month] = {
+                totalActual,
+                totalForecast,
+                totalBudget
+            }
+            // console.log(`Total actual ${totalActual} month ${month}`)
+        })
+        return totalObject;
     }
 
     getExpenseTags() {
@@ -83,6 +108,20 @@ export default class SfMdExporter {
                     this.item = ''
                 }
             })
+
+            // adding totals 
+            this.item += '| Total |';
+            this.item += ` ${this.totals[months[i]].totalActual.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`;
+            this.item += ` ${this.totals[months[i]].totalForecast.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`;
+            this.item += ` ${this.totals[months[i]].totalBudget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`;
+            threeMonths.forEach(threeMonth => {
+                this.item += ` ${this.totals[threeMonth].totalActual.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`;
+                this.item += ` ${this.totals[threeMonth].totalForecast.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`;
+                this.item += ` ${this.totals[threeMonth].totalBudget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`;
+            })
+            this.tableRows += this.item;
+            this.item = ''
+
             let monthTemplate = this.template
             monthTemplate += this.tableRows;
             this.tableRows = ''
@@ -95,7 +134,6 @@ export default class SfMdExporter {
 
         console.log('mdByMonth', this.mdByMonth)
     }
-
 
 
     getMdData() {
