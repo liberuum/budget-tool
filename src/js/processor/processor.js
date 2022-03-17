@@ -373,6 +373,7 @@ export default class Processor {
 
     addThreeMonths(monthsArr) {
         let months = [...monthsArr]
+        console.log('months', months)
         let lastMonth = months[months.length - 1]
         let toNumber = lastMonth.split('-');
         let year = Number(toNumber[0])
@@ -386,7 +387,8 @@ export default class Processor {
 
         for (let i = 1; i <= 3; i++) {
             let newMonth = month + i;
-            monthString = String(newMonth)
+            let leading0 = newMonth < 10 ? '0' : '';
+            monthString = leading0 + String(newMonth)
 
             if (newMonth > 12) {
                 yearString = String(year + 1)
@@ -400,7 +402,6 @@ export default class Processor {
             if (newMonth === 15) {
                 monthString = '03'
             }
-
             let result = yearString.concat('-').concat(monthString)
             months.push(result)
         }

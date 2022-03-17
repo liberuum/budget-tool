@@ -50,7 +50,7 @@ export default class SfMdExporter {
         let months = this.months;
         for (let i = 0; i < months.length; i++) {
             let threeMonths = months.slice(i + 1, i + 4);
-            console.log('threeExtraMonths', threeMonths)
+            // console.log('threeExtraMonths', threeMonths)
 
             // adding month strings to table 
             this.item += `| | ${months[i]} | | |`
