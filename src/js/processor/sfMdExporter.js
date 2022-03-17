@@ -12,13 +12,9 @@ export default class SfMdExporter {
     mdByMonth = {}
 
     template = `
-| Expense Category              | Actual             | Forecast           | Budget              |
-| ---------------------------   | -----------------: | -----------------: | ------------------: |
+| Expense Category| Actual | Forecast | Budget  |Actual | Forecast  | Budget  |Actual | Forecast | Budget  |Actual | Forecast  | Budget  |
+| ----------------| -----: | -------: | ------: |-----: | --------: | ------: |-----: | -------: | ------: |-----: | --------: | ------: |
 `;
-
-    // create mds by months, create new object with months and md text under each month, 
-    // later in the md view, we just pull current month and next 3 months. 
-    // if month doesn't exists, we create new empty months. 
 
     getCategoriesByMonth(categoriesByMonth) {
         this.categoriesByMonth = categoriesByMonth;
@@ -49,21 +45,26 @@ export default class SfMdExporter {
         // console.log('months', this.months)
     }
 
-    buildRow() {
-        this.expenseTags.forEach(tag => {
-            this.item += `|${tag}|`
-        })
-    }
 
     loopOverExpenseTags() {
-        this.months.forEach(month => {
+        let months = this.months;
+        for (let i = 0; i < months.length; i++) {
             this.expenseTags.forEach(tag => {
-                if (this.categoriesByMonth[tag][month] !== undefined) {
+
+                let threeMonths = months.slice(i, i + 4);
+                console.log('threeExtraMonths', threeMonths)
+
+                // create new monthsArr with current + 3 future months, loop over it below to add actuals 
+                // for(let j = 0; months.length; j++){
+
+                // }
+                if (this.categoriesByMonth[tag][months[i]] !== undefined) {
                     // console.log('tags', tag, this.categoriesByMonth[tag][month]['actual'])
                     this.item += `|${tag}|`
-                    this.item += `${this.categoriesByMonth[tag][month]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
-                    this.item += `${this.categoriesByMonth[tag][month]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
-                    this.item += `${this.categoriesByMonth[tag][month]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                    this.item += `${this.categoriesByMonth[tag][months[i]]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                    this.item += `${this.categoriesByMonth[tag][months[i]]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                    this.item += `${this.categoriesByMonth[tag][months[i]]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                    // from month + 3 loop, add again 3 times the above actual, forecast and budget together
                     this.item += `\n`;
                     this.tableRows += this.item;
                     this.item = ''
@@ -73,46 +74,16 @@ export default class SfMdExporter {
             monthTemplate += this.tableRows;
             this.tableRows = ''
 
-            this.mdByMonth[month] = Mustache.render(monthTemplate);
+            this.mdByMonth[months[i]] = Mustache.render(monthTemplate);
 
-        })
+        }
+
+
+
         console.log('mdByMonth', this.mdByMonth)
     }
 
 
-    buildTableRowObject() {
-        this.expenseTags.forEach(tag => {
-            this.item += `|${tag}|`
-            this.iterate(tag)
-            this.item += '\n'
-            this.tableRows += this.item;
-            this.item = ''
-        });
-
-        this.item += '| **Total** |';
-        this.iterate('total')
-        this.tableRows += this.item;
-        this.item = ''
-
-        this.template += this.tableRows;
-    }
-
-
-
-    iterate(expenseTag) {
-        for (const obj of this.categoriesByMonth) {
-            // console.log(obj)
-            for (const key in obj) {
-                if (key === expenseTag)
-                    // console.log(obj[key].toString())
-                    if (typeof obj[key] === 'number') {
-                        this.item += ` ${obj[key].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`
-                    } else {
-                        this.item += ` ${obj[key].toString()} |`
-                    }
-            }
-        }
-    }
 
     getMdData() {
         let output = Mustache.render(this.template);
