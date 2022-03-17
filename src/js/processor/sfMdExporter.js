@@ -49,22 +49,35 @@ export default class SfMdExporter {
     loopOverExpenseTags() {
         let months = this.months;
         for (let i = 0; i < months.length; i++) {
+            let threeMonths = months.slice(i + 1, i + 4);
+            console.log('threeExtraMonths', threeMonths)
+
+            // adding month strings to table 
+            this.item += `| | ${months[i]} | | |`
+            threeMonths.forEach(newMonth => {
+                this.item += `${newMonth} | | |`
+            })
+            this.item += `\n`;
+
             this.expenseTags.forEach(tag => {
-
-                let threeMonths = months.slice(i, i + 4);
-                console.log('threeExtraMonths', threeMonths)
-
-                // create new monthsArr with current + 3 future months, loop over it below to add actuals 
-                // for(let j = 0; months.length; j++){
-
-                // }
                 if (this.categoriesByMonth[tag][months[i]] !== undefined) {
+
+
                     // console.log('tags', tag, this.categoriesByMonth[tag][month]['actual'])
                     this.item += `|${tag}|`
+
+
                     this.item += `${this.categoriesByMonth[tag][months[i]]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
                     this.item += `${this.categoriesByMonth[tag][months[i]]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
                     this.item += `${this.categoriesByMonth[tag][months[i]]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
                     // from month + 3 loop, add again 3 times the above actual, forecast and budget together
+                    threeMonths.forEach(newMonth => {
+                        this.item += `${this.categoriesByMonth[tag][newMonth]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                        this.item += `${this.categoriesByMonth[tag][newMonth]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                        this.item += `${this.categoriesByMonth[tag][newMonth]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+
+                    })
+
                     this.item += `\n`;
                     this.tableRows += this.item;
                     this.item = ''
