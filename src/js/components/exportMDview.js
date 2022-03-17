@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm';
-import { Card, Divider, Label, Container, Textarea, Select } from "theme-ui"
+import { Card, Divider, Label, Container, Textarea, Select, Button } from "theme-ui"
 
 
 export default function MDView() {
@@ -14,12 +14,15 @@ export default function MDView() {
             return item
     })
     const [monthsArr, setMonthsArr] = useState(filtered[0]);
-    const [md, setMd] = useState('')
+    const [md, setMd] = useState('');
+    const [sfMd, setSfMd] = useState('');
+    const [sesView, setSESView] = useState(true)
 
     useEffect(() => {
-        getMonth(selectedMonth)
+        getMonth(selectedMonth);
+        getSFViewMonth(selectedMonth);
 
-    }, [getMonth, md])
+    }, [getMonth, getSFViewMonth, md, sfMd])
 
     let keys = []
     if (monthsArr !== undefined) {
@@ -35,9 +38,9 @@ export default function MDView() {
     const [selectedMonth, setSelectedMonth] = useState(keys[0]);
 
     const handleSelect = (value) => {
-        setSelectedMonth(value)
-        getMonth(value)
-
+        setSelectedMonth(value);
+        getMonth(value);
+        getSFViewMonth(value);
     }
 
 
@@ -53,6 +56,20 @@ export default function MDView() {
 
     }
 
+    const getSFViewMonth = (selectedMonth) => {
+        if (selectedMonth !== undefined) {
+            let md = monthsArr.sfSummary[selectedMonth];
+            setSfMd(md);
+        }
+    }
+
+    const handleSESView = () => {
+        setSESView(true)
+    }
+
+    const handleSFView = () => {
+        setSESView(false)
+    }
 
 
     return (
@@ -65,15 +82,20 @@ export default function MDView() {
                     })}
                 </Select>
             </Card>
+            <Card>
+                <Label>Choose View Type</Label>
+                <Button onClick={handleSFView} variant="smallOutline" >SF View</Button>
+                <Button onClick={handleSESView} variant="smallOutline" >SES View</Button>
+            </Card>
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>MarkDown View for {selectedMonth}</Label>
                 <Divider />
-                <ReactMarkdown children={md} remarkPlugins={[remarkGfm]} />
+                <ReactMarkdown children={sesView ? md : sfMd} remarkPlugins={[remarkGfm]} />
             </Card>
             <Card sx={{ mx: 'auto' }}>
                 <Label>MarkDown Raw Text for {selectedMonth}</Label>
                 <Divider />
-                <Textarea rows={16} defaultValue={md} />
+                <Textarea rows={16} defaultValue={sesView ? md : sfMd} />
             </Card>
         </Container>
     )

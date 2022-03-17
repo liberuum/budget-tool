@@ -1,7 +1,4 @@
-// import { get } from './mongodb.js';
 import Mustache from 'mustache';
-// import fs from 'fs';
-
 
 export default class MdExporter {
     expenseTags = []
@@ -12,20 +9,34 @@ export default class MdExporter {
 
     actuals = []
 
-    template = `
-| Budget Category               | Forecast           | Actuals            | Difference          | Payments       |
-| ---------------------------   | -----------------: | -----------------: | ------------------: | -------------: |
-|                               | -                  | -                  | -                   |                |
-`;
+    //template = `
+    // | Budget Category               | Forecast           | Actuals            | Difference          | Payments       |
+    // | ---------------------------   | -----------------: | -----------------: | ------------------: | -------------: |
+    // |                               | -                  | -                  | -                   |                |
+    // `;
 
     tableRows = '';
     item = ''
 
     getActuals(actuals) {
         this.actuals = actuals;
+        this.getTableColumns()
     }
 
-
+    getTableColumns() {
+        let table = `| Budget Category               |`;
+        for (let obj of this.actuals) {
+            table += `${obj.type}|`
+        }
+        table += `\n`
+        table += `| --------------------------- |`
+        for (let obj of this.actuals) {
+            table += ` ---------------------------: |`
+        }
+        table += `\n`
+        this.template = table;
+        // console.log('table', table)
+    }
 
     buildTableRowObject() {
         this.expenseTags.forEach(tag => {
@@ -53,7 +64,7 @@ export default class MdExporter {
                 if (key === expenseTag)
                     // console.log(obj[key].toString())
                     if (typeof obj[key] === 'number') {
-                        this.item += ` ${obj[key].toFixed(2)} |`
+                        this.item += ` ${obj[key].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} |`
                     } else {
                         this.item += ` ${obj[key].toString()} |`
                     }
@@ -65,11 +76,4 @@ export default class MdExporter {
         let output = Mustache.render(this.template);
         return output;
     }
-
-    // exportToMd() {
-    //     let output = Mustache.render(this.template);
-    //     fs.writeFileSync('./actuals.md', output);
-    //     console.log('Created/Updated actuals.md')
-    // }
-
 }
