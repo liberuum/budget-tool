@@ -118,7 +118,6 @@ export default class Processor {
 
     rawData = [];
     parsedRows = [];
-    monthList = [];
     filteredByMonth = {};
     budgets = {};
     filteredByCategoryMonth = {};
@@ -129,13 +128,11 @@ export default class Processor {
     processData = () => {
         this.updateFilter()
         this.parseRowData()
-        this.getListOfMonths()
         this.filterByMonth()
-        this.filteredByCategoryMonth = this.filterByCategoryByMonth(this.parsedRows)
-        this.getMonths()
-        this.leveledMonthsByCategory = this.levelMonthsByCategory(this.filteredByCategoryMonth)
-        // console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
-        // console.log('filteredByMonth', this.filteredByMonth)
+        this.filteredByCategoryMonth = this.buildSESView(this.parsedRows)
+        this.leveledMonthsByCategory = this.buildSFView(this.filteredByCategoryMonth)
+        console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
+        console.log('filteredByMonth', this.filteredByMonth)
     }
 
     getRawData = (data) => {
@@ -195,14 +192,14 @@ export default class Processor {
                 }
                 // console.log('arr', arr.month)
                 if (this.isValidExpenseRow(arr)) {
-                    this.parsedRows.push(this.cleanRecord(arr, this.currentFilter(), this.budgets, this.filteredByCategoryMonth))
+                    this.parsedRows.push(this.cleanExpenseRecord(arr, this.currentFilter(), this.budgets, this.filteredByCategoryMonth))
                     arr = {}
                 } else if (this.isValidBudgetRow(arr)) {
-                    this.processBudgetRow(arr, this.currentFilter(), this.budgets, this.filteredByCategoryMonth)
+                    this.processBudgetRow(arr, this.budgets)
                 }
             }
 
-            // console.log('budgets', this.budgets)
+            console.log('budgets', this.budgets)
         }
         while (this.selectNextFilter(false))
 
@@ -211,15 +208,41 @@ export default class Processor {
 
     }
 
-    processBudgetRow(parsedRecord, filter, budgets, byCategoryMonth) {
-        this.cleanRecord(parsedRecord, filter, budgets, byCategoryMonth)
+    processBudgetRow(parsedRecord, budgets) {
+        this.cleanBudgetRecord(parsedRecord, budgets)
         // console.log('matched budget row', parsedRecord, this.budgets)
     }
 
-    cleanRecord(parsedRecord, filter, budgets) {
+    cleanBudgetRecord(parsedRecord, budgets) {
+
+        parsedRecord.monthString = this.getMonthString(parsedRecord.month)
+
+        if (parsedRecord.category === '') {
+            parsedRecord.category = 'payment topup';
+        }
+        if (parsedRecord.budget !== undefined) {
+            parsedRecord.budget = this.parseNumber(parsedRecord.budget)
+            if (budgets[parsedRecord.monthString] === undefined) {
+                budgets[parsedRecord.monthString] = {}
+            }
+            if (budgets[parsedRecord.monthString][parsedRecord.category] === undefined) {
+                budgets[parsedRecord.monthString][parsedRecord.category] = 0;
+            }
+            budgets[parsedRecord.monthString][parsedRecord.category] += parsedRecord.budget
+        }
+
+        // console.log('budgets', this.budgets)
+        return parsedRecord
+    }
+
+    getMonthString(dateObj) {
+        let leading0 = dateObj.getMonth() + 1 < 10 ? '0' : ''
+        return `${dateObj.getFullYear()}-${leading0}${dateObj.getMonth() + 1}`
+    }
+
+    cleanExpenseRecord(parsedRecord, filter) {
         //Cleaning Month
-        let leading0 = parsedRecord.month.getMonth() + 1 < 10 ? '0' : ''
-        parsedRecord.monthString = `${parsedRecord.month.getFullYear()}-${leading0}${parsedRecord.month.getMonth() + 1}`
+        parsedRecord.monthString = this.getMonthString(parsedRecord.month)
 
         if (!filter.direct.certain) {
             parsedRecord.direct = true
@@ -240,8 +263,9 @@ export default class Processor {
         } else {
             parsedRecord.owed = calculatedOwed
         }
+
         if (!filter.paid.certain) {
-            parsedRecord.paid = parsedRecord.actual
+            parsedRecord.paid = this.parseNumber(parsedRecord.actual)
         } else if (parsedRecord.paid !== undefined) {
             parsedRecord.paid = this.parseNumber(parsedRecord.paid)
         }
@@ -251,24 +275,11 @@ export default class Processor {
         if (parsedRecord.category === '') {
             parsedRecord.category = 'payment topup';
         }
-        if (parsedRecord.budget !== undefined) {
-            parsedRecord.budget = this.parseNumber(parsedRecord.budget)
-            if (budgets[parsedRecord.monthString] === undefined) {
-                budgets[parsedRecord.monthString] = {}
-            }
-            if (budgets[parsedRecord.monthString][parsedRecord.category] === undefined) {
-                budgets[parsedRecord.monthString][parsedRecord.category] = 0;
-            }
-            budgets[parsedRecord.monthString][parsedRecord.category] += parsedRecord.budget
-        }
 
-
-
-        // console.log('budgets', this.budgets)
         return parsedRecord
     }
 
-    filterByCategoryByMonth = (parsedRows) => {
+    buildSESView = (parsedRows) => {
         let result = {}
         for (let i = 0; i < parsedRows.length; i++) {
             let row = parsedRows[i]
@@ -299,9 +310,8 @@ export default class Processor {
         return result;
     }
 
-    levelMonthsByCategory(indexByCategoryByMonth) {
-        let monthsArr = JSON.parse(JSON.stringify(this.accountedMonths));
-        let months = this.addThreeMonths(monthsArr)
+    buildSFView(indexByCategoryByMonth) {
+        let months = this.addThreeMonths(this.getMonths())
         let result = {};
 
         months.forEach(month => {
@@ -338,38 +348,23 @@ export default class Processor {
             if (indexByCategoryByMonth[category][month] === undefined) {
                 result[category][month]['actual'] = 0
                 result[category][month]['forecast'] = 0
-                result[category][month]['budget'] = 0
             } else {
                 result[category][month].actual = indexByCategoryByMonth[category][month]['actual']
                 result[category][month].forecast = indexByCategoryByMonth[category][month]['forecast']
-                result[category][month].budget = indexByCategoryByMonth[category][month]['budget']
-
             }
 
+            if (this.budgets[month] === undefined || this.budgets[month][category] === undefined) {
+                result[category][month]['budget'] = 0
+            } else {
+                result[category][month].budget = this.budgets[month][category]
+            }
         }
-
-
         // console.log('new sfTable', result)
 
         return result;
     }
 
-    getMonths() {
-        let filteredByMonth = JSON.parse(JSON.stringify(this.filteredByCategoryMonth));
-        let arrCategoriesByMonth = Object.entries(filteredByMonth);
-        let expenseTags = []
-        for (let [key, value] of arrCategoriesByMonth) {
-            expenseTags.push(key);
-        }
 
-        let months = [];
-        expenseTags.forEach(tag => {
-            for (let [key, value] of Object.entries(filteredByMonth[tag])) {
-                months.push(key)
-            }
-        })
-        this.accountedMonths = [...new Set(months)]
-    }
 
     addThreeMonths(monthsArr) {
         let months = [...monthsArr]
@@ -408,25 +403,27 @@ export default class Processor {
     }
 
     filterByMonth = () => {
-        // console.log('months', this.monthList)
-        for (let i = 0; i < this.monthList.length; i++) {
+        let months = this.getMonths()
+        for (let i = 0; i < months.length; i++) {
             let month = this.parsedRows.filter(object => {
-                return object.monthString === this.monthList[i]
+                return object.monthString === months[i]
             })
-            this.filteredByMonth[this.monthList[i]] = month;
+            this.filteredByMonth[months[i]] = month;
         }
         // console.log('filteredByMonth', this.filteredByMonth)
 
     }
 
-    getListOfMonths = () => {
+    getMonths = () => {
         let duplicateTags = [];
         for (const object of this.parsedRows) {
             if (object.monthString !== undefined)
                 duplicateTags.push(object.monthString)
         }
-        this.monthList = [...new Set(duplicateTags)];
+        return [...new Set(duplicateTags)];
+
     }
+
 
 
     matchesFilterTag(cellData, tag) {
@@ -456,17 +453,19 @@ export default class Processor {
     }
 
     // coerce data types
-    parseNumber = (stringNumber) => {
+    parseNumber = (anyNumber) => {
         const regex = /[^,]*/g;
-        let number = stringNumber;
+        let number = anyNumber;
         // console.log(`number ${number} state: ${number === ''}`)
-        if (!isNaN(stringNumber)) {
-            return stringNumber
+        if (!isNaN(anyNumber)) {
+            return anyNumber
         }
         if (number === '') {
             return 0
-        } else {
+        } else if (typeof anyNumber === 'string' || anyNumber instanceof String) {
             return parseFloat(number.match(regex).join(''));
+        } else {
+            return 0;
         }
     }
 
