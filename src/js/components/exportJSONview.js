@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Card, Label, Container, Textarea, Select } from "theme-ui"
+import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
 
 export default function JSONView() {
     const { spreadsheetId } = useParams();
@@ -30,6 +30,7 @@ export default function JSONView() {
         }
     }
 
+    console.log('keys', keys)
 
 
     const [selectedMonth, setSelectedMonth] = useState(keys[0]);
@@ -45,8 +46,54 @@ export default function JSONView() {
             let json = monthsArr.actualsByMonth[selectedMonth]
             setJsonData(json)
         }
-
     }
+
+    const inputData = {
+        month: "",
+        position: "",
+        group: "", // permanent team, grouping by teams. 
+        budgetCategory: "",
+        forecast: "",
+        actual: "",
+        comments: ""
+    }
+
+    const handleUpload = () => {
+        console.log('keys', keys)
+        const data = [];
+
+        for (let key of keys) {
+            let rowObj = {}
+            for (let category of monthsArr.actualsByMonth[key]) {
+                // console.log('category', category)
+                let rawCategories = Object.keys(category);
+                let budgetCategories = rawCategories.filter(category => {
+                    if (category !== "type" && category !== 'total' && category !== 'payment topup') {
+                        return category
+                    }
+                })
+
+                if (category.type === 'forecast' || category.type === 'actual') {
+                    for (let expenseTag of budgetCategories) {
+                        if (category.type === 'forecast') {
+                            rowObj.month = key;
+                            rowObj.budgetCategory = expenseTag;
+                            rowObj.forecast = category[expenseTag]
+                        } else if (category.type === 'actual') {
+                            rowObj.actual = category[expenseTag]
+                        }
+                    }
+
+
+                }
+
+                // data.push(rowObj)
+                // rowObj = {}
+            }
+        }
+        // console.log('data', data)
+    }
+
 
     const prepJson = () => {
         let json = ""
@@ -85,6 +132,10 @@ export default function JSONView() {
                         return <option key={month}>{`${month}`}</option>
                     })}
                 </Select>
+            </Card>
+            <Card>
+                <Label>Upload budget forecast and actuals to ecosystem dashboard</Label>
+                <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>
             </Card>
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>JSON View</Label>
