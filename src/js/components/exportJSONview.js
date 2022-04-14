@@ -58,40 +58,49 @@ export default function JSONView() {
         comments: ""
     }
 
-    const handleUpload = () => {
-        console.log('keys', keys)
-        const data = [];
-
-        for (let key of keys) {
-            let rowObj = {}
-            for (let category of monthsArr.actualsByMonth[key]) {
-                // console.log('category', category)
-                let rawCategories = Object.keys(category);
-                let budgetCategories = rawCategories.filter(category => {
-                    if (category !== "type" && category !== 'total' && category !== 'payment topup') {
-                        return category
-                    }
-                })
-
-                if (category.type === 'forecast' || category.type === 'actual') {
-                    for (let expenseTag of budgetCategories) {
-                        if (category.type === 'forecast') {
-                            rowObj.month = key;
-                            rowObj.budgetCategory = expenseTag;
-                            rowObj.forecast = category[expenseTag]
-                        } else if (category.type === 'actual') {
-                            rowObj.actual = category[expenseTag]
-                        }
-                    }
-
+    const getForecastAndActual = () => {
+        const forecastAndActual = {}
+        for (let month of keys) {
+            forecastAndActual[month] = {}
+            for (let category of monthsArr.actualsByMonth[month]) {
+                if (category.type === 'forecast') {
+                    forecastAndActual[month]['forecast'] = category
 
                 }
+                if (category.type === 'actual') {
+                    forecastAndActual[month]['actual'] = category
 
-                // data.push(rowObj)
-                // rowObj = {}
+                }
             }
         }
-        // console.log('data', data)
+        return forecastAndActual;
+
+
+
+
+    }
+
+    const handleUpload = () => {
+        const data = [];
+        const rowObject = {
+            month: "",
+            position: "",
+            group: "", 
+            budgetCategory: "",
+            forecast: "",
+            actual: "",
+            comments: ""
+        };
+        const forecastAndActual = getForecastAndActual();
+
+        for (let month of keys) {
+            for (let category of forecastAndActual[month][forecast]) {
+                let rawCategories = Object.keys(category);
+
+            }
+            forecastAndActual[month]
+        }
+
     }
 
 
