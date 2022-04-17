@@ -82,27 +82,49 @@ export default function JSONView() {
 
     const handleUpload = () => {
         const data = [];
-        const rowObject = {
-            month: "",
-            position: "",
-            group: "", 
-            budgetCategory: "",
-            forecast: "",
-            actual: "",
-            comments: ""
-        };
+
         const forecastAndActual = getForecastAndActual();
 
         for (let month of keys) {
-            for (let category of forecastAndActual[month][forecast]) {
-                let rawCategories = Object.keys(category);
 
-            }
-            forecastAndActual[month]
+            const forecasts = forecastAndActual[month]['forecast']
+            const actuals = forecastAndActual[month]['actual']
+            const categories = getCategories(Object.keys(forecastAndActual[month]['forecast']))
+            console.log('forecasts', forecasts)
+            categories.forEach(category => {
+                const rowObject = {
+                    month: "",
+                    position: "",
+                    group: "",
+                    budgetCategory: "",
+                    forecast: "",
+                    actual: "",
+                    comments: ""
+                };
+                rowObject.month = month;
+                rowObject.budgetCategory = category;
+                rowObject.forecast = roundNumber(forecasts[category]);
+                rowObject.actual = roundNumber(actuals[category])
+                data.push(rowObject)
+            });
         }
+        console.log('data', data)
 
     }
 
+    const getCategories = (mmonthlies) => {
+        let budgetCategories = mmonthlies.filter(category => {
+            if (category !== "type" && category !== 'total' && category !== 'payment topup') {
+                return category
+            }
+        })
+        return budgetCategories;
+    }
+
+    const roundNumber = (number) => {
+        return Number(Math.round(parseFloat(number + 'e' + 2)) + 'e-' + 2)
+
+    }
 
     const prepJson = () => {
         let json = ""

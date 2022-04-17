@@ -64,7 +64,7 @@ export default class MdExporter {
                 if (key === expenseTag)
                     // console.log(obj[key].toString())
                     if (typeof obj[key] === 'number') {
-                        this.item += ` ${obj[key].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} |`
+                        this.item += ` ${obj[key].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} |`
                     } else {
                         this.item += ` ${obj[key].toString()} |`
                     }
