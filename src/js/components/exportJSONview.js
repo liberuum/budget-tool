@@ -30,9 +30,6 @@ export default function JSONView() {
         }
     }
 
-    console.log('keys', keys)
-
-
     const [selectedMonth, setSelectedMonth] = useState(keys[0]);
 
     const handleSelect = (value) => {
@@ -46,16 +43,6 @@ export default function JSONView() {
             let json = monthsArr.actualsByMonth[selectedMonth]
             setJsonData(json)
         }
-    }
-
-    const inputData = {
-        month: "",
-        position: "",
-        group: "", // permanent team, grouping by teams. 
-        budgetCategory: "",
-        forecast: "",
-        actual: "",
-        comments: ""
     }
 
     const getForecastAndActual = () => {
@@ -90,7 +77,6 @@ export default function JSONView() {
             const forecasts = forecastAndActual[month]['forecast']
             const actuals = forecastAndActual[month]['actual']
             const categories = getCategories(Object.keys(forecastAndActual[month]['forecast']))
-            console.log('forecasts', forecasts)
             categories.forEach(category => {
                 const rowObject = {
                     month: "",
@@ -108,7 +94,7 @@ export default function JSONView() {
                 data.push(rowObject)
             });
         }
-        console.log('data', data)
+        console.log('ecosystem dashboard data', data)
 
     }
 
