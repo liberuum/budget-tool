@@ -72,13 +72,14 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.10",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@makerdao/dai-ui-theme-maker": "^0.0.66",
     "babel-loader": "^8.2.3",
-    "dotenv": "^15.0.0",
     "electron-settings": "^4.0.2",
     "googleapis": "^92.0.0",
+    "graphql": "^16.3.0",
     "mongodb": "^4.3.1",
     "mustache": "^4.2.0",
     "react": "^17.0.2",

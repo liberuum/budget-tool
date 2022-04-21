@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
+import UploadToDB from './uploadToDB.js';
 
 export default function JSONView() {
     const { spreadsheetId } = useParams();
@@ -62,54 +63,6 @@ export default function JSONView() {
         }
         return forecastAndActual;
 
-
-
-
-    }
-
-    const handleUpload = () => {
-        const data = [];
-
-        const forecastAndActual = getForecastAndActual();
-
-        for (let month of keys) {
-
-            const forecasts = forecastAndActual[month]['forecast']
-            const actuals = forecastAndActual[month]['actual']
-            const categories = getCategories(Object.keys(forecastAndActual[month]['forecast']))
-            categories.forEach(category => {
-                const rowObject = {
-                    month: "",
-                    position: "",
-                    group: "",
-                    budgetCategory: "",
-                    forecast: "",
-                    actual: "",
-                    comments: ""
-                };
-                rowObject.month = month;
-                rowObject.budgetCategory = category;
-                rowObject.forecast = roundNumber(forecasts[category]);
-                rowObject.actual = roundNumber(actuals[category])
-                data.push(rowObject)
-            });
-        }
-        console.log('ecosystem dashboard data', data)
-
-    }
-
-    const getCategories = (mmonthlies) => {
-        let budgetCategories = mmonthlies.filter(category => {
-            if (category !== "type" && category !== 'total' && category !== 'payment topup') {
-                return category
-            }
-        })
-        return budgetCategories;
-    }
-
-    const roundNumber = (number) => {
-        return Number(Math.round(parseFloat(number + 'e' + 2)) + 'e-' + 2)
-
     }
 
     const prepJson = () => {
@@ -150,10 +103,7 @@ export default function JSONView() {
                     })}
                 </Select>
             </Card>
-            <Card>
-                <Label>Upload budget forecast and actuals to ecosystem dashboard</Label>
-                <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>
-            </Card>
+            <UploadToDB props={{ keys, monthsArr }} />
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>JSON View</Label>
                 <Textarea rows={20} defaultValue={result} />
