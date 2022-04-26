@@ -5,22 +5,31 @@ import BudgetSheet from './components/budgetSheet';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import JSONView from './components/exportJSONview';
 import MDView from './components/exportMDview';
-
+import {
+    ApolloClient, InMemoryCache, ApolloProvider
+} from "@apollo/client";
 
 export default function App() {
 
+    const client = new ApolloClient({
+        uri: 'http://localhost:4000/graphql',
+        cache: new InMemoryCache()
+    });
+
+
     return (
         <>
-            <Router>
-                <Navbar />
-                <Routes>
-                    <Route path='/' element={<BudgetSheet />} />
-                    <Route path='/settings' element={<Settings />} />
-                    <Route path='/json/:spreadsheetId' element={<JSONView />} />
-                    <Route path='/md/:spreadsheetId' element={<MDView />} />
-                </Routes>
-
-            </Router>
+            <ApolloProvider client={client}>
+                <Router>
+                    <Navbar />
+                    <Routes>
+                        <Route path='/' element={<BudgetSheet />} />
+                        <Route path='/settings' element={<Settings />} />
+                        <Route path='/json/:spreadsheetId' element={<JSONView />} />
+                        <Route path='/md/:spreadsheetId' element={<MDView />} />
+                    </Routes>
+                </Router>
+            </ApolloProvider>
         </>
 
     )

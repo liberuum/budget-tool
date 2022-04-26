@@ -1,8 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
-import { getCoreUnits } from '../api/graphql.js'
+import { useQuery, gql, useMutation } from "@apollo/client";
+
 
 export default function UploadToDB(props) {
+
+    // graphql client call
+    const GET_CORE_UNITS = gql`
+    query getCoreUnits {
+     coreUnits {
+        code
+        name
+      }
+    }
+    `;
+
+    // const { loading, error, data } = useQuery(GET_CORE_UNITS)
+    // console.log('useQuery result', data)
+
+    const ADD_BUDGET_LINE_ITEMS = gql`
+        mutation BudgetStatementsBatchAdd($input: [BudgetStatementBatchAddInput]) {
+            budgetStatementsBatchAdd(input: $input) {
+                    errors {
+                    message
+                    }
+                    budgetStatementLineItem {
+                    id
+                    }
+                }
+            }
+    `;
+
+    const [budgetStatementsBatchAdd, { data, loading, error }] = useMutation(ADD_BUDGET_LINE_ITEMS)
+
+    if (loading) return 'Submitting data...'
+    if (error) return `Upload error! ${error.message}`
 
     const keys = props.props.keys;
     const monthsArr = props.props.monthsArr;
@@ -39,7 +71,7 @@ export default function UploadToDB(props) {
             categories.forEach(category => {
                 const rowObject = {
                     month: "",
-                    position: "",
+                    position: 0,
                     group: "",
                     budgetCategory: "",
                     forecast: "",
@@ -54,6 +86,7 @@ export default function UploadToDB(props) {
             });
         }
         console.log('ecosystem dashboard data', data)
+        budgetStatementsBatchAdd({ variables: { input: data } });
 
     }
 
