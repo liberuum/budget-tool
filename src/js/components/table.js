@@ -24,8 +24,10 @@ export default function Table() {
 
     const [inputSheetValue, setInputSheetValue] = useState('');
     const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false, duplicate: false, linkError: false });
+    const [inputWalletAddress, setInputWalletAddress] = useState('');
+    const [inputWalletName, setInputWalletName] = useState('')
 
-    const handleInput = (value) => {
+    const handleLinkInput = (value) => {
         const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
         let result = pattern.exec(value);
         if (result == null) {
@@ -68,11 +70,19 @@ export default function Table() {
         }
     }
 
+    const addrShortener = (address) => {
+        let cutAddress = ''
+        let preffix = address.substring(4, address.lenght - 4);
+        let suffix = address.substring(address.length - 4);
+        cutAddress = `${preffix}...${suffix}`
+        return cutAddress
+    }
+
     return (
         <Container>
-            <Card sx={{ my: 2, mx: [2, "auto"], p: 0, pb: 3, maxWidth: "100%" }}>
+            <Card sx={{ my: 2, mx: [1, "auto"], p: 0, pb: 3, maxWidth: "100%", }}>
                 <Grid
-                    columns={3}
+                    columns={4}
                     sx={{
                         borderBottom: "1px solid",
                         borderColor: "muted",
@@ -80,7 +90,7 @@ export default function Table() {
                         py: 1
                     }}
                 >
-                    {["Title", "Sheet", "Actions"].map((h, key) => (
+                    {["Title", "Sheet", "Wallet", "Actions"].map((h, key) => (
                         <Text sx={{ fontWeight: "bold" }} key={key}>
                             {h}
                         </Text>
@@ -92,13 +102,14 @@ export default function Table() {
                         borderColor: "muted",
                         px: 2,
                         py: 2,
+                        fontSize: "13px"
 
                     }}
                 >
                     {tableData.map((row, key) => {
                         return (
                             <Grid
-                                columns={3}
+                                columns={4}
                                 key={key}
                                 sx={{
                                     borderBottom: "1px solid",
@@ -109,9 +120,11 @@ export default function Table() {
                             >
                                 <Text >{row.spreadSheetTitle}</Text>
                                 <Text >{row.sheetName}</Text>
-                                <Text >
+                                <Text>{addrShortener("0xb5eB779cE300024EDB3dF9b6C007E312584f6F4f")}</Text>
+                                <Text sx={{ fontSize: "9px" }}>
                                     <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}`)}>To MD </Button>
                                     <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}`)}>To JSON </Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/api/${row.spreadsheetId}`)} >To Api</Button>
                                     <Button bg='red' variant='small' name={row.sheetName} onClick={handleTableRowDelete}>Delete</Button>
                                 </Text>
                             </Grid>
@@ -120,8 +133,42 @@ export default function Table() {
                 </Box>
             </Card>
             <Card sx={{ my: 4, p: 2, pb: 3, maxWidth: "100%" }}>
-                <Box
-                >
+                <Button sx={{ fontSize: "9px" }} variant="smallOutline" onClick={() => navigate(`/api/`)} >To Api</Button>
+                <Box>
+                    <Grid
+                        columns={2}
+                        sx={{
+                            py: 1, 
+                            fontSize: "14px"
+                        }}
+                    >
+                        <div>
+                            <Label>Enter Wallet Name</Label>
+                            <Input
+                                sx={{ "::placeholder": { color: '#D3D3D3' } }}
+                                // variant={validatedInput.variant}
+                                placeholder='permanent team'
+                                name='walletName'
+                                type='text'
+                                value={inputWalletName}
+                                // onChange={e => handleLinkInput(e.target.value)}
+                            ></Input>
+                        </div>
+                        <div>
+                            <Label>Enter Wallet Address</Label>
+                            <Input
+                                sx={{ "::placeholder": { color: '#D3D3D3' } }}
+                                // variant={validatedInput.variant}
+                                placeholder='0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB'
+                                name='walletName'
+                                type='text'
+                                value={inputWalletAddress}
+                                // onChange={e => handleLinkInput(e.target.value)}
+                            ></Input>
+                        </div>
+                    </Grid>
+                </Box>
+                <Box>
                     <Label>Enter Google SpreadSheet Link</Label>
                     <Input
                         sx={{ "::placeholder": { color: '#D3D3D3' } }}
@@ -130,7 +177,7 @@ export default function Table() {
                         name='spreadsheetLink'
                         type='text'
                         value={inputSheetValue}
-                        onChange={e => handleInput(e.target.value)}
+                        onChange={e => handleLinkInput(e.target.value)}
                     ></Input>
                     {
                         !validatedInput.valid && inputSheetValue ? (<Text sx={{ m: 0 }} variant="smallError">

@@ -5,6 +5,7 @@ import BudgetSheet from './components/budgetSheet';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import JSONView from './components/exportJSONview';
 import MDView from './components/exportMDview';
+import ApiView from './components/exportApiView';
 import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
@@ -27,6 +28,7 @@ export default function App() {
                         <Route path='/settings' element={<Settings />} />
                         <Route path='/json/:spreadsheetId' element={<JSONView />} />
                         <Route path='/md/:spreadsheetId' element={<MDView />} />
+                        <Route path='/api' element={<ApiView />} />
                     </Routes>
                 </Router>
             </ApolloProvider>
