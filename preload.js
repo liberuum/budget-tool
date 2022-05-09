@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('electron', {
   checkCredentials: () => ipcRenderer.invoke('checkCredentials'),
   checkToken: () => ipcRenderer.invoke('checkToken'),
   getSheetInfo: (link) => ipcRenderer.invoke('getSheetInfo', { link }),
-  openLink: () => ipcRenderer.send('open-link')
+  openLink: () => ipcRenderer.send('open-link'),
+  openWalletLink: (address) => ipcRenderer.invoke('open-wallet-link', { address })
 })

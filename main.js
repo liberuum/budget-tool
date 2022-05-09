@@ -133,3 +133,7 @@ ipcMain.handle('reset-credentials', async () => {
 ipcMain.on('open-link', () => {
     require('electron').shell.openExternal('https://developers.google.com/workspace/guides/create-credentials#oauth-client-id')
 })
+
+ipcMain.handle('open-wallet-link', (event, args) => {
+    require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args}/home`)
+})

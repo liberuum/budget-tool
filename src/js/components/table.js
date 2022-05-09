@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Label, Input, Text, Grid, Box, Container, Badge } from "theme-ui"
+import { Card, Button, Label, Input, Text, Grid, Box, Container, Badge, Link } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { storeAuthObject } from '../actions/googleAuth';
@@ -23,36 +23,67 @@ export default function Table() {
 
 
     const [inputSheetValue, setInputSheetValue] = useState('');
-    const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false, duplicate: false, linkError: false });
+    const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false, duplicate: false, linkError: false, walletFields: false });
     const [inputWalletAddress, setInputWalletAddress] = useState('');
-    const [inputWalletName, setInputWalletName] = useState('')
+    const [inputWalletName, setInputWalletName] = useState('');
+    const [shortenedAddress, setShortenedAddress] = useState('');
+
+    const handleWalletNameInput = (value) => {
+        setInputWalletName(value);
+        checkWalletInput();
+    }
+    const handleWalletAddressInput = (value) => {
+        setInputWalletAddress(value);
+        checkWalletInput();
+    }
+
+
+    const checkWalletInput = () => {
+        if (inputWalletName !== '' && inputWalletAddress.length === 42) {
+            setValidatedInput(validatedInput.walletFields = true, validatedInput.variant = null)
+        } else {
+            setValidatedInput({ ...validatedInput, variant: 'inputError', valid: false })
+        }
+    }
+
+    const handleOpenWalletLink = (address) => {
+        electron.openWalletLink(address)
+    }
+
 
     const handleLinkInput = (value) => {
+        checkWalletInput();
         const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
         let result = pattern.exec(value);
         if (result == null) {
-            setValidatedInput({ variant: 'inputError', })
+            setValidatedInput({ ...validatedInput, variant: 'inputError', valid: false })
         } else {
             if (result[0] !== undefined && result[1] !== undefined && result[2] !== undefined) {
-                setValidatedInput({ variant: null, valid: true, duplicate: isDuplicateLink(result[1]) })
+                setValidatedInput({ ...validatedInput, variant: null, valid: true, duplicate: isDuplicateLink(result[1]) })
             } else {
-                setValidatedInput({ variant: 'inputError', })
+                setValidatedInput({ ...validatedInput, variant: 'inputError', valid: false })
             }
         }
         setInputSheetValue(value)
     }
 
+
     const handleAddSheet = async (event) => {
         event.preventDefault()
-        setInputSheetValue('')
-        setValidatedInput({ variant: null, })
+        const walletAddress = inputWalletAddress;
+        const walletName = inputWalletName;
+        addrShortener(inputWalletAddress)
         const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
             const { actualsByMonth, mdTextByMonth, sfSummary } = await processData(rawData);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, mdTextByMonth, sfSummary }))
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, mdTextByMonth, sfSummary, walletName, walletAddress }))
         }
+        setValidatedInput({ variant: null, })
+        setInputWalletName('')
+        setInputWalletAddress('')
+        setInputSheetValue('')
     }
 
     const handleTableRowDelete = (e) => {
@@ -75,7 +106,7 @@ export default function Table() {
         let preffix = address.substring(4, address.lenght - 4);
         let suffix = address.substring(address.length - 4);
         cutAddress = `${preffix}...${suffix}`
-        return cutAddress
+        setShortenedAddress(cutAddress);
     }
 
     return (
@@ -100,9 +131,9 @@ export default function Table() {
                     sx={{
                         maxHeight: "auto",
                         borderColor: "muted",
-                        px: 2,
-                        py: 2,
-                        fontSize: "13px"
+                        px: 1,
+                        py: 1,
+                        fontSize: "14px"
 
                     }}
                 >
@@ -120,7 +151,7 @@ export default function Table() {
                             >
                                 <Text >{row.spreadSheetTitle}</Text>
                                 <Text >{row.sheetName}</Text>
-                                <Text>{addrShortener("0xb5eB779cE300024EDB3dF9b6C007E312584f6F4f")}</Text>
+                                <Text><Link sx={{ cursor: 'pointer' }} onClick={() => handleOpenWalletLink(row.walletAddress)}>{shortenedAddress}</Link></Text>
                                 <Text sx={{ fontSize: "9px" }}>
                                     <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}`)}>To MD </Button>
                                     <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}`)}>To JSON </Button>
@@ -138,7 +169,7 @@ export default function Table() {
                     <Grid
                         columns={2}
                         sx={{
-                            py: 1, 
+                            py: 1,
                             fontSize: "14px"
                         }}
                     >
@@ -151,7 +182,7 @@ export default function Table() {
                                 name='walletName'
                                 type='text'
                                 value={inputWalletName}
-                                // onChange={e => handleLinkInput(e.target.value)}
+                                onChange={e => handleWalletNameInput(e.target.value)}
                             ></Input>
                         </div>
                         <div>
@@ -163,7 +194,7 @@ export default function Table() {
                                 name='walletName'
                                 type='text'
                                 value={inputWalletAddress}
-                                // onChange={e => handleLinkInput(e.target.value)}
+                                onChange={e => handleWalletAddressInput(e.target.value)}
                             ></Input>
                         </div>
                     </Grid>
@@ -187,6 +218,11 @@ export default function Table() {
                     {
                         validatedInput.linkError ? (<Text sx={{ m: 0 }} variant="smallError">
                             Can't access link, make sure you have access to your spreadsheet
+                        </Text>) : ''
+                    }
+                    {
+                        inputWalletName === '' && inputWalletAddress === '' && !validatedInput.walletFields && validatedInput.variant ? (<Text sx={{ m: 0 }} variant="smallError">
+                            Fill in wallet information before you add sheet
                         </Text>) : ''
                     }
 
