@@ -1,19 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const { google } = require('googleapis');
-const fs = require('fs/promises');
-const path = require('path');
 const settings = require('electron-settings');
-
-const TOKEN_PATH = 'token.json';
-
-// console.log(app.getAppPath('userData'));
-const userPath = app.getAppPath('userData')
-
-const getSheetData = async () => {
-    const auth = await authorize();
-    // console.log('Auth', auth);
-    await fetchData(auth);
-};
 
 async function getCredentials() {
     try {
@@ -49,7 +36,9 @@ const getOAuthCodeByInteraction = (interactionWindow, authPageURL) => {
 
 const authorize = async () => {
     const credentials = await getCredentials();
-    const { client_secret, client_id, redirect_uris } = credentials.installed;
+    const { client_secret, client_id } = credentials.installed;
+    const redirect_uris = ["urn:ietf:wg:oauth:2.0:oob",
+        "http://localhost"];
     const oauth2Client = new google.auth.OAuth2(
         client_id, client_secret, redirect_uris[0]);
 
