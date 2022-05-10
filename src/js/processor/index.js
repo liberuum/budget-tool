@@ -40,7 +40,7 @@ export default async function processData(rawData) {
         mdTextObj = {}
     }
 
-    // console.log('sfSummary', sfSummary)
+    const leveledMonthsByCategory = processor.leveledMonthsByCategory;
 
-    return { actualsByMonth, mdTextByMonth, sfSummary };
+    return { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary };
 }

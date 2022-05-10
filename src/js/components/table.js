@@ -77,8 +77,8 @@ export default function Table() {
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
-            const { actualsByMonth, mdTextByMonth, sfSummary } = await processData(rawData);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, mdTextByMonth, sfSummary, walletName, walletAddress }))
+            const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData);
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth,leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress }))
         }
         setValidatedInput({ variant: null, })
         setInputWalletName('')
@@ -164,7 +164,7 @@ export default function Table() {
                 </Box>
             </Card>
             <Card sx={{ my: 4, p: 2, pb: 3, maxWidth: "100%" }}>
-                <Button sx={{ fontSize: "9px" }} variant="smallOutline" onClick={() => navigate(`/api/`)} >To Api</Button>
+                <Button sx={{ fontSize: "9px" }} variant="smallOutline" onClick={() => navigate(`/api/:spreadsheetId`)} >To Api</Button>
                 <Box>
                     <Grid
                         columns={2}

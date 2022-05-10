@@ -13,6 +13,8 @@ export default function ApiView() {
             return item
     })
 
+    console.log('filtered data', filtered);
+
     const [monthsArr, setMonthsArr] = useState(filtered[0]);
     const [jsonData, setJsonData] = useState('')
 

@@ -28,7 +28,7 @@ export default function App() {
                         <Route path='/settings' element={<Settings />} />
                         <Route path='/json/:spreadsheetId' element={<JSONView />} />
                         <Route path='/md/:spreadsheetId' element={<MDView />} />
-                        <Route path='/api' element={<ApiView />} />
+                        <Route path='/api/:spreadsheetId' element={<ApiView />} />
                     </Routes>
                 </Router>
             </ApolloProvider>
