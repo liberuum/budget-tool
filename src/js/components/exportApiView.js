@@ -12,11 +12,12 @@ export default function ApiView() {
         if (item.spreadsheetId == spreadsheetId)
             return item
     })
-
-    console.log('filtered data', filtered);
-
+    
     const [monthsArr, setMonthsArr] = useState(filtered[0]);
     const [jsonData, setJsonData] = useState('')
+    const [leveledMonthsByCategory, setLeveledMonthsByCategory] = useState('');
+
+    // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
 
 
     useEffect(() => {
@@ -24,9 +25,11 @@ export default function ApiView() {
 
     }, [getMonth, jsonData])
 
+    //Getting available actual months
     let keys = []
     if (monthsArr !== undefined) {
         let months = monthsArr.mdTextByMonth;
+        setLeveledMonthsByCategory(leveledMonthsByCategory)
         for (const month of months) {
             let key = Object.keys(month)
             keys = [...keys, ...key]
@@ -48,53 +51,6 @@ export default function ApiView() {
         }
     }
 
-    const getForecastAndActual = () => {
-        const forecastAndActual = {}
-        for (let month of keys) {
-            forecastAndActual[month] = {}
-            for (let category of monthsArr.actualsByMonth[month]) {
-                if (category.type === 'forecast') {
-                    forecastAndActual[month]['forecast'] = category
-
-                }
-                if (category.type === 'actual') {
-                    forecastAndActual[month]['actual'] = category
-
-                }
-            }
-        }
-        return forecastAndActual;
-
-    }
-
-    const prepJson = () => {
-        let json = ""
-        if (jsonData !== '') {
-            let arr = jsonData
-            let newArr = [];
-            for (const obj of arr) {
-                let newObj = {}
-                for (const key in obj) {
-                    if (typeof obj[key] === 'number') {
-                        newObj[key] = obj[key].toString()
-                    } else {
-                        newObj[key] = obj[key];
-                    }
-                }
-                newArr.push(newObj);
-                newObj = {};
-            }
-
-            let outputObj = { actuals: newArr };
-            json = JSON.stringify(outputObj, null, 2);
-        } else {
-            json = ''
-        }
-        return json
-    }
-
-    let result = prepJson()
-
     return (
         <Container >
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
@@ -106,10 +62,6 @@ export default function ApiView() {
                 </Select>
             </Card>
             <UploadToDB props={{ keys, monthsArr }} />
-            <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
-                <Label>JSON View</Label>
-                <Textarea rows={20} defaultValue={result} />
-            </Card>
         </Container>
     )
 }
