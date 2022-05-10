@@ -135,5 +135,5 @@ ipcMain.on('open-link', () => {
 })
 
 ipcMain.handle('open-wallet-link', (event, args) => {
-    require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args}/home`)
+    require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args.address}/home`)
 })
