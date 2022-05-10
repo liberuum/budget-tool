@@ -131,8 +131,8 @@ export default class Processor {
         this.filterByMonth()
         this.filteredByCategoryMonth = this.buildSESView(this.parsedRows)
         this.leveledMonthsByCategory = this.buildSFView(this.filteredByCategoryMonth)
-        console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
-        console.log('filteredByMonth', this.filteredByMonth)
+        // console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
+        // console.log('filteredByMonth', this.filteredByMonth)
     }
 
     getRawData = (data) => {
@@ -199,7 +199,7 @@ export default class Processor {
                 }
             }
 
-            console.log('budgets', this.budgets)
+            // console.log('budgets', this.budgets)
         }
         while (this.selectNextFilter(false))
 

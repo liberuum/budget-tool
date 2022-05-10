@@ -15,26 +15,25 @@ export default function ApiView() {
     
     const [monthsArr, setMonthsArr] = useState(filtered[0]);
     const [jsonData, setJsonData] = useState('')
-    const [leveledMonthsByCategory, setLeveledMonthsByCategory] = useState('');
-
-    // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
-
-
+    
     useEffect(() => {
         getMonth(selectedMonth)
-
+        
     }, [getMonth, jsonData])
-
+    
     //Getting available actual months
     let keys = []
+    let leveledMonthsByCategory;
     if (monthsArr !== undefined) {
         let months = monthsArr.mdTextByMonth;
-        setLeveledMonthsByCategory(leveledMonthsByCategory)
+        leveledMonthsByCategory = monthsArr.leveledMonthsByCategory;
         for (const month of months) {
             let key = Object.keys(month)
             keys = [...keys, ...key]
         }
     }
+    
+    // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
 
     const [selectedMonth, setSelectedMonth] = useState(keys[0]);
 
@@ -61,7 +60,7 @@ export default function ApiView() {
                     })}
                 </Select>
             </Card>
-            <UploadToDB props={{ keys, monthsArr }} />
+            <UploadToDB props={{selectedMonth, keys, leveledMonthsByCategory }} />
         </Container>
     )
 }
