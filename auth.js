@@ -1,6 +1,42 @@
 const { app, BrowserWindow } = require('electron');
 const { google } = require('googleapis');
 const settings = require('electron-settings');
+const express = require('express');
+const http = require('http');
+
+function getOauthResponse() {
+    const app = express();
+    const port = 3000;
+
+
+    app.get('/', (req, res) => {
+        let code = req.query.code;
+        console.log('code', code);
+
+    })
+
+
+    app.listen(port, () => {
+        console.log(`listening on port ${port} for OAuth response`)
+    })
+
+}
+
+async function getWithHttp() {
+
+
+    const server = http.createServer((req, res) => {
+        let url = req.url;
+        console.log('http req', req.url);
+
+        res.end()
+    });
+
+    server.listen(3000)
+
+
+
+}
 
 async function getCredentials() {
     try {
@@ -11,36 +47,51 @@ async function getCredentials() {
     }
 }
 
-const getOAuthCodeByInteraction = (interactionWindow, authPageURL) => {
+const getOAuthCodeByInteraction = async (interactionWindow, authPageURL) => {
     interactionWindow.loadURL(authPageURL);
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         const onclosed = () => {
             reject('Interaction ended intentionally ;(');
         };
         interactionWindow.on('closed', onclosed);
-        interactionWindow.on('page-title-updated', (ev) => {
-            const url = new URL(ev.sender.getURL());
-            if (url.searchParams.get('approvalCode')) {
-                interactionWindow.removeListener('closed', onclosed);
-                interactionWindow.close();
-                return resolve(url.searchParams.get('approvalCode'));
-            }
-            if ((url.searchParams.get('response') || '').startsWith('error=')) {
-                interactionWindow.removeListener('closed', onclosed);
-                interactionWindow.close();
-                return reject(url.searchParams.get('response'));
-            }
+
+        const app = express();
+        const port = 3000;
+        app.get('/', (req, res) => {
+            let code = req.query.code;
+            console.log('code', code);
+            interactionWindow.removeListener('closed', onclosed);
+            interactionWindow.close()
+            return resolve(code)
+
         });
+
+
+        app.listen(port, () => {
+        })
+
+        // interactionWindow.on('page-title-updated', (ev) => {
+        //     const url = new URL(ev.sender.getURL());
+        //     if (url.searchParams.get('approvalCode')) {
+        //         interactionWindow.removeListener('closed', onclosed);
+        //         interactionWindow.close();
+        //         return resolve(url.searchParams.get('approvalCode'));
+        //     }
+        //     if ((url.searchParams.get('response') || '').startsWith('error=')) {
+        //         interactionWindow.removeListener('closed', onclosed);
+        //         interactionWindow.close();
+        //         return reject(url.searchParams.get('response'));
+        //     }
+        // });
     });
 };
 
 const authorize = async () => {
     const credentials = await getCredentials();
-    const { client_secret, client_id } = credentials.installed;
-    const redirect_uris = ["urn:ietf:wg:oauth:2.0:oob",
-        "http://localhost"];
+    const { client_secret, client_id, redirect_uris } = credentials.installed;
+    const redirect_uri = `${redirect_uris[0]}:3000`
     const oauth2Client = new google.auth.OAuth2(
-        client_id, client_secret, redirect_uris[0]);
+        client_id, client_secret, redirect_uri);
 
     let token = {};
 
@@ -56,6 +107,7 @@ const authorize = async () => {
         // Create another window and get code;
         const authWindow = new BrowserWindow({ x: 60, y: 60, useContentSize: true });
         const code = await getOAuthCodeByInteraction(authWindow, url);
+        console.log('we got the code', code)
         try {
             let fetchedTokens = await oauth2Client.getToken(code)
             token = fetchedTokens.tokens
