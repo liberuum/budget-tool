@@ -71,7 +71,7 @@ export default function Table() {
 
     const handleAddSheet = async (event) => {
         event.preventDefault()
-        const walletAddress = inputWalletAddress;
+        const walletAddress = inputWalletAddress.toLowerCase();
         const walletName = inputWalletName;
         addrShortener(inputWalletAddress)
         const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);

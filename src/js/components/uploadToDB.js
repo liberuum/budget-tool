@@ -38,7 +38,7 @@ export default function UploadToDB(props) {
         const rawBudgetStatements = await getBudgetSatementInfo(rawCoreUnit.data.coreUnit[0].id)
         const budgetStatements = rawBudgetStatements.data.budgetStatement;
         setBudgetStatements(budgetStatements)
-        validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0])
+        validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName)
     }
 
 

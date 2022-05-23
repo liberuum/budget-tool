@@ -76,6 +76,7 @@ export const getBudgetSatementInfo = async (cuId) => {
             query: gql`
                 query BudgetStatement($filter: BudgetStatementFilter) {
                     budgetStatement(filter: $filter) {
+                        id
                         cuId
                         month
                         budgetStatementWallet {
@@ -118,17 +119,18 @@ export const addBudgetStatements = async (budgetStatements) => {
     });
 
     try {
-        client.mutate({
+        const result = await client.mutate({
             mutation: gql`
-                mutation BudgetStatementsBatchAdd($input: [BudgetStatementInput]) {
+                mutation BudgetStatementsBatchAdd($input: [BudgetStatementBatchAddInput]) {
                     budgetStatementsBatchAdd(input: $input) {
-                        errors {
-                            message
-                        }
-                        budgetStatement {
                             id
-                        }
-                        
+                            cuId
+                            month
+                            budgetStatementWallet {
+                                id
+                                name
+                                address
+                            }
                     }
                 }
             `,
@@ -136,8 +138,36 @@ export const addBudgetStatements = async (budgetStatements) => {
                 input: budgetStatements
             }
         })
+        return result;
     } catch (error) {
         console.error(error)
     }
 
+}
+
+export const addBudgetStatementWallets = async (budgetStatementWallets) => {
+    const client = new ApolloClient({
+        uri: 'http://localhost:4000/graphql',
+        cache: new InMemoryCache()
+    });
+
+    try {
+        const result = await client.mutate({
+            mutation: gql`
+                mutation BudgetStatementWalletBatchAdd($input: [BudgetStatementWalletBatchAddInput]) {
+                    budgetStatementWalletBatchAdd(input: $input) {
+                        id
+                        budgetStatementId
+                    }
+                }
+            `,
+            variables: {
+                input: budgetStatementWallets
+            }
+        });
+        return result;
+
+    } catch (error) {
+        console.error(error)
+    }
 }

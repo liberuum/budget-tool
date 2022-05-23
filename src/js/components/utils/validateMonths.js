@@ -1,24 +1,30 @@
-import { addBudgetStatements } from '../../api/graphql';
+import { addBudgetStatements, addBudgetStatementWallets } from '../../api/graphql';
 let statementMonths;
+let budgetStatements = []
 let spreadSheetMonths;
 let coreUnit;
+let walletAddress;
+let walletName;
 
 
 
-export const validateMonthsInApi = (budgetStatements, months, cu) => {
-    statementMonths = budgetStatements;
+export const validateMonthsInApi = async (apiBudgetStatements, months, cu, inputWalletAddress, inputWalletName) => {
+    budgetStatements = [...apiBudgetStatements];
     spreadSheetMonths = months;
     coreUnit = cu;
+    walletAddress = inputWalletAddress;
+    walletName = inputWalletName
 
-    statementMonths = statementMonths.map(statement => {
+    statementMonths = budgetStatements.map(statement => {
         return statement.month;
     })
 
     spreadSheetMonths = spreadSheetMonths.map(month => {
         return month.concat('-01');
     })
-
-    updateApiToMissingMonths()
+    console.log('budgetStatements', budgetStatements)
+    await updateApiToMissingMonths();
+    await validateWallets()
 }
 
 
@@ -38,15 +44,15 @@ const getMissingMonths = () => {
 const updateApiToMissingMonths = async () => {
     const months = getMissingMonths();
     months.push("2021-01-01")
-    months.push("2021-02-01")
+    // // months.push("2021-02-01")
     if (months.length == 0) {
         console.log('no need to add new data')
     } else {
-        addBudgetStatementToApi(months)
+        await addBudgetStatementToApi(months)
     }
 }
 
-const addBudgetStatementToApi = (months) => {
+const addBudgetStatementToApi = async (months) => {
     try {
         const rows = [];
 
@@ -61,8 +67,51 @@ const addBudgetStatementToApi = (months) => {
             }
             rows.push(row)
         }
-        addBudgetStatements(rows)
+        const result = await addBudgetStatements(rows);
+        const output = result.data.budgetStatementsBatchAdd
+        for (let statement of output) {
+            budgetStatements.push(statement)
+        }
+
     } catch (error) {
         console.error(error)
     }
+}
+
+// TODO add check to registered wallet addresses in MIP application
+const validateWallets = async () => {
+    let walletIdsForDataAdd = [];
+    let newBudgetStatementWallets = []
+    for (let statement of budgetStatements) {
+        if (statement.budgetStatementWallet.length < 1) {
+            let walletObj = {
+                budgetStatementId: statement.id,
+                name: walletName,
+                address: walletAddress,
+                currentBalance: 0,
+                topupTransfer: 0,
+                comments: '',
+            }
+            newBudgetStatementWallets.push(walletObj);
+        }
+        for (let wallet of statement.budgetStatementWallet) {
+            if (wallet.address.toLowerCase() == walletAddress) {
+                walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month })
+            }
+        }
+    }
+
+    console.log('newBudgetStatementWallets', newBudgetStatementWallets);
+    if (newBudgetStatementWallets.length > 0) {
+        const result = await addBudgetStatementWallets(newBudgetStatementWallets);
+        const newWallets = result.data.budgetStatementWalletBatchAdd;
+        for (let wallet of newWallets) {
+            let month = budgetStatements.find(walletObj => {
+                return walletObj.id === wallet.budgetStatementId
+            })
+            walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: wallet.budgetStatementId, month: month.month })
+        }
+
+    }
+    console.log('walletIdsForDataAdd', walletIdsForDataAdd)
 }
