@@ -1,90 +1,152 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
+import { getCoreUnit, getBudgetSatementInfo } from '../api/graphql';
+import { validateMonthsInApi } from './utils/validateMonths';
 
 
 export default function UploadToDB(props) {
+    const { walletName, walletAddress, keys, selectedMonth, leveledMonthsByCategory } = props.props;
+
 
     const [lineItems, setLineItems] = useState([])
+    const [coreUnit, setCoreUnit] = useState();
+    const [budgetStatements, setBudgetStatements] = useState();
 
-    // graphql client call
-    const GET_CORE_UNITS = gql`
-    query getCoreUnits {
-     coreUnits {
-        code
-        name
-      }
-    }
-    `;
+    useEffect(() => {
+        parseDataForApi()
+        fetchCoreUnit()
 
-    // const { loading, error, data } = useQuery(GET_CORE_UNITS)
-    // console.log('useQuery result', data)
+    }, [parseDataForApi, lineItems])
 
     const ADD_BUDGET_LINE_ITEMS = gql`
-        mutation BudgetStatementsBatchAdd($input: [BudgetStatementBatchAddInput]) {
-            budgetStatementsBatchAdd(input: $input) {
+        mutation budgetLineItemsBatchAdd($input: [BudgetLineItemsBatchAddInput]) {
+            budgetLineItemsBatchAdd(input: $input) {
                     errors {
                     message
                     }
-                    budgetStatementLineItem {
-                    id
-                    }
+                    
                 }
             }
     `;
 
-    const [budgetStatementsBatchAdd, { data, loading, error }] = useMutation(ADD_BUDGET_LINE_ITEMS)
+    const [budgetLineItemsBatchAdd, { data, loading, error }] = useMutation(ADD_BUDGET_LINE_ITEMS);
 
+    const fetchCoreUnit = async () => {
+        const rawCoreUnit = await getCoreUnit(1)
+        setCoreUnit(rawCoreUnit.data.coreUnit[0])
+        const rawBudgetStatements = await getBudgetSatementInfo(rawCoreUnit.data.coreUnit[0].id)
+        const budgetStatements = rawBudgetStatements.data.budgetStatement;
+        setBudgetStatements(budgetStatements)
+        validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0])
+    }
+
+
+    if (data) console.log('data from apollo server', data)
     if (loading) return 'Submitting data...'
     if (error) return `Upload error! ${error.message}`
 
-    const keys = props.props.keys;
-    const selectedMonth = props.props.selectedMonth;
-    const leveledMonthsByCategory = props.props.leveledMonthsByCategory;
+
+
+    // console.log('walletName', walletName)
 
     function getAllMonths() {
-        let months = [];
-        for (let month in Object.entries(leveledMonthsByCategory)[0][1]) {
-            months.push(month)
+        if (leveledMonthsByCategory !== undefined) {
+            let months = [];
+            for (let month in Object.entries(leveledMonthsByCategory)[0][1]) {
+                months.push(month)
+            }
+            return months;
         }
-        return months;
     }
 
     const parseDataForApi = () => {
         const months = getAllMonths();
-        for (let category in leveledMonthsByCategory) {
-            for (let month of months) {
-                const rowObject = {
-                    month: "",
-                    position: 0,
-                    group: 0,
-                    budgetCategory: '',
-                    forecast: 0,
-                    actual: 0,
-                    comments: ''
-                };
-                rowObject.month = month;
-                rowObject.position = 0;
-                rowObject.group = 0;
-                rowObject.budgetCategory = category;
-                rowObject.forecast = roundNumber(leveledMonthsByCategory[category][month].forecast);
-                rowObject.actual = roundNumber(leveledMonthsByCategory[category][month].actual);
-                rowObject.comments = '';
-
-                lineItems.push(rowObject)
+        if (months !== undefined) {
+            for (let category in leveledMonthsByCategory) {
+                for (let month of months) {
+                    const rowObject = {
+                        month: "",
+                        position: 0,
+                        group: '',
+                        budgetCategory: '',
+                        forecast: 0,
+                        actual: 0,
+                        comments: ''
+                    };
+                    rowObject.month = month;
+                    rowObject.position = 0;
+                    rowObject.group = '';
+                    rowObject.budgetCategory = category;
+                    rowObject.forecast = roundNumber(leveledMonthsByCategory[category][month].forecast);
+                    rowObject.actual = roundNumber(leveledMonthsByCategory[category][month].actual);
+                    rowObject.comments = '';
+                    lineItems.push(rowObject)
+                }
             }
         }
-        console.log('lineItems', lineItems)
+    }
+
+
+    const getNextThreeMonths = (selectedMonth) => {
+        if (selectedMonth !== undefined) {
+            const date = selectedMonth;
+            let monthsToUpload = [];
+            monthsToUpload.push(date);
+
+            const toNumber = date.split('-');
+            let year = Number(toNumber[0])
+            let month = Number(toNumber[1])
+            let yearString = String(year);
+
+            for (let i = 1; i <= 3; i++) {
+                let newMonth = month + i;
+                let leading0 = newMonth < 10 ? '0' : '';
+                let monthString = leading0 + String(newMonth)
+
+                if (newMonth > 12) {
+                    yearString = String(year + 1)
+                }
+                if (newMonth === 13) {
+                    monthString = '01'
+                }
+                if (newMonth === 14) {
+                    monthString = '02'
+                }
+                if (newMonth === 15) {
+                    monthString = '03'
+                }
+                let result = yearString.concat('-').concat(monthString)
+                monthsToUpload.push(result)
+            }
+            return monthsToUpload;
+        }
+    }
+
+    const filterFromLineTitems = () => {
+        const months = getNextThreeMonths(selectedMonth);
+        if (months !== undefined) {
+            let filtered = [];
+            for (let i = 0; i < months.length; i++) {
+                let selectedLineItems = lineItems.filter(item => {
+                    return item.month == months[i];
+                })
+                filtered.push(...selectedLineItems);
+                selectedLineItems = null
+            }
+
+            console.log('filtered months to upload', filtered)
+            return filtered;
+
+        }
+
     }
 
 
     const handleUpload = () => {
 
-        parseDataForApi()
-
-
-
-        // budgetStatementsBatchAdd({ variables: { input: data } });
+        let data = filterFromLineTitems()
+        budgetLineItemsBatchAdd({ variables: { input: data } });
     }
 
 
@@ -95,7 +157,7 @@ export default function UploadToDB(props) {
     return (
         <Container >
             <Card>
-                <Label>Upload budget forecast and actuals to ecosystem dashboard</Label>
+                <Label>Upload {selectedMonth} actuals and forecasts to ecosstem dashboard API</Label>
                 <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>
             </Card>
         </Container>

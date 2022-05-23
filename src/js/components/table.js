@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { storeAuthObject } from '../actions/googleAuth';
 import { storeLinkData, removeLinkData } from '../actions/tableData';
 import processData from '../processor/index';
+import CuInfo from './cuInfo';
 
 
 export default function Table() {
@@ -111,6 +112,7 @@ export default function Table() {
 
     return (
         <Container>
+            <CuInfo/>
             <Card sx={{ my: 2, mx: [1, "auto"], p: 0, pb: 3, maxWidth: "100%", }}>
                 <Grid
                     columns={4}
@@ -164,7 +166,6 @@ export default function Table() {
                 </Box>
             </Card>
             <Card sx={{ my: 4, p: 2, pb: 3, maxWidth: "100%" }}>
-                <Button sx={{ fontSize: "9px" }} variant="smallOutline" onClick={() => navigate(`/api/:spreadsheetId`)} >To Api</Button>
                 <Box>
                     <Grid
                         columns={2}

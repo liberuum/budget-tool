@@ -12,27 +12,31 @@ export default function ApiView() {
         if (item.spreadsheetId == spreadsheetId)
             return item
     })
-    
+
     const [monthsArr, setMonthsArr] = useState(filtered[0]);
     const [jsonData, setJsonData] = useState('')
-    
+
     useEffect(() => {
         getMonth(selectedMonth)
-        
+
     }, [getMonth, jsonData])
-    
+
     //Getting available actual months
     let keys = []
     let leveledMonthsByCategory;
+    let walletName;
+    let walletAddress;
     if (monthsArr !== undefined) {
         let months = monthsArr.mdTextByMonth;
+        walletName = monthsArr.walletName;
+        walletAddress = monthsArr.walletAddress;
         leveledMonthsByCategory = monthsArr.leveledMonthsByCategory;
         for (const month of months) {
             let key = Object.keys(month)
             keys = [...keys, ...key]
         }
     }
-    
+
     // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
 
     const [selectedMonth, setSelectedMonth] = useState(keys[0]);
@@ -50,6 +54,8 @@ export default function ApiView() {
         }
     }
 
+
+
     return (
         <Container >
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
@@ -60,7 +66,7 @@ export default function ApiView() {
                     })}
                 </Select>
             </Card>
-            <UploadToDB props={{selectedMonth, keys, leveledMonthsByCategory }} />
+            <UploadToDB props={{ selectedMonth, keys, leveledMonthsByCategory, walletName, walletAddress }} />
         </Container>
     )
 }
