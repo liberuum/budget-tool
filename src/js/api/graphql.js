@@ -102,7 +102,8 @@ export const getBudgetSatementInfo = async (cuId) => {
                 filter: {
                     cuId
                 }
-            }
+            },
+            fetchPolicy: 'no-cache'
         });
         return budgetStatements;
     } catch (error) {

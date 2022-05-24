@@ -18,7 +18,7 @@ export default function CuInfo() {
 
     const filter = {
         filter: {
-            id: 1
+            id: 39
         }
     }
 

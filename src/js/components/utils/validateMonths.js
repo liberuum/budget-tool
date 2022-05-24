@@ -43,11 +43,12 @@ const getMissingMonths = () => {
 
 const updateApiToMissingMonths = async () => {
     const months = getMissingMonths();
-    months.push("2021-01-01")
+    // months.push("2021-01-01")
     // // months.push("2021-02-01")
     if (months.length == 0) {
         console.log('no need to add new data')
     } else {
+        console.log('adding new budgetStatements for', months)
         await addBudgetStatementToApi(months)
     }
 }
