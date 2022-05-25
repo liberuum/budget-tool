@@ -30,7 +30,9 @@ export const validateMonthsInApi = async (apiBudgetStatements, months, cu, input
 }
 
 const addWalletIdsToLineItems = (lineItems, walletIds) => {
+    console.log('lineItems', lineItems)
     for (let lineItem of lineItems) {
+        lineItem.month = lineItem.month.concat('-01')
         for ( let walletId of walletIds) {
             if(lineItem.month == walletId.month) {
                 lineItem.budgetStatementWalletId = walletId.walletId
@@ -109,7 +111,7 @@ const validateWallets = async () => {
         }
         for (let wallet of statement.budgetStatementWallet) {
             if (wallet.address.toLowerCase() == walletAddress) {
-                walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month.substring(0, 7) })
+                walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month })
             }
         }
     }
@@ -122,7 +124,7 @@ const validateWallets = async () => {
             let month = budgetStatements.find(walletObj => {
                 return walletObj.id === wallet.budgetStatementId
             })
-            walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: wallet.budgetStatementId, month: month.month.substring(0, 7) })
+            walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: wallet.budgetStatementId, month: month.month })
         }
 
     }

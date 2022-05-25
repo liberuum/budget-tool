@@ -12,7 +12,7 @@ export default function UploadToDB(props) {
     const [lineItems, setLineItems] = useState([])
     const [coreUnit, setCoreUnit] = useState();
     const [apiBudgetStatements, setApiBudgetStatements] = useState();
- 
+
     useEffect(() => {
         parseDataForApi()
         fetchCoreUnit()
@@ -20,17 +20,17 @@ export default function UploadToDB(props) {
     }, [parseDataForApi, lineItems])
 
     const ADD_BUDGET_LINE_ITEMS = gql`
-        mutation budgetLineItemsBatchAdd($input: [BudgetLineItemsBatchAddInput]) {
+        mutation budgetLineItemsBatchAdd($input: [LineItemsBatchAddInput]) {
             budgetLineItemsBatchAdd(input: $input) {
-                    errors {
-                    message
-                    }
-                    
+                    id                    
                 }
             }
-    `;
+            `
+        ;
 
-    const [budgetLineItemsBatchAdd, { data, loading, error }] = useMutation(ADD_BUDGET_LINE_ITEMS);
+    const [budgetLineItemsBatchAdd, { data, loading, error }] = useMutation(ADD_BUDGET_LINE_ITEMS, {
+        fetchPolicy: 'no-cache'
+    });
 
     const fetchCoreUnit = async () => {
         const rawCoreUnit = await getCoreUnit(39)
@@ -130,7 +130,7 @@ export default function UploadToDB(props) {
             let filtered = [];
             for (let i = 0; i < months.length; i++) {
                 let selectedLineItems = lineItems.filter(item => {
-                    return item.month == months[i];
+                    return item.month == months[i].concat('-01');
                 })
                 filtered.push(...selectedLineItems);
                 selectedLineItems = null
@@ -147,7 +147,7 @@ export default function UploadToDB(props) {
     const handleUpload = () => {
 
         let data = filterFromLineTitems()
-        // budgetLineItemsBatchAdd({ variables: { input: data } });
+        budgetLineItemsBatchAdd({ variables: { input: data } });
     }
 
 
