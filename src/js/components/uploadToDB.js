@@ -66,6 +66,7 @@ export default function UploadToDB(props) {
             for (let category in leveledMonthsByCategory) {
                 for (let month of months) {
                     const rowObject = {
+                        budgetStatementWalletId: null,
                         month: "",
                         position: 0,
                         group: '',
@@ -146,7 +147,7 @@ export default function UploadToDB(props) {
     const handleUpload = () => {
 
         let data = filterFromLineTitems()
-        budgetLineItemsBatchAdd({ variables: { input: data } });
+        // budgetLineItemsBatchAdd({ variables: { input: data } });
     }
 
 
