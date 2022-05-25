@@ -8,7 +8,7 @@ let walletName;
 
 
 
-export const validateMonthsInApi = async (apiBudgetStatements, months, cu, inputWalletAddress, inputWalletName) => {
+export const validateMonthsInApi = async (apiBudgetStatements, months, cu, inputWalletAddress, inputWalletName, inputLineItems) => {
     budgetStatements = [...apiBudgetStatements];
     spreadSheetMonths = months;
     coreUnit = cu;
@@ -24,7 +24,19 @@ export const validateMonthsInApi = async (apiBudgetStatements, months, cu, input
     })
     console.log('budgetStatements', budgetStatements)
     await updateApiToMissingMonths();
-    await validateWallets()
+    const walletIds = await validateWallets();
+    // this function changes the lineItems state. no need to return new array
+    addWalletIdsToLineItems(inputLineItems, walletIds)
+}
+
+const addWalletIdsToLineItems = (lineItems, walletIds) => {
+    for (let lineItem of lineItems) {
+        for ( let walletId of walletIds) {
+            if(lineItem.month == walletId.month) {
+                lineItem.budgetStatementWalletId = walletId.walletId
+            }
+        }
+    }
 }
 
 
@@ -97,7 +109,7 @@ const validateWallets = async () => {
         }
         for (let wallet of statement.budgetStatementWallet) {
             if (wallet.address.toLowerCase() == walletAddress) {
-                walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month })
+                walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month.substring(0, 7) })
             }
         }
     }
@@ -110,9 +122,10 @@ const validateWallets = async () => {
             let month = budgetStatements.find(walletObj => {
                 return walletObj.id === wallet.budgetStatementId
             })
-            walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: wallet.budgetStatementId, month: month.month })
+            walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: wallet.budgetStatementId, month: month.month.substring(0, 7) })
         }
 
     }
     console.log('walletIdsForDataAdd', walletIdsForDataAdd)
+    return walletIdsForDataAdd;
 }

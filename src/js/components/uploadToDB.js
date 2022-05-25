@@ -12,7 +12,7 @@ export default function UploadToDB(props) {
     const [lineItems, setLineItems] = useState([])
     const [coreUnit, setCoreUnit] = useState();
     const [apiBudgetStatements, setApiBudgetStatements] = useState();
-
+ 
     useEffect(() => {
         parseDataForApi()
         fetchCoreUnit()
@@ -38,7 +38,7 @@ export default function UploadToDB(props) {
         const rawBudgetStatements = await getBudgetSatementInfo(rawCoreUnit.data.coreUnit[0].id)
         const budgetStatements = rawBudgetStatements.data.budgetStatement;
         setApiBudgetStatements(budgetStatements)
-        validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName)
+        validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName, lineItems);
     }
 
 

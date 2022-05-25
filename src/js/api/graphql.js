@@ -137,7 +137,8 @@ export const addBudgetStatements = async (budgetStatements) => {
             `,
             variables: {
                 input: budgetStatements
-            }
+            },
+            fetchPolicy: 'no-cache'
         })
         return result;
     } catch (error) {
