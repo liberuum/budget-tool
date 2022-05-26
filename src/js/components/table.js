@@ -6,6 +6,8 @@ import { storeAuthObject } from '../actions/googleAuth';
 import { storeLinkData, removeLinkData } from '../actions/tableData';
 import processData from '../processor/index';
 import CuInfo from './cuInfo';
+//testing function
+import './utils/validateLineItems';
 
 
 export default function Table() {
@@ -79,7 +81,7 @@ export default function Table() {
             setValidatedInput({ linkError: true })
         } else {
             const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth,leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress }))
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress }))
         }
         setValidatedInput({ variant: null, })
         setInputWalletName('')
@@ -112,7 +114,7 @@ export default function Table() {
 
     return (
         <Container>
-            <CuInfo/>
+            <CuInfo />
             <Card sx={{ my: 2, mx: [1, "auto"], p: 0, pb: 3, maxWidth: "100%", }}>
                 <Grid
                     columns={4}

@@ -3,6 +3,7 @@ import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { getCoreUnit, getBudgetSatementInfo } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
+import { validateLineItems } from './utils/validateLineItems'
 
 
 export default function UploadToDB(props) {
@@ -124,7 +125,7 @@ export default function UploadToDB(props) {
         }
     }
 
-    const filterFromLineTitems = () => {
+    const filterFromLineItems = () => {
         const months = getNextThreeMonths(selectedMonth);
         if (months !== undefined) {
             let filtered = [];
@@ -146,8 +147,10 @@ export default function UploadToDB(props) {
 
     const handleUpload = () => {
 
-        let data = filterFromLineTitems()
-        budgetLineItemsBatchAdd({ variables: { input: data } });
+        let data = filterFromLineItems()
+        validateLineItems(data);
+
+        // budgetLineItemsBatchAdd({ variables: { input: data } });
     }
 
 

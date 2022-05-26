@@ -30,7 +30,7 @@ export const validateMonthsInApi = async (apiBudgetStatements, months, cu, input
 }
 
 const addWalletIdsToLineItems = (lineItems, walletIds) => {
-    console.log('lineItems', lineItems)
+    // console.log('lineItems', lineItems)
     for (let lineItem of lineItems) {
         lineItem.month = lineItem.month.concat('-01')
         for ( let walletId of walletIds) {

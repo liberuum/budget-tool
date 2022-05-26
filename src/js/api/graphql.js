@@ -172,4 +172,35 @@ export const addBudgetStatementWallets = async (budgetStatementWallets) => {
     } catch (error) {
         console.error(error)
     }
+};
+
+export const getBudgetLineItems = async (walletId) => {
+    try {
+        const result = client.query({
+            query: gql`
+                query BudgetStatementLineItem($filter: BudgetStatementLineItemFilter) {
+                    budgetStatementLineItem(filter: $filter) {
+                        id
+                        budgetStatementWalletId
+                        month
+                        position
+                        group
+                        budgetCategory
+                        forecast
+                        actual
+                        comments
+                    }
+                }
+            `,
+            variables: {
+                filter: {
+                    budgetStatementWalletId: walletId
+                }
+            },
+            fetchPolicy: 'no-cache'
+        });
+        return result;
+    } catch (error) {
+        console.error(error)
+    }
 }
