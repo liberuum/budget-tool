@@ -364,10 +364,25 @@ const validatedLineItems = [
     }
 ]
 
+
+
+
+const getWalletIds = (lineItems) => {
+    let ids = [];
+    for(let lineItem of lineItems) {
+        ids.push(lineItem.budgetStatementWalletId);
+    }
+    const uniqueIds = [...new Set(ids)];
+    return uniqueIds;
+}
+
 export const validateLineItems = async (selectedLineItems) => {
     lineItems = [...selectedLineItems];
     console.log('validateLineItems', lineItems)
-    console.log('result', await getBudgetLineItems(146))
+    const uniqueWalletIds = getWalletIds(lineItems)
+    console.log('uniqueWalletIds', uniqueWalletIds)
+    const apiLineItems = await getBudgetLineItems(146);
+    console.log('apiLineItems', apiLineItems.data.budgetStatementLineItem )
 };
 
 validateLineItems(validatedLineItems);
