@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
-import { getCoreUnit, getBudgetSatementInfo } from '../api/graphql';
+import { getCoreUnit, getBudgetSatementInfo, updateBudgetLineItems } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
 import { validateLineItems } from './utils/validateLineItems'
 
@@ -17,8 +17,9 @@ export default function UploadToDB(props) {
     useEffect(() => {
         parseDataForApi()
         fetchCoreUnit()
+        // filterFromLineItems(selectedMonth);
 
-    }, [parseDataForApi, lineItems])
+    }, [parseDataForApi, lineItems, fetchCoreUnit])
 
     const ADD_BUDGET_LINE_ITEMS = gql`
         mutation budgetLineItemsBatchAdd($input: [LineItemsBatchAddInput]) {
@@ -125,7 +126,7 @@ export default function UploadToDB(props) {
         }
     }
 
-    const filterFromLineItems = () => {
+    const filterFromLineItems = (selectedMonth) => {
         const months = getNextThreeMonths(selectedMonth);
         if (months !== undefined) {
             let filtered = [];
@@ -145,12 +146,22 @@ export default function UploadToDB(props) {
     }
 
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
 
-        let data = filterFromLineItems()
-        validateLineItems(data);
+        let data = filterFromLineItems(selectedMonth)
+        const { lineItemsToOverride, lineItemsToUpload } = await validateLineItems(data);
+        console.log('data to override', lineItemsToOverride)
+        console.log('data to upload:', lineItemsToUpload)
 
-        // budgetLineItemsBatchAdd({ variables: { input: data } });
+        if (lineItemsToOverride.length > 0) {
+            console.log('updating lineItems',)
+            await updateBudgetLineItems(lineItemsToOverride)
+        }
+        if (lineItemsToUpload.length > 0) {
+            console.log('adding new lineItems')
+            budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
+        }
+
     }
 
 

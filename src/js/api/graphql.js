@@ -147,6 +147,32 @@ export const addBudgetStatements = async (budgetStatements) => {
 
 }
 
+export const updateBudgetLineItems = async (lineItems) => {
+    const client = new ApolloClient({
+        uri: 'http://localhost:4000/graphql',
+        cache: new InMemoryCache()
+    });
+
+    try {
+        const result = await client.mutate({
+            mutation: gql`
+                mutation Mutation($input: [LineItemsBatchUpdateInput]) {
+                    budgetLineItemsBatchUpdate(input: $input) {
+                        id
+                    }
+                }
+            `,
+            variables: {
+                input: lineItems
+            },
+            fetchPolicy: 'no-cache'
+        })
+        return result;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 export const addBudgetStatementWallets = async (budgetStatementWallets) => {
     const client = new ApolloClient({
         uri: 'http://localhost:4000/graphql',

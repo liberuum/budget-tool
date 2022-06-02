@@ -9,7 +9,7 @@ const validatedLineItems = [
         "group": "",
         "budgetCategory": "Deposits",
         "forecast": 14754.1,
-        "actual": 14754.1,
+        "actual": 15754.1,
         "comments": ""
     },
     {
@@ -364,12 +364,9 @@ const validatedLineItems = [
     }
 ]
 
-
-
-
 const getWalletIds = (lineItems) => {
     let ids = [];
-    for(let lineItem of lineItems) {
+    for (let lineItem of lineItems) {
         ids.push(lineItem.budgetStatementWalletId);
     }
     const uniqueIds = [...new Set(ids)];
@@ -378,11 +375,49 @@ const getWalletIds = (lineItems) => {
 
 export const validateLineItems = async (selectedLineItems) => {
     lineItems = [...selectedLineItems];
-    console.log('validateLineItems', lineItems)
-    const uniqueWalletIds = getWalletIds(lineItems)
-    console.log('uniqueWalletIds', uniqueWalletIds)
-    const apiLineItems = await getBudgetLineItems(146);
-    console.log('apiLineItems', apiLineItems.data.budgetStatementLineItem )
+
+    try {
+        let lineItemsToUpload = [];
+        let lineItemsToOverride = []
+        const uniqueWalletIds = getWalletIds(lineItems)
+
+        //Checking lineItems per month (walletId)
+        for (let walletId of uniqueWalletIds) {
+            const rawApiLineItems = await getBudgetLineItems(walletId);
+            const apiLineItems = rawApiLineItems.data.budgetStatementLineItem
+            const localLineItems = lineItems.filter(lineItem => {
+                return lineItem.budgetStatementWalletId === walletId
+            });
+
+            if (!apiLineItems.length == 0) {
+                for (let i = 0; i < localLineItems.length; i++) {
+                    if (apiLineItems[i] == undefined) {
+                        continue
+                        
+                    } else if (localLineItems[i].budgetCategory === apiLineItems[i].budgetCategory &&
+                        localLineItems[i].forecast === apiLineItems[i].forecast &&
+                        localLineItems[i].actual === apiLineItems[i].actual) {
+                      
+                    }
+                    else {
+                        if (localLineItems[i].budgetCategory === apiLineItems[i].budgetCategory) {
+                            console.log('not same, adding to override list')
+                            localLineItems[i].id = apiLineItems[i].id
+                            lineItemsToOverride.push(localLineItems[i])
+                        }
+                    }
+                }
+
+            } else {
+                lineItemsToUpload.push(...localLineItems)
+            }
+        }
+        return { lineItemsToOverride, lineItemsToUpload }
+    } catch (error) {
+        console.error(error)
+    }
+
+
 };
 
 validateLineItems(validatedLineItems);
