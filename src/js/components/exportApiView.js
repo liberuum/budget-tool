@@ -39,7 +39,7 @@ export default function ApiView() {
 
     // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
 
-    const [selectedMonth, setSelectedMonth] = useState(keys[0]);
+    const [selectedMonth, setSelectedMonth] = useState(keys[keys.length-1]);
 
     const handleSelect = (value) => {
         setSelectedMonth(value)
@@ -60,7 +60,7 @@ export default function ApiView() {
         <Container >
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>Choose Month</Label>
-                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${keys[0]}`}>
+                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${keys[keys.length-1]}`}>
                     {keys.map(month => {
                         return <option key={month}>{`${month}`}</option>
                     })}
