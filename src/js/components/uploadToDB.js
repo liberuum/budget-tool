@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
+import { Card, Label, Container, Textarea, Select, Button, Spinner } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { getCoreUnit, getBudgetSatementInfo, updateBudgetLineItems } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
@@ -8,6 +8,7 @@ import { validateLineItems } from './utils/validateLineItems'
 
 export default function UploadToDB(props) {
     const { walletName, walletAddress, keys, selectedMonth, leveledMonthsByCategory } = props.props;
+    const [updatingDb, setUpdatingDb] = useState(false);
 
 
     const [lineItems, setLineItems] = useState([])
@@ -147,6 +148,7 @@ export default function UploadToDB(props) {
 
 
     const handleUpload = async () => {
+        setUpdatingDb(true)
 
         let data = filterFromLineItems(selectedMonth)
         const { lineItemsToOverride, lineItemsToUpload } = await validateLineItems(data);
@@ -156,11 +158,14 @@ export default function UploadToDB(props) {
         if (lineItemsToOverride.length > 0) {
             console.log('updating lineItems',)
             await updateBudgetLineItems(lineItemsToOverride)
+            setUpdatingDb(false)
         }
         if (lineItemsToUpload.length > 0) {
             console.log('adding new lineItems')
-            budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
+            await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
+            setUpdatingDb(false)
         }
+        setUpdatingDb(false)
 
     }
 
@@ -170,11 +175,11 @@ export default function UploadToDB(props) {
     }
 
     return (
-        <Container >
-            <Card>
-                <Label>Upload {selectedMonth} actuals and forecasts to ecosstem dashboard API</Label>
-                <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>
-            </Card>
-        </Container>
+        <Card>
+            <Label>Upload {selectedMonth} actuals and forecasts to ecosstem dashboard API</Label>
+            {updatingDb ? <Spinner variant="styles.spinner" title="loading"></Spinner> :
+                <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>}
+
+        </Card>
     )
 }
