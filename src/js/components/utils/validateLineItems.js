@@ -420,4 +420,4 @@ export const validateLineItems = async (selectedLineItems) => {
 
 };
 
-validateLineItems(validatedLineItems);
+// validateLineItems(validatedLineItems);
