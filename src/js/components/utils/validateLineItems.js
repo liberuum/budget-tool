@@ -378,41 +378,27 @@ export const validateLineItems = async (selectedLineItems) => {
 
     try {
         let lineItemsToUpload = [];
-        let lineItemsToOverride = []
+        let lineItemsToDelete = []
         const uniqueWalletIds = getWalletIds(lineItems)
 
         //Checking lineItems per month (walletId)
-        for (let walletId of uniqueWalletIds) {
-            const rawApiLineItems = await getBudgetLineItems(walletId);
-            const apiLineItems = rawApiLineItems.data.budgetStatementLineItem
-            const localLineItems = lineItems.filter(lineItem => {
-                return lineItem.budgetStatementWalletId === walletId
-            });
 
-            if (!apiLineItems.length == 0) {
-                for (let i = 0; i < localLineItems.length; i++) {
-                    if (apiLineItems[i] == undefined) {
-                        continue
-                        
-                    } else if (localLineItems[i].budgetCategory === apiLineItems[i].budgetCategory &&
-                        localLineItems[i].forecast === apiLineItems[i].forecast &&
-                        localLineItems[i].actual === apiLineItems[i].actual) {
-                      
-                    }
-                    else {
-                        if (localLineItems[i].budgetCategory === apiLineItems[i].budgetCategory) {
-                            console.log('not same, adding to override list')
-                            localLineItems[i].id = apiLineItems[i].id
-                            lineItemsToOverride.push(localLineItems[i])
-                        }
-                    }
-                }
-
-            } else {
-                lineItemsToUpload.push(...localLineItems)
-            }
+        const rawApiLineItems = await getBudgetLineItems(uniqueWalletIds[0]);
+        const apiLineItems = rawApiLineItems.data.budgetStatementLineItem
+        
+        if(apiLineItems.length > 0) {
+            lineItemsToDelete = apiLineItems.map(item => {
+                delete item.__typename
+                return item;
+            })
+            lineItemsToUpload = [...selectedLineItems]
+        } else {
+            lineItemsToUpload = [...selectedLineItems]
         }
-        return { lineItemsToOverride, lineItemsToUpload }
+
+
+
+        return { lineItemsToDelete, lineItemsToUpload }
     } catch (error) {
         console.error(error)
     }

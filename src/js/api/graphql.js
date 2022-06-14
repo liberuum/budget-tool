@@ -147,7 +147,7 @@ export const addBudgetStatements = async (budgetStatements) => {
 
 }
 
-export const updateBudgetLineItems = async (lineItems) => {
+export const deleteBudgetLineItems = async (lineItems) => {
     const client = new ApolloClient({
         uri: 'http://localhost:4000/graphql',
         cache: new InMemoryCache()
@@ -156,8 +156,8 @@ export const updateBudgetLineItems = async (lineItems) => {
     try {
         const result = await client.mutate({
             mutation: gql`
-                mutation Mutation($input: [LineItemsBatchUpdateInput]) {
-                    budgetLineItemsBatchUpdate(input: $input) {
+                mutation Mutation($input: [LineItemsBatchDeleteInput]) {
+                    budgetLineItemsBatchDelete(input: $input) {
                         id
                     }
                 }

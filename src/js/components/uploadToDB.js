@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Label, Badge, Textarea, Select, Button, Spinner } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
-import { getCoreUnit, getBudgetSatementInfo, updateBudgetLineItems } from '../api/graphql';
+import { getCoreUnit, getBudgetSatementInfo, deleteBudgetLineItems } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
 import { validateLineItems } from './utils/validateLineItems'
 
@@ -16,6 +16,7 @@ export default function UploadToDB(props) {
     const [lineItems, setLineItems] = useState([])
     const [coreUnit, setCoreUnit] = useState();
     const [apiBudgetStatements, setApiBudgetStatements] = useState();
+    const [walletIds, setWalletIds] = useState()
 
     useEffect(async () => {
         parseDataForApi()
@@ -38,12 +39,13 @@ export default function UploadToDB(props) {
     });
 
     const fetchCoreUnit = async () => {
-        const rawCoreUnit = await getCoreUnit(42)
+        const rawCoreUnit = await getCoreUnit(39)
         setCoreUnit(rawCoreUnit.data.coreUnit[0])
         const rawBudgetStatements = await getBudgetSatementInfo(rawCoreUnit.data.coreUnit[0].id)
         const budgetStatements = rawBudgetStatements.data.budgetStatement;
         setApiBudgetStatements(budgetStatements)
-        validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName, lineItems);
+        const idsWallets = await validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName, lineItems);
+        setWalletIds(idsWallets);
     }
 
 
@@ -131,12 +133,21 @@ export default function UploadToDB(props) {
     }
 
     const filterFromLineItems = (selectedMonth) => {
+        // fetching walletIf of selected month so it can be applied to all lineItems 
+        // under selectedMonth
+        const walletId = walletIds.filter(wallet => {
+            return wallet.month === selectedMonth.concat('-01')
+        })
+        console.log('walletId', walletId)
         const months = getNextThreeMonths(selectedMonth);
         if (months !== undefined) {
             let filtered = [];
             for (let i = 0; i < months.length; i++) {
                 let selectedLineItems = lineItems.filter(item => {
-                    return item.month === months[i].concat('-01');
+                    if (item.month === months[i].concat('-01')) {
+                        item.budgetStatementWalletId = walletId[0].walletId
+                        return item;
+                    }
                 })
                 filtered.push(...selectedLineItems);
                 selectedLineItems = null
@@ -161,23 +172,22 @@ export default function UploadToDB(props) {
         setUploadStatus({ ...uploadStatus, updatingDb: true })
 
         let data = filterFromLineItems(selectedMonth)
-        const { lineItemsToOverride, lineItemsToUpload } = await validateLineItems(data);
-        console.log('data to override', lineItemsToOverride)
+        const { lineItemsToDelete, lineItemsToUpload } = await validateLineItems(data);
+        console.log('data to delete', lineItemsToDelete)
         console.log('data to upload:', lineItemsToUpload)
 
-        if (lineItemsToOverride.length > 0) {
-            console.log('updating lineItems',)
-            await updateBudgetLineItems(lineItemsToOverride)
+        if (lineItemsToDelete.length > 0 && lineItemsToUpload.length > 0) {
+            console.log('deleting and updating lineItems',)
+            await deleteBudgetLineItems(lineItemsToDelete)
+            await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
             setUploadStatus({ ...uploadStatus, updatingDb: false, overriding: true })
         }
-        if (lineItemsToUpload.length > 0) {
+        if (lineItemsToDelete.length === 0 && lineItemsToUpload.length > 0) {
             console.log('adding new lineItems')
             await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
             setUploadStatus({ ...uploadStatus, updatingDb: false, uploading: true })
         }
-        if (lineItemsToOverride.length == 0 && lineItemsToUpload.length == 0) {
-            setUploadStatus({ ...uploadStatus, updatingDb: false, noChange: true, overriding: false, uploading: false  })
-        }
+        
 
     }
 

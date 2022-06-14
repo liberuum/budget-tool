@@ -27,6 +27,7 @@ export const validateMonthsInApi = async (apiBudgetStatements, months, cu, input
     const walletIds = await validateWallets();
     // this function changes the lineItems state. no need to return new array
     addWalletIdsToLineItems(inputLineItems, walletIds)
+    return walletIds;
 }
 
 const addWalletIdsToLineItems = (lineItems, walletIds) => {
