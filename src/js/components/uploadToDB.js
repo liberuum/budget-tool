@@ -3,7 +3,7 @@ import { Card, Label, Badge, Textarea, Select, Button, Spinner } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { getCoreUnit, getBudgetSatementInfo, deleteBudgetLineItems } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
-import { validateLineItems } from './utils/validateLineItems'
+import { validateLineItems, getCanonicalCategory } from './utils/validateLineItems'
 
 
 export default function UploadToDB(props) {
@@ -72,6 +72,7 @@ export default function UploadToDB(props) {
         const months = getAllMonths();
         if (months !== undefined) {
             for (let category in leveledMonthsByCategory) {
+                let canonicalObj = getCanonicalCategory(category);
                 for (let month of months) {
                     const rowObject = {
                         budgetStatementWalletId: null,
@@ -81,19 +82,24 @@ export default function UploadToDB(props) {
                         budgetCategory: '',
                         forecast: 0,
                         actual: 0,
-                        comments: ''
+                        comments: '',
+                        canonicalBudgetCategory: '',
+                        headcountExpense: ''
                     };
                     rowObject.month = month;
-                    rowObject.position = 0;
+                    rowObject.position = canonicalObj ? canonicalObj.position : 0;
                     rowObject.group = '';
                     rowObject.budgetCategory = category;
                     rowObject.forecast = roundNumber(leveledMonthsByCategory[category][month].forecast);
                     rowObject.actual = roundNumber(leveledMonthsByCategory[category][month].actual);
                     rowObject.comments = '';
+                    rowObject.canonicalBudgetCategory = canonicalObj ? canonicalObj.canonicalCategory : null;
+                    rowObject.headcountExpense = canonicalObj ? canonicalObj.headCountExpense : null;
                     lineItems.push(rowObject)
                 }
             }
         }
+        console.log('lineItems', lineItems)
     }
 
 

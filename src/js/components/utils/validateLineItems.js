@@ -1,368 +1,6 @@
 import { getBudgetLineItems } from '../../api/graphql';
 
 let lineItems = [];
-const validatedLineItems = [
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Deposits",
-        "forecast": 14754.1,
-        "actual": 15754.1,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Gas Fees",
-        "forecast": 350,
-        "actual": 350,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Software Costs",
-        "forecast": 250,
-        "actual": 144,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Contractor fees",
-        "forecast": 17300,
-        "actual": 17233,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Employee salaries",
-        "forecast": 4918.03,
-        "actual": 4950,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Fees & Salary costs",
-        "forecast": 5850,
-        "actual": 6223.02,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "payment topup",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Events & Activities",
-        "forecast": 0,
-        "actual": 1750,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "146",
-        "month": "2021-06-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Travel Costs",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Deposits",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Gas Fees",
-        "forecast": 450,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Software Costs",
-        "forecast": 226,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Contractor fees",
-        "forecast": 22915.81,
-        "actual": 7198,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Employee salaries",
-        "forecast": 4918.03,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Fees & Salary costs",
-        "forecast": 5850,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "payment topup",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Events & Activities",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "147",
-        "month": "2021-07-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Travel Costs",
-        "forecast": 8000,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Deposits",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Gas Fees",
-        "forecast": 450,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Software Costs",
-        "forecast": 226,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Contractor fees",
-        "forecast": 17300,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Employee salaries",
-        "forecast": 4918.03,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Fees & Salary costs",
-        "forecast": 6400,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "payment topup",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Events & Activities",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "148",
-        "month": "2021-08-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Travel Costs",
-        "forecast": 8000,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Deposits",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Gas Fees",
-        "forecast": 450,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Software Costs",
-        "forecast": 226,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Contractor fees",
-        "forecast": 17300,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Employee salaries",
-        "forecast": 4918.03,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Fees & Salary costs",
-        "forecast": 6400,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "payment topup",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Events & Activities",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    },
-    {
-        "budgetStatementWalletId": "149",
-        "month": "2021-09-01",
-        "position": 0,
-        "group": "",
-        "budgetCategory": "Travel Costs",
-        "forecast": 0,
-        "actual": 0,
-        "comments": ""
-    }
-]
 
 const getWalletIds = (lineItems) => {
     let ids = [];
@@ -385,8 +23,8 @@ export const validateLineItems = async (selectedLineItems) => {
 
         const rawApiLineItems = await getBudgetLineItems(uniqueWalletIds[0]);
         const apiLineItems = rawApiLineItems.data.budgetStatementLineItem
-        
-        if(apiLineItems.length > 0) {
+
+        if (apiLineItems.length > 0) {
             lineItemsToDelete = apiLineItems.map(item => {
                 delete item.__typename
                 return item;
@@ -406,4 +44,108 @@ export const validateLineItems = async (selectedLineItems) => {
 
 };
 
-// validateLineItems(validatedLineItems);
+const budgetCategoriesMap = [
+    {
+        canonicalCategory: 'CompensationAndBenefits',
+        position: 1,
+        headCountExpense: true,
+        budgetCategories: ['compensation & benefits', 'salaries & wages', 'healtcare', 'contractor (temp) fees', 'insurance', 'employer taxes', 'bonus', 'referral bonus', 'sign on bonus', 'fees & salary costs', 'contractor fees']
+    },
+    {
+        canonicalCategory: 'AdminExpense',
+        position: 2,
+        headCountExpense: true,
+        budgetCategories: ['recruiting fees']
+    },
+    {
+        canonicalCategory: 'AdminExpense',
+        position: 2,
+        headCountExpense: false,
+        budgetCategories: ['admin expense', 'exchange fees', 'bank fees']
+    },
+    {
+        canonicalCategory: 'TravelAndEntertainment',
+        position: 3,
+        headCountExpense: true,
+        budgetCategories: ['travel & entertainment', 'hotels', 'airfare', 'meals', 'activities & events', 'events', 'transportation (uber, taxi, etc.)', 'events & activities', 'activities']
+    },
+    {
+        canonicalCategory: 'FreightAndDuties',
+        position: 4,
+        headCountExpense: false,
+        budgetCategories: ['freight & duties', 'shipping & fright', 'shipping', 'fright']
+    },
+    {
+        canonicalCategory: 'GasExpense',
+        position: 5,
+        headCountExpense: false,
+        budgetCategories: ['gas expense', 'gas', 'gas fees']
+    },
+    {
+        canonicalCategory: 'GovernancePrograms',
+        position: 6,
+        headCountExpense: false,
+        budgetCategories: ['governance programs', 'programs - other', 'programs - sourcecred']
+    },
+    {
+        canonicalCategory: 'HardwareExpense',
+        position: 7,
+        headCountExpense: false,
+        budgetCategories: ['hardware expense']
+    },
+    {
+        canonicalCategory: 'MarketingExpense',
+        position: 8,
+        headCountExpense: false,
+        budgetCategories: ['marketing expense', 'advertising', 'marketing campaign', 'maker swag', 'sponsorships', 'public relations']
+    },
+    {
+        canonicalCategory: 'ProfessionalServices',
+        position: 9,
+        headCountExpense: false,
+        budgetCategories: ['professional services', 'accounting expense', 'accounting expenses', 'legal expense', 'legal expenses', 'contractor services', 'contractor services (professional)', 'payrol services', 'technical operations services', 'data feeds']
+    },
+    {
+        canonicalCategory: 'SoftwareDevelopmentExpense',
+        position: 10,
+        headCountExpense: false,
+        budgetCategories: ['software development expense', 'bug bounty', 'programs', 'programs - status ui', 'sc audit expense', 'blockchain development expense', 'web development', 'software development', 'backend', 'frontend', 'software']
+    },
+    {
+        canonicalCategory: 'SoftwareExpense',
+        position: 11,
+        headCountExpense: false,
+        budgetCategories: ['software expense', 'it expense', 'tooling', 'tools']
+    },
+    {
+        canonicalCategory: 'Supplies',
+        position: 12,
+        headCountExpense: false,
+        budgetCategories: ['supplies', 'office supplies']
+    },
+    {
+        canonicalCategory: 'TrainingExpense',
+        position: 13,
+        headCountExpense: false,
+        budgetCategories: ['training expense', 'training']
+    },
+    {
+        canonicalCategory: 'CommunityDevelopmentExpense',
+        position: 14,
+        headCountExpense: false,
+        budgetCategories: ['community development expense', 'grants', 'grant']
+    }
+]
+
+export const getCanonicalCategory = (expenseType) => {
+    const cleanTag = expenseType.toLowerCase();
+    let result = budgetCategoriesMap.filter(obj => {
+        return obj.budgetCategories.includes(cleanTag)
+    })
+    if (result.length > 0) {
+        return result[0]
+    } else {
+        return null;
+    }
+}
+
