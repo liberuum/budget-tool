@@ -52,88 +52,100 @@ const budgetCategoriesMap = [
         budgetCategories: ['compensation & benefits', 'salaries & wages', 'healtcare', 'contractor (temp) fees', 'insurance', 'employer taxes', 'bonus', 'referral bonus', 'sign on bonus', 'fees & salary costs', 'contractor fees']
     },
     {
-        canonicalCategory: 'AdminExpense',
+        canonicalCategory: 'Bonus',
         position: 2,
+        headCountExpense: true,
+        budgetCategories: ['bonus']
+    },
+    {
+        canonicalCategory: 'AdminExpense',
+        position: 3,
         headCountExpense: true,
         budgetCategories: ['recruiting fees']
     },
     {
         canonicalCategory: 'AdminExpense',
-        position: 2,
+        position: 3,
         headCountExpense: false,
         budgetCategories: ['admin expense', 'exchange fees', 'bank fees']
     },
     {
         canonicalCategory: 'TravelAndEntertainment',
-        position: 3,
+        position: 4,
         headCountExpense: true,
         budgetCategories: ['travel & entertainment', 'hotels', 'airfare', 'meals', 'activities & events', 'events', 'transportation (uber, taxi, etc.)', 'events & activities', 'activities']
     },
     {
         canonicalCategory: 'FreightAndDuties',
-        position: 4,
+        position: 5,
         headCountExpense: false,
         budgetCategories: ['freight & duties', 'shipping & fright', 'shipping', 'fright']
     },
     {
         canonicalCategory: 'GasExpense',
-        position: 5,
+        position: 6,
         headCountExpense: false,
         budgetCategories: ['gas expense', 'gas', 'gas fees']
     },
     {
         canonicalCategory: 'GovernancePrograms',
-        position: 6,
+        position: 7,
         headCountExpense: false,
         budgetCategories: ['governance programs', 'programs - other', 'programs - sourcecred']
     },
     {
         canonicalCategory: 'HardwareExpense',
-        position: 7,
+        position: 8,
         headCountExpense: false,
         budgetCategories: ['hardware expense']
     },
     {
         canonicalCategory: 'MarketingExpense',
-        position: 8,
+        position: 9,
         headCountExpense: false,
         budgetCategories: ['marketing expense', 'advertising', 'marketing campaign', 'maker swag', 'sponsorships', 'public relations']
     },
     {
         canonicalCategory: 'ProfessionalServices',
-        position: 9,
+        position: 10,
         headCountExpense: false,
         budgetCategories: ['professional services', 'accounting expense', 'accounting expenses', 'legal expense', 'legal expenses', 'contractor services', 'contractor services (professional)', 'payrol services', 'technical operations services', 'data feeds']
     },
     {
         canonicalCategory: 'SoftwareDevelopmentExpense',
-        position: 10,
+        position: 11,
         headCountExpense: false,
         budgetCategories: ['software development expense', 'bug bounty', 'programs', 'programs - status ui', 'sc audit expense', 'blockchain development expense', 'web development', 'software development', 'backend', 'frontend', 'software']
     },
     {
         canonicalCategory: 'SoftwareExpense',
-        position: 11,
+        position: 12,
         headCountExpense: false,
         budgetCategories: ['software expense', 'it expense', 'tooling', 'tools']
     },
     {
         canonicalCategory: 'Supplies',
-        position: 12,
+        position: 13,
         headCountExpense: false,
         budgetCategories: ['supplies', 'office supplies']
     },
     {
         canonicalCategory: 'TrainingExpense',
-        position: 13,
+        position: 14,
         headCountExpense: false,
         budgetCategories: ['training expense', 'training']
     },
     {
         canonicalCategory: 'CommunityDevelopmentExpense',
-        position: 14,
+        position: 15,
         headCountExpense: false,
         budgetCategories: ['community development expense', 'grants', 'grant']
+    },
+    {
+        canonicalCategory: 'ContingencyBuffer',
+        position: 16,
+        headCountExpense: false,
+        budgetCategories: ['contingency buffer', 'contingency', 'buffer']
     }
 ]
 
