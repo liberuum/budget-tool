@@ -19,10 +19,11 @@ export default function BudgetSheet() {
 
 
     const gAuth = useSelector((googleAuth) => googleAuth.googleAuth.auth);
+    const userFromStore = useSelector(store => store.user.auth);
 
     return (
         <Container>
-            {gAuth ? <Table /> : <NotAuthenticated />}
+            {gAuth && userFromStore ? <Table /> : <NotAuthenticated />}
         </Container>
     )
 }

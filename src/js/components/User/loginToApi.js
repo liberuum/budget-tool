@@ -5,8 +5,6 @@ import { storeUserInfo } from '../../actions/user';
 import { useQuery, gql, useMutation } from "@apollo/client";
 
 
-
-
 export default function LoginToApi() {
     const dispatch = useDispatch();
 
@@ -64,12 +62,18 @@ export default function LoginToApi() {
             cuId: result.data.userLogin.user.cuId,
             userName: result.data.userLogin.user.userName,
             authToken: result.data.userLogin.authToken
-        }))
+        }));
+        electron.saveApiCredentials({
+            id: result.data.userLogin.user.id,
+            cuId: result.data.userLogin.user.cuId,
+            userName: result.data.userLogin.user.userName,
+            authToken: result.data.userLogin.authToken
+        })
         setUserName('')
         setPassword('')
     }
 
-    
+
 
     return (
         <Card sx={{ display: 'flex', mt: '20px', mb: '20px', mx: "33%", alignItems: 'center', justifyContent: 'center', }}>

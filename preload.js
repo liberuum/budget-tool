@@ -8,5 +8,8 @@ contextBridge.exposeInMainWorld('electron', {
   checkToken: () => ipcRenderer.invoke('checkToken'),
   getSheetInfo: (link) => ipcRenderer.invoke('getSheetInfo', { link }),
   openLink: () => ipcRenderer.send('open-link'),
-  openWalletLink: (address) => ipcRenderer.invoke('open-wallet-link', { address })
+  openWalletLink: (address) => ipcRenderer.invoke('open-wallet-link', { address }),
+  saveApiCredentials: (credentials) => ipcRenderer.invoke('save-api-credenetials', credentials),
+  getApiCredentials: () => ipcRenderer.invoke('get-api-credentials'),
+  resetApiCredentials: () => ipcRenderer.invoke('reset-api-credentials')
 })

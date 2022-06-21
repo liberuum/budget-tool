@@ -17,6 +17,7 @@ export default function UserInfo() {
 
     const handleLogoutBtn = async () => {
         dispatch(resetUserInfo())
+        electron.resetApiCredentials()
     }
 
     return (
