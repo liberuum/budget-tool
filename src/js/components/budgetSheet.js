@@ -4,6 +4,7 @@ import Table from './table';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { storeAuthObject } from '../actions/googleAuth';
+import { storeUserInfo } from '../actions/user';
 import NotAuthenticated from './notAuthenticated';
 
 export default function BudgetSheet() {
@@ -12,8 +13,12 @@ export default function BudgetSheet() {
 
     useEffect(async () => {
         const { state, authClient } = await electron.checkToken();
+        const userInfo = await electron.getApiCredentials();
         if (state) {
             dispatch(storeAuthObject());
+        }
+        if(userInfo != null) {
+            dispatch(storeUserInfo(userInfo))
         }
     }, [])
 
