@@ -131,7 +131,7 @@ ipcMain.handle('reset-credentials', async () => {
 })
 
 ipcMain.on('open-link', () => {
-    require('electron').shell.openExternal('https://developers.google.com/workspace/guides/create-credentials#oauth-client-id')
+    require('electron').shell.openExternal('https://developers.google.com/workspace/guides/create-credentials#desktop-app')
 })
 
 ipcMain.handle('open-wallet-link', (event, args) => {

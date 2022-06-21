@@ -10,6 +10,7 @@ import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
 
+
 export default function App() {
 
     const client = new ApolloClient({
@@ -17,18 +18,17 @@ export default function App() {
         cache: new InMemoryCache()
     });
 
-
     return (
         <>
             <ApolloProvider client={client}>
                 <Router>
                     <Navbar />
                     <Routes>
-                        <Route path='/' element={<BudgetSheet />} />
-                        <Route path='/settings' element={<Settings />} />
-                        <Route path='/json/:spreadsheetId' element={<JSONView />} />
-                        <Route path='/md/:spreadsheetId' element={<MDView />} />
-                        <Route path='/api/:spreadsheetId' element={<ApiView />} />
+                            <Route path='/' element={<BudgetSheet />} />
+                            <Route path='/settings' element={<Settings />} />
+                            <Route path='/json/:spreadsheetId' element={<JSONView />} />
+                            <Route path='/md/:spreadsheetId' element={<MDView />} />
+                            <Route path='/api/:spreadsheetId' element={<ApiView />} />
                     </Routes>
                 </Router>
             </ApolloProvider>

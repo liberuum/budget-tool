@@ -34,7 +34,7 @@ const getOAuthCodeByInteraction = async (interactionWindow, authPageURL, app) =>
 const authorize = async () => {
     const credentials = await getCredentials();
     const { client_secret, client_id, redirect_uris } = credentials.installed;
-    const redirect_uri = `${redirect_uris[0]}:3000`
+    const redirect_uri = `${redirect_uris[0]}:3011`
     const oauth2Client = new google.auth.OAuth2(
         client_id, client_secret, redirect_uri);
 
@@ -51,7 +51,7 @@ const authorize = async () => {
         });
         // set server:
         const app = express();
-        const port = 3000;
+        const port = 3011;
         const server = app.listen(port)
         server;
         // Create another window and get code;

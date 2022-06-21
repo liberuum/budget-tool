@@ -3,6 +3,8 @@ import { Card, Label, Input, Button, Spinner } from "theme-ui";
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserInfo } from '../../actions/user';
 import { useQuery, gql, useMutation } from "@apollo/client";
+import AlertHoC from '../utils/AlertHoC.js'
+
 
 
 export default function LoginToApi() {
@@ -11,7 +13,6 @@ export default function LoginToApi() {
     useEffect(() => {
 
     }, [])
-
 
 
     const [userName, setUserName] = useState('');
@@ -50,7 +51,9 @@ export default function LoginToApi() {
         fetchPolicy: 'no-cache'
     });
 
-    if (error) return `${error}`
+    if (error) {
+        <AlertHoC props={error.message}/>
+    }
 
     const handleLoginBtn = async () => {
         console.log('userName', userName)
@@ -100,7 +103,7 @@ export default function LoginToApi() {
                 >Log In</Button>}
 
             </div>
-
+            {error ? <AlertHoC props={error.message} /> : ''}
         </Card>
     )
 }
