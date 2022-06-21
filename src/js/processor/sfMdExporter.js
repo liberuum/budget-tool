@@ -86,9 +86,6 @@ export default class SfMdExporter {
 
             this.expenseTags.forEach(tag => {
                 if (this.categoriesByMonth[tag][months[i]] !== undefined) {
-
-
-                    // console.log('tags', tag, this.categoriesByMonth[tag][month]['actual'])
                     this.item += `|${tag}|`
 
 
