@@ -51,10 +51,6 @@ export default function LoginToApi() {
         fetchPolicy: 'no-cache'
     });
 
-    if (error) {
-        <AlertHoC props={error.message}/>
-    }
-
     const handleLoginBtn = async () => {
         console.log('userName', userName)
         console.log('password', password)

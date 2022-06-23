@@ -2,9 +2,13 @@ import React from 'react';
 import { Card, Label, Container, Textarea, Select, Button, Spinner, Text } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { GET_CORE_UNIT } from '../api/graphql';
+import { useSelector } from 'react-redux';
+
 
 
 export default function CuInfo() {
+
+    const userFromStore = useSelector(store => store.user)
 
     // const GET_CORE_UNIT = gql`
     // query getCoreUnit($filter: CoreUnitFilter) {
@@ -18,7 +22,7 @@ export default function CuInfo() {
 
     const filter = {
         filter: {
-            id: 39
+            id: userFromStore.cuId
         }
     }
 
@@ -27,10 +31,10 @@ export default function CuInfo() {
     });
 
     if (loading) return <Spinner size={1} />
-    if (error) return <Card sx={{ my: 2, textAlign: 'center',  maxWidth: "100%" }}><Text>{error.message + " CU Info"}</Text></Card>
+    if (error) return <Card sx={{ my: 2, textAlign: 'center', maxWidth: "100%" }}><Text>{error.message + " CU Info"}</Text></Card>
 
     return (
-        <Card sx={{ my: 2, textAlign: 'center',  maxWidth: "100%" }}>
+        <Card sx={{ my: 2, textAlign: 'center', maxWidth: "100%" }}>
             <Text sx={{ fontWeight: "bold", }}>{data.coreUnit[0].name} Core Unit</Text>
         </Card>
     )

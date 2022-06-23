@@ -4,9 +4,12 @@ import { useQuery, gql, useMutation } from "@apollo/client";
 import { getCoreUnit, getBudgetSatementInfo, deleteBudgetLineItems } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
 import { validateLineItems, getCanonicalCategory } from './utils/validateLineItems'
+import { useSelector } from 'react-redux';
+import AlertHoC from './utils/AlertHoC';
 
 
 export default function UploadToDB(props) {
+    const userFromStore = useSelector(store => store.user)
     const { walletName, walletAddress, keys, selectedMonth, leveledMonthsByCategory } = props.props;
     const [itemsToOverride, setItemsToOverride] = useState([])
     const [itemsToUpload, setItemsToUpload] = useState([])
@@ -39,7 +42,7 @@ export default function UploadToDB(props) {
     });
 
     const fetchCoreUnit = async () => {
-        const rawCoreUnit = await getCoreUnit(39)
+        const rawCoreUnit = await getCoreUnit(userFromStore.cuId)
         setCoreUnit(rawCoreUnit.data.coreUnit[0])
         const rawBudgetStatements = await getBudgetSatementInfo(rawCoreUnit.data.coreUnit[0].id)
         const budgetStatements = rawBudgetStatements.data.budgetStatement;
@@ -175,25 +178,28 @@ export default function UploadToDB(props) {
 
 
     const handleUpload = async () => {
-        setUploadStatus({ ...uploadStatus, updatingDb: true })
+        try {
+            setUploadStatus({ ...uploadStatus, updatingDb: true })
 
-        let data = filterFromLineItems(selectedMonth)
-        const { lineItemsToDelete, lineItemsToUpload } = await validateLineItems(data);
-        console.log('data to delete', lineItemsToDelete)
-        console.log('data to upload:', lineItemsToUpload)
+            let data = filterFromLineItems(selectedMonth)
+            const { lineItemsToDelete, lineItemsToUpload } = await validateLineItems(data);
+            console.log('data to delete', lineItemsToDelete)
+            console.log('data to upload:', lineItemsToUpload)
 
-        if (lineItemsToDelete.length > 0 && lineItemsToUpload.length > 0) {
-            console.log('deleting and updating lineItems',)
-            await deleteBudgetLineItems(lineItemsToDelete)
-            await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
-            setUploadStatus({ ...uploadStatus, updatingDb: false, overriding: true })
+            if (lineItemsToDelete.length > 0 && lineItemsToUpload.length > 0) {
+                console.log('deleting and updating lineItems',)
+                await deleteBudgetLineItems(lineItemsToDelete)
+                await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
+                setUploadStatus({ ...uploadStatus, updatingDb: false, overriding: true })
+            }
+            if (lineItemsToDelete.length === 0 && lineItemsToUpload.length > 0) {
+                console.log('adding new lineItems')
+                await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
+                setUploadStatus({ ...uploadStatus, updatingDb: false, uploading: true })
+            }
+        } catch (error) {
+            setUploadStatus({ ...uploadStatus, updatingDb: false })
         }
-        if (lineItemsToDelete.length === 0 && lineItemsToUpload.length > 0) {
-            console.log('adding new lineItems')
-            await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
-            setUploadStatus({ ...uploadStatus, updatingDb: false, uploading: true })
-        }
-        
 
     }
 
@@ -201,6 +207,8 @@ export default function UploadToDB(props) {
     const roundNumber = (number) => {
         return Number(Math.round(parseFloat(number + 'e' + 2)) + 'e-' + 2)
     }
+
+
 
     return (
         <Card>
@@ -210,6 +218,7 @@ export default function UploadToDB(props) {
             {uploadStatus.noChange ? <Badge sx={{ mx: '2' }}>Data is up to date</Badge> : ''}
             {uploadStatus.overriding ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Updated</Badge> : ''}
             {uploadStatus.uploading ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Uploaded</Badge> : ''}
+            {error ? <AlertHoC props={error.message} /> : ''}
         </Card>
     )
 }
