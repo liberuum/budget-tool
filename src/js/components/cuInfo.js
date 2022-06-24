@@ -3,6 +3,7 @@ import { Card, Label, Container, Textarea, Select, Button, Spinner, Text } from 
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { GET_CORE_UNIT } from '../api/graphql';
 import { useSelector } from 'react-redux';
+import AlertHoC from './utils/AlertHoC';
 
 
 
@@ -31,7 +32,7 @@ export default function CuInfo() {
     });
 
     if (loading) return <Spinner size={1} />
-    if (error) return <Card sx={{ my: 2, textAlign: 'center', maxWidth: "100%" }}><Text>{error.message + " CU Info"}</Text></Card>
+    if (error) return <AlertHoC props={error.message} />
 
     return (
         <Card sx={{ my: 2, textAlign: 'center', maxWidth: "100%" }}>
