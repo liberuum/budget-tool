@@ -9,9 +9,12 @@ import ApiView from './components/exportApiView';
 import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
+import { useSelector } from 'react-redux';
+
 
 
 export default function App() {
+    const userFromStore = useSelector(store => store.user)
 
     const client = new ApolloClient({
         uri: 'http://localhost:4000/graphql',
@@ -24,11 +27,11 @@ export default function App() {
                 <Router>
                     <Navbar />
                     <Routes>
-                            <Route path='/' element={<BudgetSheet />} />
-                            <Route path='/settings' element={<Settings />} />
-                            <Route path='/json/:spreadsheetId' element={<JSONView />} />
-                            <Route path='/md/:spreadsheetId' element={<MDView />} />
-                            <Route path='/api/:spreadsheetId' element={<ApiView />} />
+                        <Route path='/' element={<BudgetSheet />} />
+                        <Route path='/settings' element={<Settings />} />
+                        <Route path='/json/:spreadsheetId' element={<JSONView />} />
+                        <Route path='/md/:spreadsheetId' element={<MDView />} />
+                        <Route path='/api/:spreadsheetId' element={<ApiView />} />
                     </Routes>
                 </Router>
             </ApolloProvider>

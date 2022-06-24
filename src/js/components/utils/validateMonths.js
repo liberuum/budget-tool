@@ -5,15 +5,17 @@ let spreadSheetMonths;
 let coreUnit;
 let walletAddress;
 let walletName;
+let token;
 
 
 
-export const validateMonthsInApi = async (apiBudgetStatements, months, cu, inputWalletAddress, inputWalletName, inputLineItems) => {
+export const validateMonthsInApi = async (apiBudgetStatements, months, cu, inputWalletAddress, inputWalletName, inputLineItems, authToken) => {
     budgetStatements = [...apiBudgetStatements];
     spreadSheetMonths = months;
     coreUnit = cu;
     walletAddress = inputWalletAddress;
     walletName = inputWalletName
+    token = authToken
 
     statementMonths = budgetStatements.map(statement => {
         return statement.month;
@@ -83,7 +85,7 @@ const addBudgetStatementToApi = async (months) => {
             }
             rows.push(row)
         }
-        const result = await addBudgetStatements(rows);
+        const result = await addBudgetStatements(rows, token);
         const output = result.data.budgetStatementsBatchAdd
         for (let statement of output) {
             budgetStatements.push(statement)
@@ -119,7 +121,7 @@ const validateWallets = async () => {
 
     console.log('newBudgetStatementWallets', newBudgetStatementWallets);
     if (newBudgetStatementWallets.length > 0) {
-        const result = await addBudgetStatementWallets(newBudgetStatementWallets);
+        const result = await addBudgetStatementWallets(newBudgetStatementWallets, token);
         const newWallets = result.data.budgetStatementWalletBatchAdd;
         for (let wallet of newWallets) {
             let month = budgetStatements.find(walletObj => {

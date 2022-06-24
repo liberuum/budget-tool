@@ -6,6 +6,7 @@ import {
     gql
 } from "@apollo/client";
 
+
 const client = new ApolloClient({
     uri: 'https://ecosystem-dashboard.herokuapp.com/graphql',
     cache: new InMemoryCache()
@@ -112,11 +113,14 @@ export const getBudgetSatementInfo = async (cuId) => {
 }
 
 
-export const addBudgetStatements = async (budgetStatements) => {
+export const addBudgetStatements = async (budgetStatements, authToken) => {
 
     const client = new ApolloClient({
         uri: 'http://localhost:4000/graphql',
-        cache: new InMemoryCache()
+        cache: new InMemoryCache(),
+        headers: {
+            authorization: `Bearer ${authToken}`
+        }
     });
 
     try {
@@ -147,10 +151,13 @@ export const addBudgetStatements = async (budgetStatements) => {
 
 }
 
-export const deleteBudgetLineItems = async (lineItems) => {
+export const deleteBudgetLineItems = async (lineItems, authToken) => {
     const client = new ApolloClient({
         uri: 'http://localhost:4000/graphql',
-        cache: new InMemoryCache()
+        cache: new InMemoryCache(),
+        headers: {
+            authorization: `Bearer ${authToken}`
+        }
     });
 
     try {
@@ -173,10 +180,13 @@ export const deleteBudgetLineItems = async (lineItems) => {
     }
 }
 
-export const addBudgetStatementWallets = async (budgetStatementWallets) => {
+export const addBudgetStatementWallets = async (budgetStatementWallets, authToken) => {
     const client = new ApolloClient({
         uri: 'http://localhost:4000/graphql',
-        cache: new InMemoryCache()
+        cache: new InMemoryCache(),
+        headers: {
+            authorization: `Bearer ${authToken}`
+        }
     });
 
     try {

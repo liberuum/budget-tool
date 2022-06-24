@@ -38,7 +38,12 @@ export default function UploadToDB(props) {
         ;
 
     const [budgetLineItemsBatchAdd, { data, loading, error }] = useMutation(ADD_BUDGET_LINE_ITEMS, {
-        fetchPolicy: 'no-cache'
+        fetchPolicy: 'no-cache',
+        context: {
+            headers: {
+                authorization: `Bearer ${userFromStore.authToken}`
+            }
+        }
     });
 
     const fetchCoreUnit = async () => {
@@ -47,18 +52,10 @@ export default function UploadToDB(props) {
         const rawBudgetStatements = await getBudgetSatementInfo(rawCoreUnit.data.coreUnit[0].id)
         const budgetStatements = rawBudgetStatements.data.budgetStatement;
         setApiBudgetStatements(budgetStatements)
-        const idsWallets = await validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName, lineItems);
+        const idsWallets = await validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName, lineItems, userFromStore.authToken);
         setWalletIds(idsWallets);
     }
 
-
-    // if (data) console.log('data from apollo server', data)
-    // if (loading) return 'Submitting data...'
-    // if (error) return `Upload error! ${error.message}`
-
-
-
-    // console.log('walletName', walletName)
 
     function getAllMonths() {
         if (leveledMonthsByCategory !== undefined) {
@@ -188,7 +185,7 @@ export default function UploadToDB(props) {
 
             if (lineItemsToDelete.length > 0 && lineItemsToUpload.length > 0) {
                 console.log('deleting and updating lineItems',)
-                await deleteBudgetLineItems(lineItemsToDelete)
+                await deleteBudgetLineItems(lineItemsToDelete, userFromStore.authToken)
                 await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
                 setUploadStatus({ ...uploadStatus, updatingDb: false, overriding: true })
             }
