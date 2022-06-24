@@ -6,7 +6,6 @@ import { useQuery, gql, useMutation } from "@apollo/client";
 import AlertHoC from '../utils/AlertHoC.js'
 
 
-
 export default function LoginToApi() {
     const dispatch = useDispatch();
 
@@ -52,10 +51,7 @@ export default function LoginToApi() {
     });
 
     const handleLoginBtn = async () => {
-        console.log('userName', userName)
-        console.log('password', password)
         const result = await userLogin()
-        console.log('result', result)
         dispatch(storeUserInfo({
             id: result.data.userLogin.user.id,
             cuId: result.data.userLogin.user.cuId,
