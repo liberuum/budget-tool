@@ -16,6 +16,7 @@ export default function LoginToApi() {
 
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [stateError, setStateError] = useState('')
 
     const handleUserName = (value) => {
         setUserName(value)
@@ -52,20 +53,24 @@ export default function LoginToApi() {
 
     const handleLoginBtn = async () => {
         const result = await userLogin()
-        dispatch(storeUserInfo({
-            id: result.data.userLogin.user.id,
-            cuId: result.data.userLogin.user.cuId,
-            userName: result.data.userLogin.user.userName,
-            authToken: result.data.userLogin.authToken
-        }));
-        electron.saveApiCredentials({
-            id: result.data.userLogin.user.id,
-            cuId: result.data.userLogin.user.cuId,
-            userName: result.data.userLogin.user.userName,
-            authToken: result.data.userLogin.authToken
-        })
-        setUserName('')
-        setPassword('')
+        if (result.data.userLogin.user.cuId !== null) {
+            dispatch(storeUserInfo({
+                id: result.data.userLogin.user.id,
+                cuId: result.data.userLogin.user.cuId,
+                userName: result.data.userLogin.user.userName,
+                authToken: result.data.userLogin.authToken
+            }));
+            electron.saveApiCredentials({
+                id: result.data.userLogin.user.id,
+                cuId: result.data.userLogin.user.cuId,
+                userName: result.data.userLogin.user.userName,
+                authToken: result.data.userLogin.authToken
+            })
+            setUserName('')
+            setPassword('')
+        } else {
+            setStateError('cannot use tool without cu id')
+        }
     }
 
 
@@ -95,7 +100,7 @@ export default function LoginToApi() {
                 >Log In</Button>}
 
             </div>
-            {error ? <AlertHoC props={error.message} /> : ''}
+            {error || stateError ? <AlertHoC props={error ? error.message : stateError} /> : ''}
         </Card>
     )
 }
