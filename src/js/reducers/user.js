@@ -9,7 +9,6 @@ const INITIAL_STATE = {
 export default function userReducer(state = INITIAL_STATE, action) {
     switch (action.type) {
         case 'USER_LOGIN_ON_SUCCESS':
-            console.log('USER_LOGIN_ON_SUCCESS reducer', action)
             return {
                 ...state,
                 id: action.userData.id,
