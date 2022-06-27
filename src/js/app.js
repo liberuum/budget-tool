@@ -17,7 +17,7 @@ export default function App() {
     const userFromStore = useSelector(store => store.user)
 
     const client = new ApolloClient({
-        uri: 'http://localhost:4000/graphql',
+        uri: 'https://ecosystem-dashboard.herokuapp.com/graphql',
         cache: new InMemoryCache()
     });
 

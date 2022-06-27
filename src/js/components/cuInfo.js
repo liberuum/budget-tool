@@ -11,16 +11,6 @@ export default function CuInfo() {
 
     const userFromStore = useSelector(store => store.user)
 
-    // const GET_CORE_UNIT = gql`
-    // query getCoreUnit($filter: CoreUnitFilter) {
-    //  coreUnit(filter: $filter) {
-    //     id
-    //     code
-    //     name
-    // }
-    // }
-    // `;
-
     const filter = {
         filter: {
             id: userFromStore.cuId

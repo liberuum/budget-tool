@@ -1,8 +1,6 @@
 import {
     ApolloClient,
     InMemoryCache,
-    ApolloProvider,
-    useQuery,
     gql
 } from "@apollo/client";
 
@@ -114,15 +112,6 @@ export const getBudgetSatementInfo = async (cuId) => {
 
 
 export const addBudgetStatements = async (budgetStatements, authToken) => {
-
-    const client = new ApolloClient({
-        uri: 'http://localhost:4000/graphql',
-        cache: new InMemoryCache(),
-        headers: {
-            authorization: `Bearer ${authToken}`
-        }
-    });
-
     try {
         const result = await client.mutate({
             mutation: gql`
@@ -142,7 +131,12 @@ export const addBudgetStatements = async (budgetStatements, authToken) => {
             variables: {
                 input: budgetStatements
             },
-            fetchPolicy: 'no-cache'
+            fetchPolicy: 'no-cache',
+            context: {
+                headers: {
+                    authorization: `Bearer ${userFromStore.authToken}`
+                }
+            }
         })
         return result;
     } catch (error) {
@@ -152,14 +146,6 @@ export const addBudgetStatements = async (budgetStatements, authToken) => {
 }
 
 export const deleteBudgetLineItems = async (lineItems, authToken) => {
-    const client = new ApolloClient({
-        uri: 'http://localhost:4000/graphql',
-        cache: new InMemoryCache(),
-        headers: {
-            authorization: `Bearer ${authToken}`
-        }
-    });
-
     try {
         const result = await client.mutate({
             mutation: gql`
@@ -172,7 +158,12 @@ export const deleteBudgetLineItems = async (lineItems, authToken) => {
             variables: {
                 input: lineItems
             },
-            fetchPolicy: 'no-cache'
+            fetchPolicy: 'no-cache',
+            context: {
+                headers: {
+                    authorization: `Bearer ${authToken}`
+                }
+            }
         })
         return result;
     } catch (error) {
@@ -181,14 +172,6 @@ export const deleteBudgetLineItems = async (lineItems, authToken) => {
 }
 
 export const addBudgetStatementWallets = async (budgetStatementWallets, authToken) => {
-    const client = new ApolloClient({
-        uri: 'http://localhost:4000/graphql',
-        cache: new InMemoryCache(),
-        headers: {
-            authorization: `Bearer ${authToken}`
-        }
-    });
-
     try {
         const result = await client.mutate({
             mutation: gql`
@@ -201,6 +184,11 @@ export const addBudgetStatementWallets = async (budgetStatementWallets, authToke
             `,
             variables: {
                 input: budgetStatementWallets
+            },
+            context: {
+                headers: {
+                    authorization: `Bearer ${authToken}`
+                }
             }
         });
         return result;
