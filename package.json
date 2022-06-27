@@ -1,6 +1,6 @@
 {
   "name": "budgettool",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Get monthly actuals in MD and JSON format",
   "main": "main.js",
   "scripts": {
