@@ -9,14 +9,17 @@ import ApiView from './components/exportApiView';
 import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
+import { useSelector } from 'react-redux';
+
+
 
 export default function App() {
+    const userFromStore = useSelector(store => store.user)
 
     const client = new ApolloClient({
-        uri: 'http://localhost:4000/graphql',
+        uri: 'https://ecosystem-dashboard.herokuapp.com/graphql',
         cache: new InMemoryCache()
     });
-
 
     return (
         <>

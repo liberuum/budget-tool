@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import googleAuthReducer from '../reducers/googleAuth';
 import tableDataReducer from '../reducers/tableDataReducer';
+import userReducer from '../reducers/user';
 
 export default function configureStore() {
 
@@ -12,7 +13,8 @@ export default function configureStore() {
     const store = createStore(
         combineReducers({
             googleAuth: googleAuthReducer,
-            tableData: tableDataReducer
+            tableData: tableDataReducer,
+            user: userReducer
         }), applyMiddleware(...middleWares)
     )
 

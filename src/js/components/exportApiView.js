@@ -12,30 +12,34 @@ export default function ApiView() {
         if (item.spreadsheetId == spreadsheetId)
             return item
     })
-    
+
     const [monthsArr, setMonthsArr] = useState(filtered[0]);
     const [jsonData, setJsonData] = useState('')
-    
+
     useEffect(() => {
         getMonth(selectedMonth)
-        
+
     }, [getMonth, jsonData])
-    
+
     //Getting available actual months
     let keys = []
     let leveledMonthsByCategory;
+    let walletName;
+    let walletAddress;
     if (monthsArr !== undefined) {
         let months = monthsArr.mdTextByMonth;
+        walletName = monthsArr.walletName;
+        walletAddress = monthsArr.walletAddress;
         leveledMonthsByCategory = monthsArr.leveledMonthsByCategory;
         for (const month of months) {
             let key = Object.keys(month)
             keys = [...keys, ...key]
         }
     }
-    
+
     // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
 
-    const [selectedMonth, setSelectedMonth] = useState(keys[0]);
+    const [selectedMonth, setSelectedMonth] = useState(keys[keys.length-1]);
 
     const handleSelect = (value) => {
         setSelectedMonth(value)
@@ -50,17 +54,19 @@ export default function ApiView() {
         }
     }
 
+
+
     return (
         <Container >
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>Choose Month</Label>
-                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${keys[0]}`}>
+                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${keys[keys.length-1]}`}>
                     {keys.map(month => {
                         return <option key={month}>{`${month}`}</option>
                     })}
                 </Select>
             </Card>
-            <UploadToDB props={{selectedMonth, keys, leveledMonthsByCategory }} />
+            <UploadToDB props={{ selectedMonth, keys, leveledMonthsByCategory, walletName, walletAddress }} />
         </Container>
     )
 }

@@ -12,9 +12,10 @@ export default class CrunchData {
         let total = 0;
         for (const object of dataObject) {
             if (object['category'] === expenseTag) {
-                total += object[keyName]
+                if (typeof object[keyName] === 'number') {
+                    total += object[keyName]
+                }
             }
-            // console.log(object[keyName])
         }
         return total;
     }
@@ -22,12 +23,12 @@ export default class CrunchData {
     getTotalByBudgetVariance(budgetVarianceObj) {
         let total = 0;
         for (const [key, value] of Object.entries(budgetVarianceObj)) {
-            if (key !== 'type')
+            if (key !== 'type') {
                 total += value
+            }
         }
         total = Math.round((total + Number.EPSILON) * 100) / 100;
         return total;
-        // console.log('total', total)
     }
 
     getTotalPaidDaiByEmptyBudgetCategory() {
@@ -70,7 +71,7 @@ export default class CrunchData {
 
     calcDifference() {
         let actAndDiff = this.getActAndDiff()
-        if (actAndDiff.actual === undefined || actAndDiff.forecast === undefined ) {
+        if (actAndDiff.actual === undefined || actAndDiff.forecast === undefined) {
             return
         } else {
             let differenceObj = {

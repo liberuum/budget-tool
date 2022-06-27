@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Card, Label, Container, Textarea, Select, Button } from "theme-ui"
-import UploadToDB from './uploadToDB.js';
+import { Card, Label, Container, Textarea, Select, Button } from "theme-ui";
 
 export default function JSONView() {
     const { spreadsheetId } = useParams();
@@ -31,7 +30,7 @@ export default function JSONView() {
         }
     }
 
-    const [selectedMonth, setSelectedMonth] = useState(keys[0]);
+    const [selectedMonth, setSelectedMonth] = useState(keys[keys.length - 1]);
 
     const handleSelect = (value) => {
         setSelectedMonth(value)
@@ -97,13 +96,12 @@ export default function JSONView() {
         <Container >
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>Choose Month</Label>
-                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${keys[0]}`}>
+                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${keys[keys.length - 1]}`}>
                     {keys.map(month => {
                         return <option key={month}>{`${month}`}</option>
                     })}
                 </Select>
             </Card>
-            <UploadToDB props={{ keys, monthsArr }} />
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>JSON View</Label>
                 <Textarea rows={20} defaultValue={result} />

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Card, Label, Grid, Text, Link } from 'theme-ui';
+import { Container, Button, Card, Label, Grid, Text, Link, Input, Flex } from 'theme-ui';
 import { useDispatch } from 'react-redux';
 import { storeAuthObject, resetAuthSettings } from '../actions/googleAuth';
+import User from './User/user';
 
 
 export default function Settings() {
@@ -66,7 +67,7 @@ export default function Settings() {
 					}}
 				>
 					<div>
-						<Label>{credentials ? 'Credentials are set' : <Text>Set Credentials <Link sx={{cursor: 'pointer'}} onClick={handleOpenLink} >learn more</Link></Text>}</Label>
+						<Label>{credentials ? 'Credentials are set' : <Text>Set Credentials <Link sx={{ cursor: 'pointer' }} onClick={handleOpenLink} >learn more</Link></Text>}</Label>
 						<Button
 							onClick={handleGoogleCredButton}
 							disabled={credentials}
@@ -89,7 +90,7 @@ export default function Settings() {
 					</div>
 				</Grid>
 			</Card>
-
+			<User />
 		</Container>
 	)
 }

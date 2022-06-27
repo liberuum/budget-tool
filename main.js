@@ -131,9 +131,34 @@ ipcMain.handle('reset-credentials', async () => {
 })
 
 ipcMain.on('open-link', () => {
-    require('electron').shell.openExternal('https://developers.google.com/workspace/guides/create-credentials#oauth-client-id')
+    require('electron').shell.openExternal('https://developers.google.com/workspace/guides/create-credentials#desktop-app')
 })
 
 ipcMain.handle('open-wallet-link', (event, args) => {
     require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args.address}/home`)
+})
+
+ipcMain.handle('save-api-credenetials', async (event, args) => {
+    try {
+        await settings.set('api-credentials', JSON.stringify(args))
+    } catch (error) {
+        return { error }
+    }
+})
+
+ipcMain.handle('get-api-credentials', async (event, args) => {
+    try {
+        const result = await settings.get('api-credentials');
+        return JSON.parse(result)
+    } catch (error) {
+        return { error }
+    }
+})
+
+ipcMain.handle('reset-api-credentials', async (event, args) => {
+    try {
+        await settings.set('api-credentials', null)
+    } catch (error) {
+        return { error }
+    }
 })
