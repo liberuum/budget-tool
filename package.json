@@ -13,7 +13,7 @@
     "make:macos": "electron-builder --mac",
     "make:win": "electron-builder --win --x64"
   },
-  "author": "Petru Catana",
+  "author": "Petru Catana <petru@ses.makerdao.network>",
   "license": "ISC",
   "build": {
     "productName": "Budget-Tool",
