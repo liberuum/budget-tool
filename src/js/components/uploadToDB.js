@@ -95,6 +95,7 @@ export default function UploadToDB(props) {
                     rowObject.comments = '';
                     rowObject.canonicalBudgetCategory = canonicalObj ? canonicalObj.canonicalCategory : null;
                     rowObject.headcountExpense = canonicalObj ? canonicalObj.headCountExpense : null;
+                    rowObject.budgetCap = roundNumber(leveledMonthsByCategory[category][month].budget)
                     lineItems.push(rowObject)
                 }
             }
