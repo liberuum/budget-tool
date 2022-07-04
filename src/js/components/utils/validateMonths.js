@@ -36,8 +36,8 @@ const addWalletIdsToLineItems = (lineItems, walletIds) => {
     // console.log('lineItems', lineItems)
     for (let lineItem of lineItems) {
         lineItem.month = lineItem.month.concat('-01')
-        for ( let walletId of walletIds) {
-            if(lineItem.month == walletId.month) {
+        for (let walletId of walletIds) {
+            if (lineItem.month == walletId.month) {
                 lineItem.budgetStatementWalletId = walletId.walletId
             }
         }
@@ -115,6 +115,16 @@ const validateWallets = async () => {
         for (let wallet of statement.budgetStatementWallet) {
             if (wallet.address.toLowerCase() == walletAddress) {
                 walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month })
+            } {
+                let walletObj = {
+                    budgetStatementId: statement.id,
+                    name: walletName,
+                    address: walletAddress,
+                    currentBalance: 0,
+                    topupTransfer: 0,
+                    comments: '',
+                }
+                newBudgetStatementWallets.push(walletObj);
             }
         }
     }
