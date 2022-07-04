@@ -101,7 +101,15 @@ const validateWallets = async () => {
     let walletIdsForDataAdd = [];
     let newBudgetStatementWallets = []
     for (let statement of budgetStatements) {
-        if (statement.budgetStatementWallet.length < 1) {
+
+        let existingWallets = statement.budgetStatementWallet.filter(wallet => {
+            return wallet.address === walletAddress
+        })
+        if (existingWallets.length > 0) {
+            for (let wallet of existingWallets) {
+                walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month })
+            }
+        } else {
             let walletObj = {
                 budgetStatementId: statement.id,
                 name: walletName,
@@ -111,21 +119,6 @@ const validateWallets = async () => {
                 comments: '',
             }
             newBudgetStatementWallets.push(walletObj);
-        }
-        for (let wallet of statement.budgetStatementWallet) {
-            if (wallet.address.toLowerCase() == walletAddress) {
-                walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month })
-            } else {
-                let walletObj = {
-                    budgetStatementId: statement.id,
-                    name: walletName,
-                    address: walletAddress,
-                    currentBalance: 0,
-                    topupTransfer: 0,
-                    comments: '',
-                }
-                newBudgetStatementWallets.push(walletObj);
-            }
         }
     }
 
