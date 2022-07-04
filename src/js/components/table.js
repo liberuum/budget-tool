@@ -43,7 +43,7 @@ export default function Table() {
 
     const checkWalletInput = () => {
         if (inputWalletName !== '' && inputWalletAddress.length === 42) {
-            setValidatedInput(validatedInput.walletFields = true, validatedInput.variant = null)
+            setValidatedInput({ ...validatedInput, walletFields: true, variant: null })
         } else {
             setValidatedInput({ ...validatedInput, variant: 'inputError', valid: false })
         }
