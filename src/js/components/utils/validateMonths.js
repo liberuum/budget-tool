@@ -115,7 +115,7 @@ const validateWallets = async () => {
         for (let wallet of statement.budgetStatementWallet) {
             if (wallet.address.toLowerCase() == walletAddress) {
                 walletIdsForDataAdd.push({ walletId: wallet.id, budgetStatementId: statement.id, month: statement.month })
-            } {
+            } else {
                 let walletObj = {
                     budgetStatementId: statement.id,
                     name: walletName,

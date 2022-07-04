@@ -134,7 +134,7 @@ export const addBudgetStatements = async (budgetStatements, authToken) => {
             fetchPolicy: 'no-cache',
             context: {
                 headers: {
-                    authorization: `Bearer ${userFromStore.authToken}`
+                    authorization: `Bearer ${authToken}`
                 }
             }
         })
