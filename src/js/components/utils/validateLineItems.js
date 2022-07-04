@@ -49,13 +49,13 @@ const budgetCategoriesMap = [
         canonicalCategory: 'CompensationAndBenefits',
         position: 1,
         headCountExpense: true,
-        budgetCategories: ['compensation & benefits', 'salaries & wages', 'healtcare', 'contractor (temp) fees', 'insurance', 'employer taxes', 'bonus', 'referral bonus', 'sign on bonus', 'fees & salary costs', 'contractor fees']
+        budgetCategories: ['compensation & benefits', 'contributor compensation', 'salaries & wages', 'healtcare', 'contractor (temp) fees', 'insurance', 'employer taxes', 'bonus', 'referral bonus', 'sign on bonus', 'fees & salary costs', 'contractor fees', 'salaries & benefits', 'phone']
     },
     {
         canonicalCategory: 'Bonus',
         position: 2,
         headCountExpense: true,
-        budgetCategories: ['bonus']
+        budgetCategories: ['bonus', 'referral bonus', 'sign on bonus', 'sign-on bonus']
     },
     {
         canonicalCategory: 'AdminExpense',
@@ -67,13 +67,13 @@ const budgetCategoriesMap = [
         canonicalCategory: 'AdminExpense',
         position: 3,
         headCountExpense: false,
-        budgetCategories: ['admin expense', 'exchange fees', 'bank fees']
+        budgetCategories: ['admin expense', 'exchange fees', 'bank fees', 'admin expenses']
     },
     {
         canonicalCategory: 'TravelAndEntertainment',
         position: 4,
         headCountExpense: true,
-        budgetCategories: ['travel & entertainment', 'hotels', 'airfare', 'meals', 'activities & events', 'events', 'transportation (uber, taxi, etc.)', 'events & activities', 'activities']
+        budgetCategories: ['travel & entertainment', 'hotels', 'airfare', 'meals', 'activities & events', 'events', 'transportation (uber, taxi, etc.)', 'events & activities', 'activities', 'internet/online fees while traveling', 'taxi/uber/bus/train', 'hotels/airbnb', 'events/ tickets', 'lunch employee', 'travel costs']
     },
     {
         canonicalCategory: 'FreightAndDuties',
@@ -103,13 +103,13 @@ const budgetCategoriesMap = [
         canonicalCategory: 'MarketingExpense',
         position: 9,
         headCountExpense: false,
-        budgetCategories: ['marketing expense', 'advertising', 'marketing campaign', 'maker swag', 'sponsorships', 'public relations']
+        budgetCategories: ['marketing expense', 'marketing expenses', 'advertising', 'marketing campaign', 'maker swag', 'sponsorships', 'public relations']
     },
     {
         canonicalCategory: 'ProfessionalServices',
         position: 10,
         headCountExpense: false,
-        budgetCategories: ['professional services', 'accounting expense', 'accounting expenses', 'legal expense', 'legal expenses', 'contractor services', 'contractor services (professional)', 'payrol services', 'technical operations services', 'data feeds']
+        budgetCategories: ['professional services', 'accounting expense', 'accounting expenses', 'legal expense', 'legal expenses', 'legal advice', 'contractor services', 'contractor services (professional)', 'payroll services', 'technical operations services', 'data feeds']
     },
     {
         canonicalCategory: 'SoftwareDevelopmentExpense',
@@ -121,7 +121,7 @@ const budgetCategoriesMap = [
         canonicalCategory: 'SoftwareExpense',
         position: 12,
         headCountExpense: false,
-        budgetCategories: ['software expense', 'it expense', 'tooling', 'tools']
+        budgetCategories: ['software expense', 'it expense', 'tooling', 'tools', 'software costs']
     },
     {
         canonicalCategory: 'Supplies',
