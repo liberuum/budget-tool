@@ -59,11 +59,16 @@ export default function UploadToDB(props) {
 
     function getAllMonths() {
         if (leveledMonthsByCategory !== undefined) {
-            let months = [];
-            for (let month in Object.entries(leveledMonthsByCategory)[0][1]) {
-                months.push(month)
+            let months = {};
+
+            for (let category in leveledMonthsByCategory) {
+                for (let group in leveledMonthsByCategory[category]) {
+                    for (let month in leveledMonthsByCategory[category][group]) {
+                        months[month] = true;
+                    }
+                }
             }
-            return months;
+            return Object.keys(months)
         }
     }
 
@@ -73,36 +78,43 @@ export default function UploadToDB(props) {
         if (months !== undefined) {
             for (let category in leveledMonthsByCategory) {
                 let canonicalObj = getCanonicalCategory(category);
-                for (let month of months) {
-                    const rowObject = {
-                        budgetStatementWalletId: null,
-                        month: "",
-                        position: 0,
-                        group: '',
-                        budgetCategory: '',
-                        forecast: 0,
-                        actual: 0,
-                        comments: '',
-                        canonicalBudgetCategory: '',
-                        headcountExpense: ''
-                    };
-                    rowObject.month = month;
-                    rowObject.position = canonicalObj ? canonicalObj.position : 0;
-                    rowObject.group = '';
-                    rowObject.budgetCategory = category;
-                    rowObject.forecast = roundNumber(leveledMonthsByCategory[category][month].forecast);
-                    rowObject.actual = roundNumber(leveledMonthsByCategory[category][month].actual);
-                    rowObject.comments = '';
-                    rowObject.canonicalBudgetCategory = canonicalObj ? canonicalObj.canonicalCategory : null;
-                    rowObject.headcountExpense = canonicalObj ? canonicalObj.headCountExpense : null;
-                    rowObject.budgetCap = roundNumber(leveledMonthsByCategory[category][month].budget)
-                    lineItems.push(rowObject)
+                // TODO
+                // Read the groups from leveledMonthsByCategory
+                for (let group in leveledMonthsByCategory[category]) {
+                    for (let month of months) {
+                        lineItems.push(createRowObject(month, category, canonicalObj, group, leveledMonthsByCategory))
+                    }
                 }
             }
         }
         console.log('lineItems', lineItems)
     }
 
+    const createRowObject = (month, category, canonicalObj, group, lookup) => {
+        const rowObject = {
+            budgetStatementWalletId: null,
+            month: "",
+            position: 0,
+            group: '',
+            budgetCategory: '',
+            forecast: 0,
+            actual: 0,
+            comments: '',
+            canonicalBudgetCategory: '',
+            headcountExpense: ''
+        };
+        rowObject.month = month;
+        rowObject.position = canonicalObj ? canonicalObj.position : 0;
+        rowObject.group = group;
+        rowObject.budgetCategory = category;
+        rowObject.forecast = roundNumber(lookup[category][group][month].forecast);
+        rowObject.actual = roundNumber(lookup[category][group][month].actual);
+        rowObject.comments = '';
+        rowObject.canonicalBudgetCategory = canonicalObj ? canonicalObj.canonicalCategory : null;
+        rowObject.headcountExpense = canonicalObj ? canonicalObj.headCountExpense : null;
+        rowObject.budgetCap = roundNumber(lookup[category][group][month].budget)
+        return rowObject;
+    }
 
     const getNextThreeMonths = (selectedMonth) => {
         if (selectedMonth !== undefined) {

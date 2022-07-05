@@ -18,7 +18,6 @@ export default class SfMdExporter {
 
     getCategoriesByMonth(categoriesByMonth) {
         this.categoriesByMonth = categoriesByMonth;
-        // console.log('categories by month', this.categoriesByMonth)
         this.getExpenseTags()
         this.getMonths()
         this.totals = this.getTotalsByMonth();
@@ -35,9 +34,12 @@ export default class SfMdExporter {
             let totalForecast = 0;
             let totalBudget = 0;
             this.expenseTags.forEach(tag => {
-                totalActual += this.categoriesByMonth[tag][month].actual;
-                totalForecast += this.categoriesByMonth[tag][month].forecast;
-                totalBudget += this.categoriesByMonth[tag][month].budget;
+                for (let group in this.categoriesByMonth[tag]) {
+                    totalActual += this.categoriesByMonth[tag][group][month].actual;
+                    totalForecast += this.categoriesByMonth[tag][group][month].forecast;
+                    totalBudget += this.categoriesByMonth[tag][group][month].budget;
+                }
+
             })
             totalObject[month] = {
                 totalActual,
@@ -62,8 +64,10 @@ export default class SfMdExporter {
     getMonths() {
         let months = []
         this.expenseTags.forEach(tag => {
-            for (let [key, value] of Object.entries(this.categoriesByMonth[tag])) {
-                months.push(key)
+            for (let group in this.categoriesByMonth[tag]) {
+                for (let [key, value] of Object.entries(this.categoriesByMonth[tag][group])) {
+                    months.push(key)
+                }
             }
         })
         this.months = [...new Set(months)]
@@ -85,24 +89,27 @@ export default class SfMdExporter {
             this.item += `\n`;
 
             this.expenseTags.forEach(tag => {
-                if (this.categoriesByMonth[tag][months[i]] !== undefined) {
-                    this.item += `|${tag}|`
+                for (let group in this.categoriesByMonth[tag]) {
+                    if (this.categoriesByMonth[tag][group][months[i]] !== undefined) {
+                        this.item += `|${tag}|`
 
 
-                    this.item += `${this.categoriesByMonth[tag][months[i]]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
-                    this.item += `${this.categoriesByMonth[tag][months[i]]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
-                    this.item += `${this.categoriesByMonth[tag][months[i]]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
-                    // from month + 3 loop, add again 3 times the above actual, forecast and budget together
-                    threeMonths.forEach(newMonth => {
-                        this.item += `${this.categoriesByMonth[tag][newMonth]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
-                        this.item += `${this.categoriesByMonth[tag][newMonth]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
-                        this.item += `${this.categoriesByMonth[tag][newMonth]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                        this.item += `${this.categoriesByMonth[tag][group][months[i]]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                        this.item += `${this.categoriesByMonth[tag][group][months[i]]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                        this.item += `${this.categoriesByMonth[tag][group][months[i]]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                        // from month + 3 loop, add again 3 times the above actual, forecast and budget together
+                        threeMonths.forEach(newMonth => {
+                            this.item += `${this.categoriesByMonth[tag][group][newMonth]['actual'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                            this.item += `${this.categoriesByMonth[tag][group][newMonth]['forecast'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
+                            this.item += `${this.categoriesByMonth[tag][group][newMonth]['budget'].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}|`
 
-                    })
+                        })
 
-                    this.item += `\n`;
-                    this.tableRows += this.item;
-                    this.item = ''
+                        this.item += `\n`;
+                        this.tableRows += this.item;
+                        this.item = ''
+                    }
+
                 }
             })
 

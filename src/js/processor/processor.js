@@ -138,7 +138,7 @@ export default class Processor {
         this.filterByMonth()
         this.filteredByCategoryMonth = this.buildSESView(this.parsedRows)
         this.leveledMonthsByCategory = this.buildSFView(this.filteredByCategoryMonth)
-        console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
+        // console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
         // console.log('filteredByMonth', this.filteredByMonth)
     }
 
@@ -293,8 +293,12 @@ export default class Processor {
                 result[row.category] = {}
             }
 
-            if (!result[row.category].hasOwnProperty(row.monthString)) {
-                result[row.category][row.monthString] = {
+            if (!result[row.category].hasOwnProperty(row.group)) {
+                result[row.category][row.group] = {}
+            }
+
+            if (!result[row.category][row.group].hasOwnProperty(row.monthString)) {
+                result[row.category][row.group][row.monthString] = {
                     actual: 0,
                     forecast: 0,
                     budget: 0
@@ -302,17 +306,16 @@ export default class Processor {
             }
 
             if (row.actual !== undefined) {
-                result[row.category][row.monthString]['actual'] += row.actual
+                result[row.category][row.group][row.monthString]['actual'] += row.actual
             }
             if (row.forecast !== undefined) {
-                result[row.category][row.monthString]['forecast'] += row.forecast
+                result[row.category][row.group][row.monthString]['forecast'] += row.forecast
             }
             if (row.budget !== undefined) {
-                result[row.category][row.monthString]['budget'] += row.budget
+                result[row.category][row.group][row.monthString]['budget'] += row.budget
             }
 
         }
-        // console.log('result', result)
         return result;
     }
 
@@ -323,7 +326,6 @@ export default class Processor {
         months.forEach(month => {
             result = this.addSfTableSection(result, indexByCategoryByMonth, month);
         })
-        delete result._newRow
 
         return result;
     }
@@ -331,38 +333,34 @@ export default class Processor {
     addSfTableSection(sfTable, indexByCategoryByMonth, month) {
         let result = JSON.parse(JSON.stringify(sfTable));
 
-        if (result._newRow === undefined) {
-            result._newRow = {}
-        }
-
-        result._newRow[month] = {
-            actual: 0,
-            forecast: 0,
-            budget: 0
-        }
 
         // not all categories have same month
         for (const category in indexByCategoryByMonth) {
             // console.log('category', category);
             if (result[category] === undefined) {
-                result[category] = JSON.parse(JSON.stringify(result._newRow))
+                result[category] = {}
             }
-            if (result[category][month] === undefined) {
-                result[category][month] = {}
-            }
+            for (const group in indexByCategoryByMonth[category]) {
+                if (result[category][group] === undefined) {
+                    result[category][group] = {}
+                }
+                if (result[category][group][month] === undefined) {
+                    result[category][group][month] = {}
+                }
 
-            if (indexByCategoryByMonth[category][month] === undefined) {
-                result[category][month]['actual'] = 0
-                result[category][month]['forecast'] = 0
-            } else {
-                result[category][month].actual = indexByCategoryByMonth[category][month]['actual']
-                result[category][month].forecast = indexByCategoryByMonth[category][month]['forecast']
-            }
+                if (indexByCategoryByMonth[category][group][month] === undefined) {
+                    result[category][group][month]['actual'] = 0
+                    result[category][group][month]['forecast'] = 0
+                } else {
+                    result[category][group][month].actual = indexByCategoryByMonth[category][group][month]['actual']
+                    result[category][group][month].forecast = indexByCategoryByMonth[category][group][month]['forecast']
+                }
 
-            if (this.budgets[month] === undefined || this.budgets[month][category] === undefined) {
-                result[category][month]['budget'] = 0
-            } else {
-                result[category][month].budget = this.budgets[month][category]
+                if (this.budgets[month] === undefined || this.budgets[month][category] === undefined) {
+                    result[category][group][month]['budget'] = 0
+                } else {
+                    result[category][group][month].budget = this.budgets[month][category]
+                }
             }
         }
         // console.log('new sfTable', result)

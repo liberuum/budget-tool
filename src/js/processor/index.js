@@ -16,7 +16,7 @@ export default async function processData(rawData) {
     const expenseTagsByMonth = {}
 
     for (const month in processor.filteredByMonth) {
-        crunchData.getData(processor.filteredByMonth[month])
+        crunchData.setData(processor.filteredByMonth[month])
         actualsByMonth[month] = crunchData.crunchData();
         expenseTagsByMonth[month] = crunchData.expenseTags
         crunchData.actuals = []
@@ -28,7 +28,7 @@ export default async function processData(rawData) {
     const mdTextByMonth = [];
 
     const sfMdExporter = new SfMdExporter()
-    sfMdExporter.getCategoriesByMonth(processor.leveledMonthsByCategory)
+    sfMdExporter.getCategoriesByMonth(processor.leveledMonthsByCategory) // fix
     const sfSummary = sfMdExporter.mdByMonth;
 
     for (const month in actualsByMonth) {
@@ -44,5 +44,6 @@ export default async function processData(rawData) {
 
     const leveledMonthsByCategory = processor.leveledMonthsByCategory;
 
+    // fix
     return { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary };
 }

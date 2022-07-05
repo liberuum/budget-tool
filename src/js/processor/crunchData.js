@@ -94,8 +94,7 @@ export default class CrunchData {
     }
 
 
-    async getData(filteredByMonth) {
-        this.data = []
+    async setData(filteredByMonth) {
         this.data = filteredByMonth
         this.expenseTags = this.getExpenseTags()
 
@@ -109,7 +108,6 @@ export default class CrunchData {
 
     checkKeys() {
         const budgetKeys = ['forecast', 'estimate', 'actual', 'owed', 'paid'];
-
         for (let i = 0; i < budgetKeys.length; i++) {
             if (this.data[0].hasOwnProperty(budgetKeys[i])) {
                 this.setTotalsByExpenseTag(budgetKeys[i])
