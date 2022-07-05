@@ -103,7 +103,7 @@ const validateWallets = async () => {
     for (let statement of budgetStatements) {
 
         let existingWallets = statement.budgetStatementWallet.filter(wallet => {
-            return wallet.address === walletAddress
+            return wallet.address.toLowerCase() === walletAddress.toLowerCase()
         })
         if (existingWallets.length > 0) {
             for (let wallet of existingWallets) {
@@ -113,7 +113,7 @@ const validateWallets = async () => {
             let walletObj = {
                 budgetStatementId: statement.id,
                 name: walletName,
-                address: walletAddress,
+                address: walletAddress.toLowerCase(),
                 currentBalance: 0,
                 topupTransfer: 0,
                 comments: '',
