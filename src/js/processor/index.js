@@ -3,6 +3,8 @@ import CrunchData from './crunchData.js';
 import MdExporter from './mdExporter.js';
 import SfMdExporter from './sfMdExporter.js';
 
+// TODO
+// Refactor -  minimize dependencies between data structures
 export default async function processData(rawData) {
     const processor = new Processor();
     processor.getRawData(rawData);

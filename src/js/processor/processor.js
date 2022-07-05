@@ -98,7 +98,7 @@ export default class Processor {
             index: null,
             certain: false,
             labels: ['!category', 'Budget Category'],
-            parseFunction: null
+            parseFunction: 'tryParseString'
         },
         month: {
             column: null,
@@ -112,7 +112,14 @@ export default class Processor {
             index: null,
             certain: false,
             labels: ['!transaction', 'Transaction'],
-            parseFunction: null
+            parseFunction: 'tryParseString'
+        },
+        group: {
+            column: null,
+            index: null,
+            certain: false,
+            labels: ['!group', 'Group'],
+            parseFunction: 'tryParseString'
         }
     }
 
@@ -131,7 +138,7 @@ export default class Processor {
         this.filterByMonth()
         this.filteredByCategoryMonth = this.buildSESView(this.parsedRows)
         this.leveledMonthsByCategory = this.buildSFView(this.filteredByCategoryMonth)
-        // console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
+        console.log('leveledMonthsByCategory', this.leveledMonthsByCategory)
         // console.log('filteredByMonth', this.filteredByMonth)
     }
 
@@ -157,16 +164,15 @@ export default class Processor {
     }
 
     isValidExpenseRow(rowCandidate) {
-        let result = this.isValidMonth(rowCandidate.month) && (this.isValidNumber(rowCandidate.actual) || this.isValidNumber(rowCandidate.forecast) || this.isValidNumber(rowCandidate.estimate) || this.isValidNumber(rowCandidate.paid))
-        if (result == false) {
-            // console.log('rejected rowCandidate', rowCandidate, this.isValidMonth(rowCandidate.month), this.isValidNumber(rowCandidate.actual), this.isValidNumber(rowCandidate.forecast), this.isValidNumber(rowCandidate.estimate))
-        }
-        return result;
+        return this.isValidMonth(rowCandidate.month) &&
+            (this.isValidNumber(rowCandidate.actual) ||
+                this.isValidNumber(rowCandidate.forecast) ||
+                this.isValidNumber(rowCandidate.estimate) ||
+                this.isValidNumber(rowCandidate.paid));
     }
 
     isValidBudgetRow(rowCandidate) {
-        let result = this.isValidMonth(rowCandidate.month) && this.isValidNumber(rowCandidate.budget);
-        return result;
+        return this.isValidMonth(rowCandidate.month) && this.isValidNumber(rowCandidate.budget);
     }
 
     parseRowData = () => {
@@ -203,7 +209,7 @@ export default class Processor {
         }
         while (this.selectNextFilter(false))
 
-        // console.log('parsedRows:', this.parsedRows)
+        // console.log('parsedRows:', this.parsedRows);
         // console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
 
     }
@@ -519,6 +525,14 @@ export default class Processor {
         ogDate = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate(), 0, 0, 0, ms);
         // console.log(ogDate);
         return ogDate;
+    }
+
+    tryParseString(input) {
+        if (!input) {
+            return '';
+        }
+        return (input + '').trim();
+
     }
 
 }
