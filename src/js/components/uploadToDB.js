@@ -78,8 +78,6 @@ export default function UploadToDB(props) {
         if (months !== undefined) {
             for (let category in leveledMonthsByCategory) {
                 let canonicalObj = getCanonicalCategory(category);
-                // TODO
-                // Read the groups from leveledMonthsByCategory
                 for (let group in leveledMonthsByCategory[category]) {
                     for (let month of months) {
                         lineItems.push(createRowObject(month, category, canonicalObj, group, leveledMonthsByCategory))
@@ -101,7 +99,9 @@ export default function UploadToDB(props) {
             actual: 0,
             comments: '',
             canonicalBudgetCategory: '',
-            headcountExpense: ''
+            headcountExpense: '',
+            budgetCap: 0,
+            payment: 0
         };
         rowObject.month = month;
         rowObject.position = canonicalObj ? canonicalObj.position : 0;
@@ -112,7 +112,7 @@ export default function UploadToDB(props) {
         rowObject.comments = '';
         rowObject.canonicalBudgetCategory = canonicalObj ? canonicalObj.canonicalCategory : null;
         rowObject.headcountExpense = canonicalObj ? canonicalObj.headCountExpense : null;
-        rowObject.budgetCap = roundNumber(lookup[category][group][month].budget)
+        rowObject.budgetCap = roundNumber(lookup[category][group][month].budget);
         return rowObject;
     }
 
