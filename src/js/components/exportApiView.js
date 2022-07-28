@@ -26,10 +26,12 @@ export default function ApiView() {
     let leveledMonthsByCategory;
     let walletName;
     let walletAddress;
+    let actualsByMonth;
     if (monthsArr !== undefined) {
         let months = monthsArr.mdTextByMonth;
         walletName = monthsArr.walletName;
         walletAddress = monthsArr.walletAddress;
+        actualsByMonth = monthsArr.actualsByMonth;
         leveledMonthsByCategory = monthsArr.leveledMonthsByCategory;
         for (const month of months) {
             let key = Object.keys(month)
@@ -66,7 +68,7 @@ export default function ApiView() {
                     })}
                 </Select>
             </Card>
-            <UploadToDB props={{ selectedMonth, keys, leveledMonthsByCategory, walletName, walletAddress }} />
+            <UploadToDB props={{ selectedMonth, keys, leveledMonthsByCategory, walletName, walletAddress, actualsByMonth }} />
         </Container>
     )
 }
