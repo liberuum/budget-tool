@@ -6,8 +6,6 @@ import { storeAuthObject } from '../actions/googleAuth';
 import { storeLinkData, removeLinkData } from '../actions/tableData';
 import processData from '../processor/index';
 import CuInfo from './cuInfo';
-//testing function
-import './utils/validateLineItems';
 
 
 export default function Table() {
@@ -33,19 +31,20 @@ export default function Table() {
 
     const handleWalletNameInput = (value) => {
         setInputWalletName(value);
-        checkWalletInput();
     }
     const handleWalletAddressInput = (value) => {
         setInputWalletAddress(value);
-        checkWalletInput();
+        checkWalletInput(value);
     }
 
 
-    const checkWalletInput = () => {
-        if (inputWalletName !== '' && inputWalletAddress.length === 42) {
+    const checkWalletInput = (value) => {
+        let regex = new RegExp(/^0x[a-fA-F0-9]{40}$/);
+        let result = regex.test(value);
+        if (result) {
             setValidatedInput({ ...validatedInput, walletFields: true, variant: null })
         } else {
-            setValidatedInput({ ...validatedInput, variant: 'inputError', valid: false })
+            setValidatedInput({ ...validatedInput, walletFields: false })
         }
     }
 
@@ -55,7 +54,6 @@ export default function Table() {
 
 
     const handleLinkInput = (value) => {
-        checkWalletInput();
         const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
         let result = pattern.exec(value);
         if (result == null) {
@@ -193,12 +191,18 @@ export default function Table() {
                             <Input
                                 sx={{ "::placeholder": { color: '#D3D3D3' } }}
                                 // variant={validatedInput.variant}
+                                disabled={inputWalletName === ''}
                                 placeholder='0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB'
                                 name='walletName'
                                 type='text'
                                 value={inputWalletAddress}
                                 onChange={e => handleWalletAddressInput(e.target.value)}
                             ></Input>
+                            {
+                                !validatedInput.walletFields && inputWalletAddress !== '' ? (<Text sx={{ m: 0 }} variant="smallError">
+                                    Paste the correct format - only wallet address
+                                </Text>) : ''
+                            }
                         </div>
                     </Grid>
                 </Box>
@@ -207,6 +211,7 @@ export default function Table() {
                     <Input
                         sx={{ "::placeholder": { color: '#D3D3D3' } }}
                         variant={validatedInput.variant}
+                        disabled={!validatedInput.walletFields}
                         placeholder='https://docs.google.com/spreadsheets/d/1N4kcF0TiMmDlKE4K5TLT7jw48h1-nEgDelSIexT93EA/edit#gid=1845449681'
                         name='spreadsheetLink'
                         type='text'
@@ -223,11 +228,6 @@ export default function Table() {
                             Can't access link, make sure you have access to your spreadsheet
                         </Text>) : ''
                     }
-                    {
-                        inputWalletName === '' && inputWalletAddress === '' && !validatedInput.walletFields && validatedInput.variant ? (<Text sx={{ m: 0 }} variant="smallError">
-                            Fill in wallet information before you add sheet
-                        </Text>) : ''
-                    }
 
                 </Box>
                 <Box>
@@ -235,7 +235,7 @@ export default function Table() {
                         sx={{
                             mt: '10px'
                         }}
-                        disabled={validatedInput.valid && !validatedInput.duplicate ? false : true}
+                        disabled={validatedInput.valid && !validatedInput.duplicate && validatedInput.walletFields ? false : true}
                         onClick={handleAddSheet}
                     >Add Sheet</Button>
                     {validatedInput.valid ?
