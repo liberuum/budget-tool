@@ -23,10 +23,13 @@ export default function CuInfo() {
 
     if (loading) return <Spinner size={1} />
     if (error) return <AlertHoC props={error.message} />
-
-    return (
-        <Card sx={{ my: 2, textAlign: 'center', maxWidth: "100%" }}>
-            <Text sx={{ fontWeight: "bold", }}>{data.coreUnit[0].name} Core Unit</Text>
-        </Card>
-    )
+    if (data.coreUnit.length < 1) {
+        return <AlertHoC props={'No CU is found'} />
+    } else {
+        return (
+            <Card sx={{ my: 2, textAlign: 'center', maxWidth: "100%" }}>
+                <Text sx={{ fontWeight: "bold", }}>{data.coreUnit[0].name} Core Unit</Text>
+            </Card>
+        )
+    }
 }

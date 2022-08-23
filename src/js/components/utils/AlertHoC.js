@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert, Close } from 'theme-ui'
 
 
 export default function AlertHoC(props) {
 
+    useEffect(() => {
+        return () => {
+            setTimeout(() => {
+                setShow(false)
+            }, 10000)
+        }
+    })
     const [show, setShow] = useState(true);
-    
+
     const handleClose = () => {
         setShow(!show)
     }
-
-    setTimeout( () => {
-        setShow(false)
-    },10000)
 
     return (
         <div style={{
@@ -23,10 +26,8 @@ export default function AlertHoC(props) {
         }}>
             {show ? <Alert variant="warning">
                 {props.props}
-                <Close style={{cursor: 'pointer'}} onClick={handleClose} ml="auto" mr={-2} />
+                <Close style={{ cursor: 'pointer' }} onClick={handleClose} ml="auto" mr={-2} />
             </Alert> : ''}
-
-
         </div>
     )
 }
