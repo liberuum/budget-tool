@@ -111,9 +111,9 @@ ipcMain.handle('checkToken', async (event, args) => {
 ipcMain.handle('getSheetInfo', async (evemt, args) => {
     try {
         // console.log('Getting Link in Main:', await args)
-        const { spreadSheetTitle, sheetName, spreadsheetId } = await parseSpreadSheetLink(args);
+        const { spreadSheetTitle, sheetName, spreadsheetId, tabId } = await parseSpreadSheetLink(args);
         const rawData = await fetchData(spreadsheetId, sheetName);
-        return { spreadSheetTitle, sheetName, spreadsheetId, rawData }
+        return { spreadSheetTitle, sheetName, spreadsheetId, tabId, rawData }
 
     } catch (error) {
         return { error };

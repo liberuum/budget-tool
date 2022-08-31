@@ -4,11 +4,11 @@ import { useSelector } from 'react-redux';
 import { Card, Label, Container, Textarea, Select, Button } from "theme-ui";
 
 export default function JSONView() {
-    const { spreadsheetId } = useParams();
+    const { spreadsheetId, tabId } = useParams();
 
     const tableData = useSelector((tableData) => tableData.tableData.links);
     const filtered = tableData.filter(item => {
-        if (item.spreadsheetId == spreadsheetId)
+        if (item.spreadsheetId == spreadsheetId && item.tabId == tabId)
             return item
     })
 

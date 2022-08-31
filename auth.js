@@ -106,18 +106,18 @@ async function parseSpreadSheetLink({ link }) {
         const pattern = /\/spreadsheets\/d\/([^\/]+)\/edit[^#]*(?:#gid=([0-9]+))?/gm
         let result = pattern.exec(link)
         const spreadsheetId = result[1];
-        const sheetId = Number(result[2])
+        const tabId = Number(result[2])
         // Getting Sheet Name
         const sheets = google.sheets('v4');
         const sheetNameResponse = await sheets.spreadsheets.get({ auth, spreadsheetId });
         const spreadSheetTitle = sheetNameResponse.data.properties.title;
         const sheetData = sheetNameResponse.data.sheets.filter(item => {
-            if (item.properties.sheetId == sheetId)
+            if (item.properties.sheetId == tabId)
                 return item.properties.title
         })
         const sheetName = sheetData[0].properties.title;
 
-        return { spreadSheetTitle, sheetName, spreadsheetId }
+        return { spreadSheetTitle, sheetName, spreadsheetId, tabId }
     } catch (error) {
         console.log(`The API returned an error ${error}`)
     }

@@ -60,7 +60,7 @@ export default function Table() {
             setValidatedInput({ ...validatedInput, variant: 'inputError', valid: false })
         } else {
             if (result[0] !== undefined && result[1] !== undefined && result[2] !== undefined) {
-                setValidatedInput({ ...validatedInput, variant: null, valid: true, duplicate: isDuplicateLink(result[1]) })
+                setValidatedInput({ ...validatedInput, variant: null, valid: true, duplicate: isDuplicateLink(result[1], result[2]) })
             } else {
                 setValidatedInput({ ...validatedInput, variant: 'inputError', valid: false })
             }
@@ -74,12 +74,12 @@ export default function Table() {
         const walletAddress = inputWalletAddress.toLowerCase();
         const walletName = inputWalletName;
         addrShortener(inputWalletAddress)
-        const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId } = await electron.getSheetInfo(inputSheetValue);
+        const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(inputSheetValue);
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
             const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress }))
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress }))
         }
         setValidatedInput({ variant: null, })
         setInputWalletName('')
@@ -91,9 +91,9 @@ export default function Table() {
         dispatch(removeLinkData(e.target.getAttribute('name')))
     }
 
-    const isDuplicateLink = (sheetId) => {
+    const isDuplicateLink = (spreadsheetId, tabId) => {
         let response = tableData.filter(row => {
-            return row.spreadsheetId === sheetId
+            return row.spreadsheetId === spreadsheetId && row.tabId === Number(tabId)
         })
         if (response.length == 0) {
             return false
@@ -155,9 +155,9 @@ export default function Table() {
                                 <Text >{row.sheetName}</Text>
                                 <Text><Link sx={{ cursor: 'pointer' }} onClick={() => handleOpenWalletLink(row.walletAddress)}>{shortenedAddress}</Link></Text>
                                 <Text sx={{ fontSize: "9px" }}>
-                                    <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}`)}>To MD </Button>
-                                    <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}`)}>To JSON </Button>
-                                    <Button variant="smallOutline" onClick={() => navigate(`/api/${row.spreadsheetId}`)} >To Api</Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}/${row.tabId}`)}>To MD </Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}/${row.tabId}`)}>To JSON </Button>
+                                    <Button variant="smallOutline" onClick={() => navigate(`/api/${row.spreadsheetId}/${row.tabId}`)} >To Api</Button>
                                     <Button bg='red' variant='small' name={row.sheetName} onClick={handleTableRowDelete}>Delete</Button>
                                 </Text>
                             </Grid>
