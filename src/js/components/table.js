@@ -71,16 +71,18 @@ export default function Table() {
 
     const handleAddSheet = async (event) => {
         event.preventDefault()
+        
         const walletAddress = inputWalletAddress.toLowerCase();
         const walletName = inputWalletName;
-        addrShortener(inputWalletAddress)
         const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(inputSheetValue);
+        
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
             const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData);
             dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress }))
         }
+        
         setValidatedInput({ variant: null, })
         setInputWalletName('')
         setInputWalletAddress('')
@@ -102,12 +104,8 @@ export default function Table() {
         }
     }
 
-    const addrShortener = (address) => {
-        let cutAddress = ''
-        let preffix = address.substring(4, address.lenght - 4);
-        let suffix = address.substring(address.length - 4);
-        cutAddress = `${preffix}...${suffix}`
-        setShortenedAddress(cutAddress);
+    const getShortFormAddress = (address) => {
+        return address.substring(4, address.lenght - 4) + '...' + address.substring(address.length - 4);
     }
 
     return (
@@ -153,7 +151,7 @@ export default function Table() {
                             >
                                 <Text >{row.spreadSheetTitle}</Text>
                                 <Text >{row.sheetName}</Text>
-                                <Text><Link sx={{ cursor: 'pointer' }} onClick={() => handleOpenWalletLink(row.walletAddress)}>{shortenedAddress}</Link></Text>
+                                <Text><Link sx={{ cursor: 'pointer' }} onClick={() => handleOpenWalletLink(row.walletAddress)}>{getShortFormAddress(row.walletAddress)}</Link></Text>
                                 <Text sx={{ fontSize: "9px" }}>
                                     <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}/${row.tabId}`)}>To MD </Button>
                                     <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}/${row.tabId}`)}>To JSON </Button>
