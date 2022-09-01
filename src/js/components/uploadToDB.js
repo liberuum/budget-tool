@@ -89,15 +89,7 @@ export default function UploadToDB(props) {
                 }
             }
         }
-        console.log('lineItems', lineItems)
-    }
-
-    const getPaymentValue = (month, category) => {
-        if (actualsByMonth[month] !== undefined) {
-            let selectedActual = actualsByMonth[month].find(actual => actual.type === 'paid');
-            return selectedActual[category] ? selectedActual[category] : 0
-        }
-        return 0
+        if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] lineItems', lineItems);
     }
 
     const createRowObject = (month, category, canonicalObj, group, lookup) => {
@@ -125,7 +117,7 @@ export default function UploadToDB(props) {
         rowObject.canonicalBudgetCategory = canonicalObj ? canonicalObj.canonicalCategory : null;
         rowObject.headcountExpense = canonicalObj ? canonicalObj.headCountExpense : null;
         rowObject.budgetCap = roundNumber(lookup[category][group][month].budget);
-        rowObject.payment = roundNumber(getPaymentValue(month, category))
+        rowObject.payment = roundNumber(lookup[category][group][month].paid);
         return rowObject;
     }
 

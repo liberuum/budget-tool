@@ -302,6 +302,7 @@ export default class Processor {
                 result[row.category][row.group][row.monthString] = {
                     actual: 0,
                     forecast: 0,
+                    paid: 0,
                     budget: 0
                 }
             }
@@ -311,6 +312,9 @@ export default class Processor {
             }
             if (row.forecast !== undefined) {
                 result[row.category][row.group][row.monthString]['forecast'] += row.forecast
+            }
+            if (row.paid !== undefined) {
+                result[row.category][row.group][row.monthString]['paid'] += row.paid
             }
             if (row.budget !== undefined) {
                 result[row.category][row.group][row.monthString]['budget'] += row.budget
@@ -354,9 +358,11 @@ export default class Processor {
                 if (indexByCategoryByMonth[category][group][month] === undefined) {
                     result[category][group][month]['actual'] = 0
                     result[category][group][month]['forecast'] = 0
+                    result[category][group][month]['paid'] = 0
                 } else {
                     result[category][group][month].actual = indexByCategoryByMonth[category][group][month]['actual']
                     result[category][group][month].forecast = indexByCategoryByMonth[category][group][month]['forecast']
+                    result[category][group][month].paid = indexByCategoryByMonth[category][group][month]['paid']
                 }
 
                 if (this.budgets[month] === undefined || this.budgets[month][category] === undefined) {
@@ -410,7 +416,8 @@ export default class Processor {
     }
 
     filterByMonth = () => {
-        let months = this.getMonths()
+        const months = this.getMonths()
+        
         for (let i = 0; i < months.length; i++) {
             let month = this.parsedRows.filter(object => {
                 return object.monthString === months[i]
