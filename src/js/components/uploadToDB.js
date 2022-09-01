@@ -79,17 +79,26 @@ export default function UploadToDB(props) {
     const parseDataForApi = () => {
         lineItems.splice(0, lineItems.length)
         const months = getAllMonths();
+        
         if (months !== undefined) {
             for (let category in leveledMonthsByCategory) {
                 let canonicalObj = getCanonicalCategory(category);
                 for (let group in leveledMonthsByCategory[category]) {
                     for (let month of months) {
-                        lineItems.push(createRowObject(month, category, canonicalObj, group, leveledMonthsByCategory))
+                        const row = createRowObject(month, category, canonicalObj, group, leveledMonthsByCategory);
+                        if (!isEmptyRow(row)) {
+                            lineItems.push(row);
+                        }
                     }
                 }
             }
         }
+
         if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] lineItems', lineItems);
+    }
+
+    const isEmptyRow = (row) => {
+        return (row.actual == 0) && (row.forecast == 0) && (row.payment == 0) && (row.budgetCap == 0);
     }
 
     const createRowObject = (month, category, canonicalObj, group, lookup) => {
