@@ -65,6 +65,14 @@ app.on('activate', () => {
     }
 });
 
+/**
+ *  IPC Handlers
+ * 
+ *  Set DEBUG_IPC_HANDLERS=true for debug output.
+ */
+
+const DEBUG_IPC_HANDLERS = false;
+
 ipcMain.handle('save-credentials', async () => {
     try {
         const gSecretsPath = await dialog.showOpenDialog({ properties: ['openFile'] })
@@ -110,7 +118,8 @@ ipcMain.handle('checkToken', async (event, args) => {
 
 ipcMain.handle('getSheetInfo', async (evemt, args) => {
     try {
-        // console.log('Getting Link in Main:', await args)
+        if (DEBUG_IPC_HANDLERS) console.log('Getting Link in Main:', await args);
+
         const { spreadSheetTitle, sheetName, spreadsheetId, tabId } = await parseSpreadSheetLink(args);
         const rawData = await fetchData(spreadsheetId, sheetName);
         return { spreadSheetTitle, sheetName, spreadsheetId, tabId, rawData }
@@ -160,12 +169,12 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
      */
     ipcMain.handle(`save-${name}`, async (event, args) => {
         try {
-            console.log("Storing " + name, args)
+            if (DEBUG_IPC_HANDLERS) console.log("Storing " + name, args);
             await settings.set(name, JSON.stringify(args))
 
         } catch (error) {
             // If an error occurs, clear the storage.
-            console.log(`save-${name} error`, error);
+            if (DEBUG_IPC_HANDLERS) console.log(`save-${name} error`, error);
             await settings.set(name, null)
             return { error }
         }
@@ -177,12 +186,12 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
     ipcMain.handle(`get-${name}`, async (event, args) => {
         try {
             const result = await settings.get(name);
-            console.log("Getting " + name, result, " => ", (result ? JSON.parse(result) : defaultValue))
+            if (DEBUG_IPC_HANDLERS) console.log("Getting " + name, result, " => ", (result ? JSON.parse(result) : defaultValue));
             return (result ? JSON.parse(result) : defaultValue);
 
         } catch (error) {
             // If an error occurs, clear the storage.
-            console.log(`get-${name} error`, error);
+            if (DEBUG_IPC_HANDLERS) console.log(`get-${name} error`, error);
             await settings.set(name, null)
             return { error }
         }
@@ -193,10 +202,10 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
      */
     ipcMain.handle(`reset-${name}`, async (event, args) => {
         try {
-            console.log("Resetting " + name)
+            if (DEBUG_IPC_HANDLERS) console.log("Resetting " + name);
             await settings.set(name, null)
         } catch (error) {
-            console.log(`reset-${name} error`, error);
+            if (DEBUG_IPC_HANDLERS) console.log(`reset-${name} error`, error);
             return { error }
         }
     });
@@ -218,14 +227,14 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
                     value: args
                 });
                 
-                console.log(`Adding record ${newId} to ${name}`, set);
+                if (DEBUG_IPC_HANDLERS) console.log(`Adding record ${newId} to ${name}`, set);
                 await settings.set(name, JSON.stringify(set));
 
                 return newId;
 
             } catch (error) {
                 // If an error occurs, clear the storage.
-                console.log(`add-${name} error`, error);
+                if (DEBUG_IPC_HANDLERS) console.log(`add-${name} error`, error);
                 await settings.set(name, null)
                 return { error }
             }
@@ -241,12 +250,12 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
                 const removalId = args[0] ? Number(args[0]) : 0;
                 const set = Array.isArray(existingValue) ? existingValue.filter(record => record.id != removalId) : [];
                 
-                console.log(`Removing record ${removalId} from ${name}`, set);
+                if (DEBUG_IPC_HANDLERS) console.log(`Removing record ${removalId} from ${name}`, set);
                 await settings.set(name, JSON.stringify(set));
 
             } catch (error) {
                 // If an error occurs, clear the storage.
-                console.log(`delete-${name} error`, error);
+                if (DEBUG_IPC_HANDLERS) console.log(`delete-${name} error`, error);
                 await settings.set(name, null);
                 return { error };
             }

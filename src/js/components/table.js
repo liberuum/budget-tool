@@ -7,6 +7,12 @@ import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../ac
 import processData from '../processor/index';
 import CuInfo from './cuInfo';
 
+/**
+ * Set DEBUG_TABLE_DATA=true to get debug output in the console.
+ */
+
+const DEBUG_TABLE_DATA = false;
+
 export default function Table() {
 
     const navigate = useNavigate();
@@ -15,8 +21,8 @@ export default function Table() {
     const initialized = useSelector((store) => store.tableData.initialized);
     const tableData = useSelector((store) => store.tableData.links);
 
-    console.log('initialized:', initialized);
-    console.log('tableData:', tableData);
+    if (DEBUG_TABLE_DATA) console.log('Table initialization flagged:', initialized);
+    if (DEBUG_TABLE_DATA) console.log('tableData:', tableData);
 
     useEffect(async () => {
         const { state, authClient } = await electron.checkToken();
@@ -27,11 +33,11 @@ export default function Table() {
     useEffect(async () => {
         if (!initialized) {
             await dispatch(flagLinkDataInitialization());
-            console.log("Initializing table data...");
+            if (DEBUG_TABLE_DATA) console.log("Initializing table data...");
 
             const gsheetLinks = await electron.getGsheetLinks();
             if (Array.isArray(gsheetLinks)) {
-                console.log(`Dispatching ${gsheetLinks.length} Gsheet links`, gsheetLinks);
+                if (DEBUG_TABLE_DATA) console.log(`Dispatching ${gsheetLinks.length} Gsheet links`, gsheetLinks);
                 for (const record of gsheetLinks) {
                     await dispatchNewSheet(record.value.walletName, record.value.walletAddress, record.value.sheetUrl, record.id);
                 }
@@ -114,7 +120,7 @@ export default function Table() {
 
     const handleTableRowDelete = async (e) => {
         const storageId = e.target.getAttribute('name');
-        console.log(`Removing ${storageId} from`, tableData);
+        if (DEBUG_TABLE_DATA) console.log(`Removing ${storageId} from`, tableData);
         await electron.deleteGsheetLink(storageId);
         dispatch(removeLinkData(storageId))
     }
