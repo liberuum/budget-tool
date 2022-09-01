@@ -108,7 +108,7 @@ export default function Table() {
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
-            const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData);
+            const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData, `${walletName} (ID:${storageId})`);
             dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress, storageId }))
         }
         

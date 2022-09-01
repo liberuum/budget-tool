@@ -7,6 +7,10 @@ import { validateLineItems, getCanonicalCategory } from './utils/validateLineIte
 import { useSelector } from 'react-redux';
 import AlertHoC from './utils/AlertHoC';
 
+/**
+ *  Set DEBUG_UPLOAD = false to suppress debug output.
+ */
+const DEBUG_UPLOAD = true;
 
 export default function UploadToDB(props) {
     const userFromStore = useSelector(store => store.user)
@@ -166,7 +170,7 @@ export default function UploadToDB(props) {
         const walletId = walletIds.filter(wallet => {
             return wallet.month === selectedMonth.concat('-01')
         })
-        console.log('walletId', walletId)
+        if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] walletId', walletId)
         const months = getNextThreeMonths(selectedMonth);
         if (months !== undefined) {
             let filtered = [];
@@ -181,16 +185,15 @@ export default function UploadToDB(props) {
                 selectedLineItems = null
             }
 
-            console.log('filtered months to upload', filtered)
+            if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] filtered months to upload', filtered)
             return filtered;
-
         }
 
     }
 
     const handleMonthChange = async () => {
 
-        console.log('month has changed', selectedMonth)
+        if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] month has changed', selectedMonth)
         setUploadStatus({ ...uploadStatus, updatingDb: false, noChange: false, overriding: false, uploading: false })
 
     }
@@ -202,17 +205,17 @@ export default function UploadToDB(props) {
 
             let data = filterFromLineItems(selectedMonth)
             const { lineItemsToDelete, lineItemsToUpload } = await validateLineItems(data);
-            console.log('data to delete', lineItemsToDelete)
-            console.log('data to upload:', lineItemsToUpload)
+            if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] data to delete', lineItemsToDelete)
+            if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] data to upload:', lineItemsToUpload)
 
             if (lineItemsToDelete.length > 0 && lineItemsToUpload.length > 0) {
-                console.log('deleting and updating lineItems',)
+                if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] deleting and updating lineItems')
                 await deleteBudgetLineItems(lineItemsToDelete, userFromStore.authToken)
                 await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
                 setUploadStatus({ ...uploadStatus, updatingDb: false, overriding: true })
             }
             if (lineItemsToDelete.length === 0 && lineItemsToUpload.length > 0) {
-                console.log('adding new lineItems')
+                if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] adding new lineItems')
                 await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
                 setUploadStatus({ ...uploadStatus, updatingDb: false, uploading: true })
             }

@@ -1,7 +1,11 @@
 
+const DEBUG_PROCESSOR = false;
 
 export default class Processor {
-    constructor() { };
+
+    constructor(wallet) {
+        this.wallet = wallet;
+    };
 
     filterIndex = null;
 
@@ -151,7 +155,8 @@ export default class Processor {
         for (let i = 0; i < this.rawData.length; i++) {
             this.tryParseFilterRow(this.rawData[i], i)
         }
-        // console.log('updated filters', this.filters)
+        
+        if (DEBUG_PROCESSOR) console.log(this.wallet, 'Updated filters: ', this.filters)
     }
 
 
@@ -178,15 +183,13 @@ export default class Processor {
     parseRowData = () => {
         this.budgets = {}
         this.resetFilterIndex();
+        
         do {
             let arrFilter = Object.entries(this.currentFilter());
             let arr = {}
-            // console.log('Parsing with filter,', this.currentFilter())
-            // 0 should be replaced by first row where it has valid values
+            
             for (let i = 0; i < this.rawData.length; i++) {
                 for (let item = 0; item < arrFilter.length; item++) {
-                    // console.log('this.rawData[i]', this.rawData[i])
-                    // console.log('arrFilter', arrFilter[item][1])
                     if (arrFilter[item][1].certain) {
                         let cellValue = this.rawData[i][arrFilter[item][1].column]
                         if (arrFilter[item][1].parseFunction) {
@@ -196,7 +199,7 @@ export default class Processor {
                         }
                     }
                 }
-                // console.log('arr', arr.month)
+                
                 if (this.isValidExpenseRow(arr)) {
                     this.parsedRows.push(this.cleanExpenseRecord(arr, this.currentFilter(), this.budgets, this.filteredByCategoryMonth))
                     arr = {}
@@ -204,14 +207,12 @@ export default class Processor {
                     this.processBudgetRow(arr, this.budgets)
                 }
             }
-
-            // console.log('budgets', this.budgets)
         }
         while (this.selectNextFilter(false))
 
-        // console.log('parsedRows:', this.parsedRows);
-        // console.log('filteredByCategoryMonth', this.filteredByCategoryMonth)
-
+        if (DEBUG_PROCESSOR) console.log(this.wallet, 'parseRowData output -- parsedRows:', this.parsedRows);
+        if (DEBUG_PROCESSOR) console.log(this.wallet, 'parseRowData output -- filteredByCategoryMonth', this.filteredByCategoryMonth);
+        if (DEBUG_PROCESSOR) console.log(this.wallet, 'parseRowData output -- budgets:', this.budgets);
     }
 
     processBudgetRow(parsedRecord, budgets) {
@@ -314,8 +315,9 @@ export default class Processor {
             if (row.budget !== undefined) {
                 result[row.category][row.group][row.monthString]['budget'] += row.budget
             }
-
         }
+
+        if (DEBUG_PROCESSOR) console.log(this.wallet, 'buildSESView() output:', result);
         return result;
     }
 
@@ -327,12 +329,12 @@ export default class Processor {
             result = this.addSfTableSection(result, indexByCategoryByMonth, month);
         })
 
+        if (DEBUG_PROCESSOR) console.log(this.wallet, 'buildSFView() output:', result);
         return result;
     }
 
     addSfTableSection(sfTable, indexByCategoryByMonth, month) {
         let result = JSON.parse(JSON.stringify(sfTable));
-
 
         // not all categories have same month
         for (const category in indexByCategoryByMonth) {
@@ -344,6 +346,7 @@ export default class Processor {
                 if (result[category][group] === undefined) {
                     result[category][group] = {}
                 }
+
                 if (result[category][group][month] === undefined) {
                     result[category][group][month] = {}
                 }
@@ -414,8 +417,8 @@ export default class Processor {
             })
             this.filteredByMonth[months[i]] = month;
         }
-        // console.log('filteredByMonth', this.filteredByMonth)
 
+        if (DEBUG_PROCESSOR) console.log(this.wallet, 'filterByMonth() output -- filteredByMonth', this.filteredByMonth)
     }
 
     getMonths = () => {
