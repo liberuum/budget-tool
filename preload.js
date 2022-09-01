@@ -9,7 +9,13 @@ contextBridge.exposeInMainWorld('electron', {
   getSheetInfo: (link) => ipcRenderer.invoke('getSheetInfo', { link }),
   openLink: () => ipcRenderer.send('open-link'),
   openWalletLink: (address) => ipcRenderer.invoke('open-wallet-link', { address }),
-  saveApiCredentials: (credentials) => ipcRenderer.invoke('save-api-credenetials', credentials),
+  saveApiCredentials: (credentials) => ipcRenderer.invoke('save-api-credentials', credentials),
   getApiCredentials: () => ipcRenderer.invoke('get-api-credentials'),
-  resetApiCredentials: () => ipcRenderer.invoke('reset-api-credentials')
+  resetApiCredentials: () => ipcRenderer.invoke('reset-api-credentials'),
+
+  saveGsheetLinks: (links) => ipcRenderer.invoke('save-gsheet-links', links),
+  getGsheetLinks: () => ipcRenderer.invoke('get-gsheet-links'),
+  resetGsheetLinks: () => ipcRenderer.invoke('reset-gsheet-links'),
+  addGsheetLink: (link) => ipcRenderer.invoke('add-gsheet-links', link),
+  deleteGsheetLink: (linkId) => ipcRenderer.invoke('delete-gsheet-links', linkId)
 })

@@ -3,18 +3,20 @@ import { Card, Button, Label, Input, Text, Grid, Box, Container, Badge, Link } f
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { storeAuthObject } from '../actions/googleAuth';
-import { storeLinkData, removeLinkData } from '../actions/tableData';
+import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../actions/tableData';
 import processData from '../processor/index';
 import CuInfo from './cuInfo';
-
 
 export default function Table() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const tableData = useSelector((tableData) => tableData.tableData.links);
 
-    console.log('tableData:', tableData)
+    const initialized = useSelector((store) => store.tableData.initialized);
+    const tableData = useSelector((store) => store.tableData.links);
+
+    console.log('initialized:', initialized);
+    console.log('tableData:', tableData);
 
     useEffect(async () => {
         const { state, authClient } = await electron.checkToken();
@@ -22,12 +24,25 @@ export default function Table() {
 
     }, [electron.checkToken])
 
+    useEffect(async () => {
+        if (!initialized) {
+            await dispatch(flagLinkDataInitialization());
+            console.log("Initializing table data...");
+
+            const gsheetLinks = await electron.getGsheetLinks();
+            if (Array.isArray(gsheetLinks)) {
+                console.log(`Dispatching ${gsheetLinks.length} Gsheet links`, gsheetLinks);
+                for (const record of gsheetLinks) {
+                    await dispatchNewSheet(record.value.walletName, record.value.walletAddress, record.value.sheetUrl, record.id);
+                }
+            }
+        }
+    }, [initialized, electron.getGsheetLinks])
 
     const [inputSheetValue, setInputSheetValue] = useState('');
     const [validatedInput, setValidatedInput] = useState({ variant: null, valid: false, duplicate: false, linkError: false, walletFields: false });
     const [inputWalletAddress, setInputWalletAddress] = useState('');
-    const [inputWalletName, setInputWalletName] = useState('');
-    const [shortenedAddress, setShortenedAddress] = useState('');
+    const [inputWalletName, setInputWalletName] = useState('Permanent Team');
 
     const handleWalletNameInput = (value) => {
         setInputWalletName(value);
@@ -68,19 +83,27 @@ export default function Table() {
         setInputSheetValue(value)
     }
 
-
     const handleAddSheet = async (event) => {
         event.preventDefault()
-        
-        const walletAddress = inputWalletAddress.toLowerCase();
-        const walletName = inputWalletName;
-        const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(inputSheetValue);
+
+        const inputParameters = {
+            walletName: inputWalletName,
+            walletAddress: inputWalletAddress.toLowerCase(),
+            sheetUrl: inputSheetValue
+        }
+
+        const storageId = await electron.addGsheetLink(inputParameters);
+        await dispatchNewSheet(inputParameters.walletName, inputParameters.walletAddress, inputParameters.sheetUrl, storageId);
+    }
+
+    const dispatchNewSheet = async (walletName, walletAddress, sheetUrl, storageId) => {
+        const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
         
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
             const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress }))
+            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress, storageId }))
         }
         
         setValidatedInput({ variant: null, })
@@ -89,8 +112,11 @@ export default function Table() {
         setInputSheetValue('')
     }
 
-    const handleTableRowDelete = (e) => {
-        dispatch(removeLinkData(e.target.getAttribute('name')))
+    const handleTableRowDelete = async (e) => {
+        const storageId = e.target.getAttribute('name');
+        console.log(`Removing ${storageId} from`, tableData);
+        await electron.deleteGsheetLink(storageId);
+        dispatch(removeLinkData(storageId))
     }
 
     const isDuplicateLink = (spreadsheetId, tabId) => {
@@ -105,7 +131,7 @@ export default function Table() {
     }
 
     const getShortFormAddress = (address) => {
-        return address.substring(4, address.lenght - 4) + '...' + address.substring(address.length - 4);
+        return address.substring(0, 5) + '...' + address.substring(address.length - 4);
     }
 
     return (
@@ -121,7 +147,7 @@ export default function Table() {
                         py: 1
                     }}
                 >
-                    {["Title", "Sheet", "Wallet", "Actions"].map((h, key) => (
+                    {["Wallet", "Google Sheet", "Tab", "Actions"].map((h, key) => (
                         <Text sx={{ fontWeight: "bold" }} key={key}>
                             {h}
                         </Text>
@@ -149,14 +175,17 @@ export default function Table() {
                                     py: "1"
                                 }}
                             >
-                                <Text >{row.spreadSheetTitle}</Text>
-                                <Text >{row.sheetName}</Text>
-                                <Text><Link sx={{ cursor: 'pointer' }} onClick={() => handleOpenWalletLink(row.walletAddress)}>{getShortFormAddress(row.walletAddress)}</Link></Text>
+                                <Text>
+                                    <Text sx={{ display: 'block', fontWeight: 'bold' }}>{row.walletName}</Text>
+                                    <Link sx={{ cursor: 'pointer' }} onClick={() => handleOpenWalletLink(row.walletAddress)}>{getShortFormAddress(row.walletAddress)}</Link>
+                                </Text>
+                                <Text>{row.spreadSheetTitle}</Text>
+                                <Text>{row.sheetName}</Text>
                                 <Text sx={{ fontSize: "9px" }}>
                                     <Button variant="smallOutline" onClick={() => navigate(`/md/${row.spreadsheetId}/${row.tabId}`)}>To MD </Button>
                                     <Button variant="smallOutline" onClick={() => navigate(`/json/${row.spreadsheetId}/${row.tabId}`)}>To JSON </Button>
                                     <Button variant="smallOutline" onClick={() => navigate(`/api/${row.spreadsheetId}/${row.tabId}`)} >To Api</Button>
-                                    <Button bg='red' variant='small' name={row.sheetName} onClick={handleTableRowDelete}>Delete</Button>
+                                    <Button bg='red' variant='small' name={row.storageId} onClick={handleTableRowDelete}>Delete</Button>
                                 </Text>
                             </Grid>
                         )
@@ -177,7 +206,7 @@ export default function Table() {
                             <Input
                                 sx={{ "::placeholder": { color: '#D3D3D3' } }}
                                 // variant={validatedInput.variant}
-                                placeholder='permanent team'
+                                placeholder='Permanent Team'
                                 name='walletName'
                                 type='text'
                                 value={inputWalletName}

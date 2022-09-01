@@ -138,27 +138,121 @@ ipcMain.handle('open-wallet-link', (event, args) => {
     require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args.address}/home`)
 })
 
-ipcMain.handle('save-api-credenetials', async (event, args) => {
-    try {
-        await settings.set('api-credentials', JSON.stringify(args))
-    } catch (error) {
-        return { error }
-    }
-})
 
-ipcMain.handle('get-api-credentials', async (event, args) => {
-    try {
-        const result = await settings.get('api-credentials');
-        return JSON.parse(result)
-    } catch (error) {
-        return { error }
+function getNextStorageId(set) {
+    if (!Array.isArray(set)) {
+        return 1;
     }
-})
 
-ipcMain.handle('reset-api-credentials', async (event, args) => {
-    try {
-        await settings.set('api-credentials', null)
-    } catch (error) {
-        return { error }
+    let nextId = 1;
+    for (const element of set) {
+        if (element.id && element.id >= nextId) {
+            nextId = element.id + 1;
+        }
     }
-})
+
+    return nextId;
+}
+
+function createJsonStorageVariable(name, defaultValue, isCollection=false) {
+    /**
+     *  Save storage value
+     */
+    ipcMain.handle(`save-${name}`, async (event, args) => {
+        try {
+            console.log("Storing " + name, args)
+            await settings.set(name, JSON.stringify(args))
+
+        } catch (error) {
+            // If an error occurs, clear the storage.
+            console.log(`save-${name} error`, error);
+            await settings.set(name, null)
+            return { error }
+        }
+    });
+    
+    /**
+     *  Get storage value
+     */
+    ipcMain.handle(`get-${name}`, async (event, args) => {
+        try {
+            const result = await settings.get(name);
+            console.log("Getting " + name, result, " => ", (result ? JSON.parse(result) : defaultValue))
+            return (result ? JSON.parse(result) : defaultValue);
+
+        } catch (error) {
+            // If an error occurs, clear the storage.
+            console.log(`get-${name} error`, error);
+            await settings.set(name, null)
+            return { error }
+        }
+    });
+    
+    /**
+     *  Clear storage value
+     */
+    ipcMain.handle(`reset-${name}`, async (event, args) => {
+        try {
+            console.log("Resetting " + name)
+            await settings.set(name, null)
+        } catch (error) {
+            console.log(`reset-${name} error`, error);
+            return { error }
+        }
+    });
+
+    if (isCollection) {
+
+        /**
+         *  Add a value to the storage array and return its ID
+         */
+        ipcMain.handle(`add-${name}`, async (event, args) => {
+            try {
+                const existingRawValue = await settings.get(name);
+                const existingValue = existingRawValue ? JSON.parse(existingRawValue) : [];
+                const set = Array.isArray(existingValue) ? existingValue : [];
+                const newId = getNextStorageId(set);
+
+                set.push({
+                    id: newId,
+                    value: args
+                });
+                
+                console.log(`Adding record ${newId} to ${name}`, set);
+                await settings.set(name, JSON.stringify(set));
+
+                return newId;
+
+            } catch (error) {
+                // If an error occurs, clear the storage.
+                console.log(`add-${name} error`, error);
+                await settings.set(name, null)
+                return { error }
+            }
+        });
+
+        /**
+         *  Remove a value from the storage array by ID
+         */
+         ipcMain.handle(`delete-${name}`, async (event, args) => {
+            try {
+                const existingRawValue = await settings.get(name);
+                const existingValue = existingRawValue ? JSON.parse(existingRawValue) : [];
+                const removalId = args[0] ? Number(args[0]) : 0;
+                const set = Array.isArray(existingValue) ? existingValue.filter(record => record.id != removalId) : [];
+                
+                console.log(`Removing record ${removalId} from ${name}`, set);
+                await settings.set(name, JSON.stringify(set));
+
+            } catch (error) {
+                // If an error occurs, clear the storage.
+                console.log(`delete-${name} error`, error);
+                await settings.set(name, null);
+                return { error };
+            }
+        });
+    }
+}
+
+createJsonStorageVariable('api-credentials', null);
+createJsonStorageVariable('gsheet-links', [], true);
