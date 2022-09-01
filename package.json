@@ -1,6 +1,6 @@
 {
   "name": "budgettool",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Get monthly actuals in MD, JSON format and push to Ecosystem Performance Api",
   "main": "main.js",
   "scripts": {
