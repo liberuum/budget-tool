@@ -17,5 +17,6 @@ contextBridge.exposeInMainWorld('electron', {
   getGsheetLinks: () => ipcRenderer.invoke('get-gsheet-links'),
   resetGsheetLinks: () => ipcRenderer.invoke('reset-gsheet-links'),
   addGsheetLink: (link) => ipcRenderer.invoke('add-gsheet-links', link),
-  deleteGsheetLink: (linkId) => ipcRenderer.invoke('delete-gsheet-links', linkId)
+  deleteGsheetLink: (linkId) => ipcRenderer.invoke('delete-gsheet-links', linkId),
+  getIsDev: () => ipcRenderer.invoke('get-isDev')
 })

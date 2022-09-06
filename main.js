@@ -9,6 +9,8 @@ const settings = require('electron-settings');
 const dockIcon = path.join(__dirname, 'assets', 'images', 'budgetToolLogo.png');
 const trayIcon = path.join(__dirname, 'assets', 'images', 'budget_icon.jpg');
 
+createJsonStorageVariable('isDev', false);
+
 function createWindow() {
     const win = new BrowserWindow({
         width: 1200,
@@ -51,6 +53,7 @@ app.whenReady().then(async () => {
 
     createWindow();
 
+    await setEnv()
 });
 
 app.on('window-all-closed', () => {
@@ -163,7 +166,7 @@ function getNextStorageId(set) {
     return nextId;
 }
 
-function createJsonStorageVariable(name, defaultValue, isCollection=false) {
+function createJsonStorageVariable(name, defaultValue, isCollection = false) {
     /**
      *  Save storage value
      */
@@ -179,7 +182,7 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
             return { error }
         }
     });
-    
+
     /**
      *  Get storage value
      */
@@ -196,7 +199,7 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
             return { error }
         }
     });
-    
+
     /**
      *  Clear storage value
      */
@@ -226,7 +229,7 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
                     id: newId,
                     value: args
                 });
-                
+
                 if (DEBUG_IPC_HANDLERS) console.log(`Adding record ${newId} to ${name}`, set);
                 await settings.set(name, JSON.stringify(set));
 
@@ -243,13 +246,13 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
         /**
          *  Remove a value from the storage array by ID
          */
-         ipcMain.handle(`delete-${name}`, async (event, args) => {
+        ipcMain.handle(`delete-${name}`, async (event, args) => {
             try {
                 const existingRawValue = await settings.get(name);
                 const existingValue = existingRawValue ? JSON.parse(existingRawValue) : [];
                 const removalId = args[0] ? Number(args[0]) : 0;
                 const set = Array.isArray(existingValue) ? existingValue.filter(record => record.id != removalId) : [];
-                
+
                 if (DEBUG_IPC_HANDLERS) console.log(`Removing record ${removalId} from ${name}`, set);
                 await settings.set(name, JSON.stringify(set));
 
@@ -261,6 +264,10 @@ function createJsonStorageVariable(name, defaultValue, isCollection=false) {
             }
         });
     }
+}
+
+function setEnv() {
+    settings.set('isDev', isDev)
 }
 
 createJsonStorageVariable('api-credentials', null);

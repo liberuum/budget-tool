@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Settings from './components/settings'
 import Navbar from './components/navbar';
 import BudgetSheet from './components/budgetSheet';
@@ -9,15 +9,17 @@ import ApiView from './components/exportApiView';
 import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
-import { useSelector } from 'react-redux';
-
-
 
 export default function App() {
-    const userFromStore = useSelector(store => store.user)
+    const [isDev, setIsDev] = useState(false);
+
+    useEffect(async () => {
+        const dev = await electron.getIsDev();
+        setIsDev(dev)
+    }, []);
 
     const client = new ApolloClient({
-        uri: 'https://ecosystem-dashboard.herokuapp.com/graphql',
+        uri: isDev ? 'https://publish-dev-2cx6rcfwf0t9ckrbfy.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
         cache: new InMemoryCache()
     });
 

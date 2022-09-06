@@ -4,11 +4,16 @@ import {
     gql
 } from "@apollo/client";
 
+let client;
+setupClient()
 
-const client = new ApolloClient({
-    uri: 'https://ecosystem-dashboard.herokuapp.com/graphql',
-    cache: new InMemoryCache()
-});
+async function setupClient() {
+    const isDev = await electron.getIsDev();
+    client = new ApolloClient({
+        uri: isDev ? 'https://publish-dev-2cx6rcfwf0t9ckrbfy.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
+        cache: new InMemoryCache()
+    });
+}
 
 export const GET_CORE_UNITS = gql`
     query getCoreUnits {
