@@ -10,7 +10,7 @@ import AlertHoC from './utils/AlertHoC';
 /**
  *  Set DEBUG_UPLOAD = false to suppress debug output.
  */
-const DEBUG_UPLOAD = true;
+const DEBUG_UPLOAD = false;
 
 export default function UploadToDB(props) {
     const userFromStore = useSelector(store => store.user)
