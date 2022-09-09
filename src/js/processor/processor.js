@@ -59,36 +59,46 @@ export default class Processor {
             column: null,
             index: null,
             certain: false,
-            labels: ['!forecast', '!forecast-inv', 'Forecast'],
-            parseFunction: 'tryParseNumber'
+            labels: ['!forecast', 'Forecast'],
+            parseFunction: 'tryParseNumber',
+            signInitialized: false,
+            signMultiplier: 1
         },
         estimate: {
             column: null,
             index: null,
             certain: false,
             labels: ['!estimate', 'Estimate'],
-            parseFunction: 'tryParseNumber'
+            parseFunction: 'tryParseNumber',
+            signInitialized: false,
+            signMultiplier: 1
         },
         actual: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!actual', '!actual-inv', 'Actual'],
-            parseFunction: 'tryParseNumber'
+            labels: ['!actual', 'Actual'],
+            parseFunction: 'tryParseNumber',
+            signInitialized: false,
+            signMultiplier: 1
         },
         owed: {
             colum: null,
             index: null,
             certain: false,
             labels: ['!owed', 'Owed'],
-            parseFunction: 'tryParseNumber'
+            parseFunction: 'tryParseNumber',
+            signInitialized: false,
+            signMultiplier: 1
         },
         paid: {
             column: null,
             index: null,
             certain: false,
-            labels: ['!paid', '!paid-inv', 'Paid'],
-            parseFunction: 'tryParseNumber'
+            labels: ['!paid', 'Paid'],
+            parseFunction: 'tryParseNumber',
+            signInitialized: false,
+            signMultiplier: 1
         },
         budget: {
             column: null,
@@ -204,7 +214,22 @@ export default class Processor {
                 }
 
                 if (this.isValidExpenseRow(arr)) {
-                    this.parsedRows.push(this.cleanExpenseRecord(arr, this.currentFilter(), this.budgets, this.filteredByCategoryMonth))
+                    let selectedFilter = JSON.parse(JSON.stringify(this.currentFilter()));
+
+                    if ('actual' in arr) {
+                        selectedFilter.actual.signInitialized = true;
+                        selectedFilter.actual.signMultiplier = Math.sign(arr.actual);
+                    }
+                    if ('forecast' in arr) {
+                        selectedFilter.forecast.signInitialized = true;
+                        selectedFilter.forecast.signMultiplier = Math.sign(arr.forecast)
+                    }
+
+                    if (arr.category.toLowerCase() === 'revenue') {
+                        arr.actual = arr.actual * -1
+                    }
+
+                    this.parsedRows.push(this.cleanExpenseRecord(arr, selectedFilter, this.budgets, this.filteredByCategoryMonth))
                     arr = {}
                 } else if (this.isValidBudgetRow(arr)) {
                     this.processBudgetRow(arr, this.budgets)
@@ -265,7 +290,7 @@ export default class Processor {
             calculatedOwed = parsedRecord.estimate
         }
         if (parsedRecord.actual !== undefined) {
-            parsedRecord.actual = this.parseNumber(parsedRecord.actual)
+            parsedRecord.actual = this.parseNumber(parsedRecord.actual) * filter.actual.signMultiplier
             calculatedOwed = parsedRecord.actual
         }
         if (parsedRecord.owed !== undefined) {
@@ -280,7 +305,7 @@ export default class Processor {
             parsedRecord.paid = this.parseNumber(parsedRecord.paid)
         }
         if (parsedRecord.forecast !== undefined) {
-            parsedRecord.forecast = this.parseNumber(parsedRecord.forecast)
+            parsedRecord.forecast = this.parseNumber(parsedRecord.forecast) * filter.forecast.signMultiplier
         }
         if (parsedRecord.category === '') {
             parsedRecord.category = 'payment topup';
@@ -459,7 +484,7 @@ export default class Processor {
             }
             let filterArr = Object.entries(this.currentFilter())
             for (let j = 0; j < filterArr.length; j++) {
-                if (this.matchesFilterTag(arr[i], filterArr[j][1]['labels'][0]) || this.matchesFilterTag(arr[i], filterArr[j][1]['labels'][1])) {
+                if (this.matchesFilterTag(arr[i], filterArr[j][1]['labels'][0])) {
                     this.currentFilter()[filterArr[j][0]].certain = true;
                     this.currentFilter()[filterArr[j][0]].column = i;
                     this.currentFilter()[filterArr[j][0]].index = rowIndex;
@@ -491,11 +516,11 @@ export default class Processor {
         if (typeof numberString !== 'string' || numberString.length < 1) {
             if (numberString === '')
                 return 0
-            return numberString * Math.sign(numberString)
+            return numberString
         }
 
         let result = parseFloat(numberString.match(regex).join(''));
-        return isNaN(result) ? numberString * Math.sign(numberString) : result * Math.sign(result);
+        return isNaN(result) ? numberString : result;
 
     }
 
