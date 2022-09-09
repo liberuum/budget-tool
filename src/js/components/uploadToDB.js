@@ -233,7 +233,6 @@ export default function UploadToDB(props) {
 
 
     const handleViewExpense = () => {
-        console.log(coreUnit.shortCode)
         electron.openDashboardLink(coreUnit.shortCode)
     }
 
