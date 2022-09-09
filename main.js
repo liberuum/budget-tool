@@ -150,6 +150,13 @@ ipcMain.handle('open-wallet-link', (event, args) => {
     require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args.address}/home`)
 })
 
+ipcMain.handle('open-dashboard-link', (event, args) => {
+    require('electron').shell.openExternal(isDev ?
+        `https://expenses-dev.makerdao.network/core-unit/${args.cuName}/finances/reports`
+        :
+        `https://expenses.makerdao.network/core-unit/${args.cuName}/finances/reports`)
+});
+
 
 function getNextStorageId(set) {
     if (!Array.isArray(set)) {

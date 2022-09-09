@@ -58,6 +58,7 @@ export const getCoreUnit = async (id) => {
                         id
                         code
                         name
+                        shortCode
                     }
                 }
             `,

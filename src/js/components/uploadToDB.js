@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Label, Badge, Textarea, Select, Button, Spinner } from "theme-ui"
+import { Card, Label, Badge, Link, Select, Button, Spinner } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { getCoreUnit, getBudgetSatementInfo, deleteBudgetLineItems } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
@@ -79,7 +79,7 @@ export default function UploadToDB(props) {
     const parseDataForApi = () => {
         lineItems.splice(0, lineItems.length)
         const months = getAllMonths();
-        
+
         if (months !== undefined) {
             for (let category in leveledMonthsByCategory) {
                 let canonicalObj = getCanonicalCategory(category);
@@ -232,6 +232,11 @@ export default function UploadToDB(props) {
     }
 
 
+    const handleViewExpense = () => {
+        console.log(coreUnit.shortCode)
+        electron.openDashboardLink(coreUnit.shortCode)
+    }
+
 
     return (
         <Card>
@@ -242,6 +247,9 @@ export default function UploadToDB(props) {
             {uploadStatus.overriding ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Updated</Badge> : ''}
             {uploadStatus.uploading ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Uploaded</Badge> : ''}
             {error ? <AlertHoC props={error.message} /> : ''}
+            <Label>
+                <Link sx={{ cursor: 'pointer' }} onClick={handleViewExpense}>View your reported data in the dashboard</Link>
+            </Label>
         </Card>
     )
 }

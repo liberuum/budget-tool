@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electron', {
   saveApiCredentials: (credentials) => ipcRenderer.invoke('save-api-credentials', credentials),
   getApiCredentials: () => ipcRenderer.invoke('get-api-credentials'),
   resetApiCredentials: () => ipcRenderer.invoke('reset-api-credentials'),
+  openDashboardLink: (cuName) => ipcRenderer.invoke('open-dashboard-link', {cuName}),
 
   saveGsheetLinks: (links) => ipcRenderer.invoke('save-gsheet-links', links),
   getGsheetLinks: () => ipcRenderer.invoke('get-gsheet-links'),
