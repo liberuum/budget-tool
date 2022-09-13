@@ -9,9 +9,11 @@ import ApiView from './components/exportApiView';
 import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
+import Modal from './components/modal/modal';
 
 export default function App() {
     const [isDev, setIsDev] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
 
     useEffect(async () => {
         const dev = await electron.getIsDev();
@@ -26,6 +28,8 @@ export default function App() {
     return (
         <>
             <ApolloProvider client={client}>
+            <button onClick={() => setOpenModal(true)}>open modal</button>
+            {openModal && <Modal closeModal={setOpenModal} />}
                 <Router>
                     <Navbar />
                     <Routes>
