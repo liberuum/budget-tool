@@ -3,7 +3,7 @@ import { Card, Label, Container, Textarea, Select, Button, Spinner, Text } from 
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { GET_CORE_UNIT } from '../api/graphql';
 import { useSelector } from 'react-redux';
-import AlertHoC from './utils/AlertHoC';
+import AlertHoC from './utils/alertHoC';
 
 
 

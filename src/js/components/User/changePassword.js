@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Card, Label, Input, Button, Spinner } from 'theme-ui';
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { useSelector } from 'react-redux';
-import AlertHoC from '../utils/AlertHoC.js'
-import GreenAlertHoc from '../utils/GreenAlertHoc.js';
+import AlertHoC from '../utils/alertHoC.js';
+import GreenAlertHoc from '../utils/greenAlertHoc.js';
 
 
 
