@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import Modal from './modal';
+import { getBudgetToolVersion } from '../../api/graphql';
 
 export default function AppVersionAlert() {
     const [openModal, setOpenModal] = useState(false);
     const [appVersion, setAppVersion] = useState('')
-    const latestVersion = '1.2.0';
+    const [latestVersion, setLatestVersion] = useState('')
 
     useEffect(async () => {
-        const version = await electron.getAppVersion();
-        setAppVersion(version)
-        needingUpdate()
-        const interval = setInterval(() => {
-            needingUpdate()
-        }, 120000)
+        await needingUpdate()
+        const interval = setInterval(async () => {
+            await needingUpdate()
+        }, 60000)
         return () => clearInterval(interval);
     }, []);
 
-
-    const needingUpdate = () => {
-        if (isSameVersion(appVersion, latestVersion)) {
+    const needingUpdate = async () => {
+        const version = await electron.getAppVersion();
+        const data = await getBudgetToolVersion();
+        setLatestVersion(data.data.latestBudgetToolVersion[0].version)
+        setAppVersion(version)
+        if (isSameVersion(version, data.data.latestBudgetToolVersion[0].version)) {
             setOpenModal(true)
         }
     }

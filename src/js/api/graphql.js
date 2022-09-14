@@ -234,3 +234,22 @@ export const getBudgetLineItems = async (walletId) => {
         console.error(error)
     }
 }
+
+export const getBudgetToolVersion = async () => {
+    try {
+        const result = client.query({
+            query: gql`
+                query latestQuery {
+                    latestBudgetToolVersion {
+                        id
+                        version
+                        link
+                }
+            }
+            `
+        });
+        return result;
+    } catch (error) {
+        console.error(object)
+    }
+}
