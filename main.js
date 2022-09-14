@@ -162,7 +162,7 @@ ipcMain.handle('get-app-version', () => {
 })
 
 ipcMain.handle('open-github-release', (event, args) => {
-    require('electron').shell.openExternal(`https://github.com/pcatana/budget-tool/releases/tag/v${args.version}`)
+    require('electron').shell.openExternal(args.link)
 })
 
 

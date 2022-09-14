@@ -5,7 +5,8 @@ import { getBudgetToolVersion } from '../../api/graphql';
 export default function AppVersionAlert() {
     const [openModal, setOpenModal] = useState(false);
     const [appVersion, setAppVersion] = useState('')
-    const [latestVersion, setLatestVersion] = useState('')
+    const [latestVersion, setLatestVersion] = useState('');
+    const [link, setLink] = useState('');
 
     useEffect(async () => {
         await needingUpdate()
@@ -20,6 +21,7 @@ export default function AppVersionAlert() {
         const data = await getBudgetToolVersion();
         setLatestVersion(data.data.latestBudgetToolVersion[0].version)
         setAppVersion(version)
+        setLink(data.data.latestBudgetToolVersion[0].link)
         if (isSameVersion(version, data.data.latestBudgetToolVersion[0].version)) {
             setOpenModal(true)
         }
@@ -38,7 +40,7 @@ export default function AppVersionAlert() {
 
     return (
         <>
-            {openModal && <Modal closeModal={handleCloseModal} currentVersion={appVersion} newVersion={latestVersion} />}
+            {openModal && <Modal closeModal={handleCloseModal} currentVersion={appVersion} newVersion={latestVersion} link={link} />}
         </>
     )
 }

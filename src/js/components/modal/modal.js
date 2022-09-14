@@ -2,10 +2,10 @@ import React from 'react';
 import './modal.css'
 import { Button, Text } from 'theme-ui'
 
-export default function Modal({ closeModal, currentVersion, newVersion }) {
+export default function Modal({ closeModal, currentVersion, newVersion, link }) {
 
     const handleDownloadButton = () => {
-        electron.openGithubRelease(newVersion);
+        electron.openGithubRelease(link);
     }
 
     return (

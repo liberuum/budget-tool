@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('electron', {
   openDashboardLink: (cuName) => ipcRenderer.invoke('open-dashboard-link', { cuName }),
   getIsDev: () => ipcRenderer.invoke('get-isDev'),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
-  openGithubRelease: (version) => ipcRenderer.invoke('open-github-release', { version }),
+  openGithubRelease: (link) => ipcRenderer.invoke('open-github-release', { link }),
 
   saveGsheetLinks: (links) => ipcRenderer.invoke('save-gsheet-links', links),
   getGsheetLinks: () => ipcRenderer.invoke('get-gsheet-links'),
