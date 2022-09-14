@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Button, Card, Label, Grid, Text, Link, Input, Flex } from 'theme-ui';
 import { useDispatch } from 'react-redux';
 import { storeAuthObject, resetAuthSettings } from '../actions/googleAuth';
-import User from './User/user';
+import User from './user/user'
 
 
 export default function Settings() {

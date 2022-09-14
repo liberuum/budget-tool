@@ -9,6 +9,7 @@ import ApiView from './components/exportApiView';
 import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
+import AppVersionAlert from './components/modal/appVersionAlert';
 
 export default function App() {
     const [isDev, setIsDev] = useState(false);
@@ -26,6 +27,7 @@ export default function App() {
     return (
         <>
             <ApolloProvider client={client}>
+                <AppVersionAlert />
                 <Router>
                     <Navbar />
                     <Routes>

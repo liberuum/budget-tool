@@ -3,7 +3,7 @@ import { Card, Label, Input, Button, Spinner } from "theme-ui";
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserInfo } from '../../actions/user';
 import { useQuery, gql, useMutation } from "@apollo/client";
-import AlertHoC from '../utils/AlertHoC.js'
+import AlertHoC from '../utils/alertHoC';
 
 
 export default function LoginToApi() {

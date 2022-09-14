@@ -5,7 +5,7 @@ import { getCoreUnit, getBudgetSatementInfo, deleteBudgetLineItems } from '../ap
 import { validateMonthsInApi } from './utils/validateMonths';
 import { validateLineItems, getCanonicalCategory } from './utils/validateLineItems'
 import { useSelector } from 'react-redux';
-import AlertHoC from './utils/AlertHoC';
+import AlertHoC from './utils/alertHoC';
 
 /**
  *  Set DEBUG_UPLOAD = false to suppress debug output.
