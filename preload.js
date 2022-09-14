@@ -12,12 +12,14 @@ contextBridge.exposeInMainWorld('electron', {
   saveApiCredentials: (credentials) => ipcRenderer.invoke('save-api-credentials', credentials),
   getApiCredentials: () => ipcRenderer.invoke('get-api-credentials'),
   resetApiCredentials: () => ipcRenderer.invoke('reset-api-credentials'),
-  openDashboardLink: (cuName) => ipcRenderer.invoke('open-dashboard-link', {cuName}),
+  openDashboardLink: (cuName) => ipcRenderer.invoke('open-dashboard-link', { cuName }),
+  getIsDev: () => ipcRenderer.invoke('get-isDev'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  openGithubRelease: (version) => ipcRenderer.invoke('open-github-release', { version }),
 
   saveGsheetLinks: (links) => ipcRenderer.invoke('save-gsheet-links', links),
   getGsheetLinks: () => ipcRenderer.invoke('get-gsheet-links'),
   resetGsheetLinks: () => ipcRenderer.invoke('reset-gsheet-links'),
   addGsheetLink: (link) => ipcRenderer.invoke('add-gsheet-links', link),
-  deleteGsheetLink: (linkId) => ipcRenderer.invoke('delete-gsheet-links', linkId),
-  getIsDev: () => ipcRenderer.invoke('get-isDev')
+  deleteGsheetLink: (linkId) => ipcRenderer.invoke('delete-gsheet-links', linkId)
 })

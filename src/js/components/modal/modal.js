@@ -1,24 +1,31 @@
 import React from 'react';
 import './modal.css'
-import { Button } from 'theme-ui'
+import { Button, Text } from 'theme-ui'
 
-export default function Modal({ closeModal }) {
+export default function Modal({ closeModal, currentVersion, newVersion }) {
+
+    const handleDownloadButton = () => {
+        electron.openGithubRelease(newVersion);
+    }
 
     return (
         <div className='modalBackground'>
             <div className='modalContainer'>
                 <div className='titleCloseBtn'>
-                    <button onClick={() => closeModal(false)}>x</button>
+                    <button onClick={(event) => closeModal(event)}>x</button>
                 </div>
                 <div className='title'>
                     <h3>Budget Tool Update</h3>
                 </div>
-                <div className='body'>
+                <div>
                     <p>There's a new version, download and update.</p>
+                    <Text>Current Version: {currentVersion}</Text>
+                    <br />
+                    <Text>New Version: {newVersion}</Text>
                 </div>
                 <div className='footer'>
-                    <Button bg='red' onClick={() => closeModal(false)}>cancel</Button>
-                    <Button >download</Button>
+                    <Button bg='red' onClick={(event) => closeModal(event)}>Cancel</Button>
+                    <Button onClick={handleDownloadButton}>More Info</Button>
                 </div>
             </div>
         </div>

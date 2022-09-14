@@ -157,6 +157,14 @@ ipcMain.handle('open-dashboard-link', (event, args) => {
         `https://expenses.makerdao.network/core-unit/${args.cuName}/finances/reports`)
 });
 
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion()
+})
+
+ipcMain.handle('open-github-release', (event, args) => {
+    require('electron').shell.openExternal(`https://github.com/pcatana/budget-tool/releases/tag/v${args.version}`)
+})
+
 
 function getNextStorageId(set) {
     if (!Array.isArray(set)) {
