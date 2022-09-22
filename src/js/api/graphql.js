@@ -204,7 +204,7 @@ export const addBudgetStatementWallets = async (budgetStatementWallets, authToke
     }
 };
 
-export const getBudgetLineItems = async (walletId) => {
+export const getBudgetLineItems = async (walletId, month) => {
     try {
         const result = client.query({
             query: gql`
@@ -224,7 +224,8 @@ export const getBudgetLineItems = async (walletId) => {
             `,
             variables: {
                 filter: {
-                    budgetStatementWalletId: walletId
+                    budgetStatementWalletId: walletId,
+                    month: month ? month : undefined
                 }
             },
             fetchPolicy: 'no-cache'

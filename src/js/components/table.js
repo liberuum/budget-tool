@@ -6,6 +6,7 @@ import { storeAuthObject } from '../actions/googleAuth';
 import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../actions/tableData';
 import processData from '../processor/index';
 import CuInfo from './cuInfo';
+import CommentTable from './comment/commentTable';
 
 /**
  * Set DEBUG_TABLE_DATA=true to get debug output in the console.
@@ -104,14 +105,14 @@ export default function Table() {
 
     const dispatchNewSheet = async (walletName, walletAddress, sheetUrl, storageId) => {
         const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
-        
+
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
             const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData, `${walletName} (ID:${storageId})`);
             dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress, storageId }))
         }
-        
+
         setValidatedInput({ variant: null, })
         setInputWalletName('')
         setInputWalletAddress('')
@@ -281,6 +282,7 @@ export default function Table() {
                         : ''}
                 </Box>
             </Card>
+            <CommentTable />
         </Container>
 
     )

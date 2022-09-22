@@ -239,7 +239,7 @@ export default function UploadToDB(props) {
 
     return (
         <Card>
-            <Label onChange={handleMonthChange}>Upload {selectedMonth} actuals and forecasts to ecosstem dashboard API</Label>
+            <Label onChange={handleMonthChange}>Upload {selectedMonth} actuals and forecasts to ecosystem dashboard API</Label>
             {uploadStatus.updatingDb ? <Spinner variant="styles.spinner" title="loading"></Spinner> :
                 <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>}
             {uploadStatus.noChange ? <Badge sx={{ mx: '2' }}>Data is up to date</Badge> : ''}
