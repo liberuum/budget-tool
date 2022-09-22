@@ -1,33 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Grid, Text, Box, Input } from 'theme-ui'
 import { getBudgetLineItems } from '../../api/graphql';
+import { useSelector } from 'react-redux';
+import { updateBudgetLineItem } from '../../api/graphql';
+import GreenAlertHoc from '../utils/greenAlertHoc';
+import AlertHoC from '../utils/alertHoC';
 
 export default function CommentTable() {
+    const userFromStore = useSelector(store => store.user)
 
-    const [lineItems, setLineItems] = useState([])
-    const [itemComment, setItemComment] = useState('')
+    const [lineItems, setLineItems] = useState([]);
+    const [successMsg, setSuccessMsg] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(async () => {
         const items = await getBudgetLineItems('643', '2022-05-01');
         setLineItems(items.data.budgetStatementLineItem)
-    }, [])
+    }, [successMsg])
 
-    const updateLineItem = (id) => {
-        const updatedLineItems = lineItems.map(lineItem => {
-            if (lineItem.id === id) {
-                return { ...lineItem, comments: itemComment }
-            }
-            return { ...lineItem }
-        })
+    const updateLineItem = async (id) => {
+        const lineItem = lineItems.find(item => item.id == id)
+        delete lineItem.__typename
+        const itemToUpdate = {
+            id: lineItem.id,
+            comments: lineItem.comments
+        }
+        try {
+            const result = await updateBudgetLineItem(itemToUpdate, userFromStore.authToken);
+            console.log('result from updating', result.data.budgetLineItemUpdate[0]);
+            setSuccessMsg(`Updated ${result.data.budgetLineItemUpdate[0].budgetCategory}`)
+        } catch (error) {
+            setErrorMsg('Could not update to API')
+        }
+    }
 
-        setLineItems(updatedLineItems)
-        console.log(lineItems)
-
-        
+    const updateAll = (id, comment) => {
+        let newItems = lineItems.map(item => {
+            if (item.id == id) {
+                return {
+                    ...item,
+                    comments: comment
+                }
+            } return { ...item }
+        });
+        setLineItems(newItems)
     }
     return (
         <>
-
+            {successMsg ? <GreenAlertHoc props={successMsg} /> : ''}
+            {errorMsg ? <AlertHoC props={errorMsg} /> : ''}
             <Card >
                 <Grid
                     gap={1}
@@ -90,7 +111,8 @@ export default function CommentTable() {
                                     <Input
                                         // value={comment}
                                         defaultValue={comment}
-                                        onChange={(event) => setItemComment(event.target.value)}
+                                        // onChange={(event) => setItemComment(event.target.value)}
+                                        onChange={(e) => updateAll(lineItem.id, e.target.value)}
                                     />
                                 </Text>
                                 <Box sx={{ textAlign: 'center' }}>

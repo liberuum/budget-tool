@@ -177,6 +177,33 @@ export const deleteBudgetLineItems = async (lineItems, authToken) => {
     }
 }
 
+export const updateBudgetLineItem = async (lineItem, authToken) => {
+    try {
+        const result = await client.mutate({
+            mutation: gql`
+                mutation BudgetLineItemUpdate($input: LineItemUpdateInput) {
+                    budgetLineItemUpdate(input: $input) {
+                        id
+                        budgetCategory
+                    }
+                }
+            `,
+            variables: {
+                input: lineItem
+            },
+            fetchPolicy: 'no-cache',
+            context: {
+                headers: {
+                    authorization: `Bearer ${authToken}`
+                }
+            }
+        })
+        return result;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 export const addBudgetStatementWallets = async (budgetStatementWallets, authToken) => {
     try {
         const result = await client.mutate({
