@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Grid, Text, Box, Input } from 'theme-ui'
+import { Label, Button, Card, Grid, Text, Box, Input } from 'theme-ui'
 import { getBudgetLineItems } from '../../api/graphql';
 import { useSelector } from 'react-redux';
 import { updateBudgetLineItem, updateBudgetLineItems } from '../../api/graphql';
 import GreenAlertHoc from '../utils/greenAlertHoc';
 import AlertHoC from '../utils/alertHoC';
 
-export default function CommentTable() {
+export default function CommentTable({ walletId, month }) {
     const userFromStore = useSelector(store => store.user)
 
     const [lineItems, setLineItems] = useState([]);
@@ -14,11 +14,13 @@ export default function CommentTable() {
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(async () => {
-        const items = await getBudgetLineItems('643', '2022-05-01');
+        const items = await getBudgetLineItems(walletId, month);
         setLineItems(items.data.budgetStatementLineItem);
-    }, [])
+    }, [walletId, month])
 
     const updateLineItem = async (id) => {
+        setSuccessMsg('')
+        setErrorMsg('')
         const lineItem = lineItems.find(item => item.id == id)
         delete lineItem.__typename
         const itemToUpdate = {
@@ -64,7 +66,8 @@ export default function CommentTable() {
         <>
             {successMsg ? <GreenAlertHoc props={successMsg} /> : ''}
             {errorMsg ? <AlertHoC props={errorMsg} /> : ''}
-            <Card >
+            <Card sx={{ mt: '10px' }}>
+                <Label sx={{ mx: "39%", fontWeight: "bold", textAlign: 'center' }}>Reported data for {month}</Label>
                 <Grid
                     gap={1}
                     columns={[5, '1fr 0.5fr 0.5fr 2.5fr 0.5fr']}
@@ -138,7 +141,6 @@ export default function CommentTable() {
                     })}
                 </Box>
             </Card>
-
         </>
     )
 }

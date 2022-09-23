@@ -282,7 +282,6 @@ export default function Table() {
                         : ''}
                 </Box>
             </Card>
-            <CommentTable />
         </Container>
 
     )
