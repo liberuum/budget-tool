@@ -204,6 +204,34 @@ export const updateBudgetLineItem = async (lineItem, authToken) => {
     }
 }
 
+export const updateBudgetLineItems = async (lineItems, authToken) => {
+    try {
+        const result = await client.mutate({
+            mutation: gql`
+                mutation BudgetLineItemsBatchUpdate($input: [LineItemsBatchUpdateInput]) {
+                    budgetLineItemsBatchUpdate(input: $input) {
+                        id
+                        comments
+                        budgetCategory
+                    }
+                }
+            `,
+            variables: {
+                input: lineItems
+            },
+            fetchPolicy: 'no-cache',
+            context: {
+                headers: {
+                    authorization: `Bearer ${authToken}`
+                }
+            }
+        })
+        return result;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 export const addBudgetStatementWallets = async (budgetStatementWallets, authToken) => {
     try {
         const result = await client.mutate({

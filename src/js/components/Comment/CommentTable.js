@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Card, Grid, Text, Box, Input } from 'theme-ui'
 import { getBudgetLineItems } from '../../api/graphql';
 import { useSelector } from 'react-redux';
-import { updateBudgetLineItem } from '../../api/graphql';
+import { updateBudgetLineItem, updateBudgetLineItems } from '../../api/graphql';
 import GreenAlertHoc from '../utils/greenAlertHoc';
 import AlertHoC from '../utils/alertHoC';
 
@@ -15,8 +15,8 @@ export default function CommentTable() {
 
     useEffect(async () => {
         const items = await getBudgetLineItems('643', '2022-05-01');
-        setLineItems(items.data.budgetStatementLineItem)
-    }, [successMsg])
+        setLineItems(items.data.budgetStatementLineItem);
+    }, [])
 
     const updateLineItem = async (id) => {
         const lineItem = lineItems.find(item => item.id == id)
@@ -27,7 +27,6 @@ export default function CommentTable() {
         }
         try {
             const result = await updateBudgetLineItem(itemToUpdate, userFromStore.authToken);
-            console.log('result from updating', result.data.budgetLineItemUpdate[0]);
             setSuccessMsg(`Updated ${result.data.budgetLineItemUpdate[0].budgetCategory}`)
         } catch (error) {
             setErrorMsg('Could not update to API')
@@ -45,6 +44,22 @@ export default function CommentTable() {
         });
         setLineItems(newItems)
     }
+
+    const updateAllToApi = async () => {
+        const itemsToUpdate = lineItems.map(item => {
+            delete item.__typename;
+            return { ...item }
+        })
+        try {
+            const result = await updateBudgetLineItems(itemsToUpdate, userFromStore.authToken);
+            console.log(`Updated ${result.data.budgetLineItemsBatchUpdate.length} expenses`);
+            setSuccessMsg(`Updated ${result.data.budgetLineItemsBatchUpdate.length} expenses`)
+        } catch (error) {
+            console.log(error);
+            setErrorMsg('Could not update to API')
+        }
+    }
+
     return (
         <>
             {successMsg ? <GreenAlertHoc props={successMsg} /> : ''}
@@ -73,7 +88,7 @@ export default function CommentTable() {
                         Comments
                     </Box>
                     <Box sx={{ fontWeight: "bold", textAlign: 'center' }}>
-                        <Button variant='smallOutline'>Update All</Button>
+                        <Button onClick={updateAllToApi} variant='smallOutline'>Update All</Button>
                     </Box>
                 </Grid>
                 <Box
