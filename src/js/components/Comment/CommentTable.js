@@ -67,7 +67,7 @@ export default function CommentTable({ walletId, month }) {
             {successMsg ? <GreenAlertHoc props={successMsg} /> : ''}
             {errorMsg ? <AlertHoC props={errorMsg} /> : ''}
             <Card sx={{ mt: '10px' }}>
-                <Label sx={{ mx: "39%", fontWeight: "bold", textAlign: 'center' }}>Reported data for {month}</Label>
+                <Box sx={{ textAlign: 'center', fontWeight: "bold" }}>Reported data for {month}</Box>
                 <Grid
                     gap={1}
                     columns={[5, '1fr 0.5fr 0.5fr 2.5fr 0.5fr']}
