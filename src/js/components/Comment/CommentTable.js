@@ -87,13 +87,13 @@ export default function CommentTable({ walletId, month }) {
                     }}
                 >
                     <Box sx={{ fontWeight: "bold" }}>
-                        Category
-                    </Box>
-                    <Box sx={{ fontWeight: "bold" }}>
-                        Actuals
+                        Budget Category
                     </Box>
                     <Box sx={{ fontWeight: "bold" }}>
                         Forecast
+                    </Box>
+                    <Box sx={{ fontWeight: "bold" }}>
+                        Actuals
                     </Box>
                     <Box sx={{ fontWeight: "bold", textAlign: 'center' }}>
                         Comments
@@ -127,12 +127,8 @@ export default function CommentTable({ walletId, month }) {
                                 }}
                             >
                                 <Text >{lineItem.budgetCategory}</Text>
-                                <Text
-
-                                >{lineItem.actual}</Text>
-                                <Text
-
-                                >{lineItem.forecast}</Text>
+                                <Text>{lineItem.forecast.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                                <Text>{lineItem.actual.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                                 <Text>
                                     <Input
                                         // value={comment}
