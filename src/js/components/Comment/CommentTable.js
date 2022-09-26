@@ -12,17 +12,19 @@ export default function CommentTable({ walletId, month }) {
     const [lineItems, setLineItems] = useState([]);
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
-    const [id, setId] = useState(walletId)
 
     useEffect(async () => {
-        if (id !== walletId) {
-            const items = await getBudgetLineItems(id, month);
-            setLineItems(items.data.budgetStatementLineItem);
-        } else {
-            const items = await getBudgetLineItems(walletId, month);
-            setLineItems(items.data.budgetStatementLineItem);
-        }
+        getItems()
+
     }, [walletId, month])
+
+    const getItems = async () => {
+        let items = await getBudgetLineItems(walletId, month);
+        if (items.data.budgetStatementLineItem.length === 0) {
+            items = await getBudgetLineItems(walletId, month);
+        }
+        setLineItems(items.data.budgetStatementLineItem);
+    }
 
     const updateLineItem = async (id) => {
         setSuccessMsg('')
