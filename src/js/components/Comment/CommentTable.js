@@ -62,7 +62,6 @@ export default function CommentTable({ walletId, month }) {
         })
         try {
             const result = await updateBudgetLineItems(itemsToUpdate, userFromStore.authToken);
-            console.log(`Updated ${result.data.budgetLineItemsBatchUpdate.length} expenses`);
             setSuccessMsg(`Updated ${result.data.budgetLineItemsBatchUpdate.length} expenses`)
         } catch (error) {
             console.log(error);
