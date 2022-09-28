@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Label, Input, Text, Grid, Box, Container, Badge, Link } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { storeAuthObject } from '../actions/googleAuth';
-import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../actions/tableData';
-import processData from '../processor/index';
-import CuInfo from './cuInfo';
-import CommentTable from './comment/commentTable';
+import { storeAuthObject } from '../../actions/googleAuth'
+import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../../actions/tableData';
+import processData from '../../processor/index';
+import CuInfo from '../cuInfo';
+import './table.css'
 
 /**
  * Set DEBUG_TABLE_DATA=true to get debug output in the console.
@@ -209,7 +209,12 @@ export default function Table() {
                         }}
                     >
                         <div>
-                            <Label>Enter Wallet Name</Label>
+                            <Label>
+                                <span className='tooltip'>
+                                    Enter Wallet Name
+                                    <span className='tooltiptext'>If your CU has only one wallet please keep the name as permanent team. In case you are using more wallets, feel free to name accordingly.</span>
+                                </span>
+                            </Label>
                             <Input
                                 sx={{ "::placeholder": { color: '#D3D3D3' } }}
                                 // variant={validatedInput.variant}
