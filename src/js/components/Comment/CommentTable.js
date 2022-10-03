@@ -33,7 +33,8 @@ export default function CommentTable({ walletId, month }) {
         delete lineItem.__typename
         const itemToUpdate = {
             id: lineItem.id,
-            comments: lineItem.comments
+            comments: lineItem.comments,
+            budgetStatementWalletId: lineItem.budgetStatementWalletId
         }
         try {
             const result = await updateBudgetLineItem(itemToUpdate, userFromStore.authToken);
