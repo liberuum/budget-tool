@@ -309,3 +309,29 @@ export const getBudgetToolVersion = async () => {
         console.error(object)
     }
 }
+
+export const getFte = async (budgetStatementId) => {
+    try {
+        const result = client.query({
+            query: gql`
+                query fte($filter: BudgetStatementFTEsFilter) {
+                    budgetStatementFTE(filter: $filter) {
+                        id
+                        budgetStatementId
+                        month
+                        ftes
+                }
+             }
+            `,
+            variables: {
+                filter: {
+                    budgetStatementId
+                }
+            },
+            fetchPolicy: 'no-cache'
+        });
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
+}

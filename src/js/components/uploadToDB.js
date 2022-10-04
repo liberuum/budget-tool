@@ -1,12 +1,12 @@
 import React, { useState, useEffect, forceUpdate } from 'react';
-import { Card, Label, Badge, Link, Select, Button, Spinner } from "theme-ui"
+import { Card, Label, Badge, Link, Grid, Button, Spinner } from "theme-ui"
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { getCoreUnit, getBudgetSatementInfo, deleteBudgetLineItems } from '../api/graphql';
 import { validateMonthsInApi } from './utils/validateMonths';
 import { validateLineItems, getCanonicalCategory } from './utils/validateLineItems'
 import { useSelector } from 'react-redux';
 import AlertHoC from './utils/alertHoC';
-import { useNavigate } from 'react-router-dom';
+import FTE from './fte/fte';
 import CommentTable from './comment/commentTable';
 
 /**
@@ -19,7 +19,7 @@ export default function UploadToDB(props) {
     const userFromStore = useSelector(store => store.user)
     const { walletName, walletAddress, actualsByMonth, selectedMonth, leveledMonthsByCategory } = props.props;
     const [uploadStatus, setUploadStatus] = useState({ updatingDb: false, noChange: false, overriding: false, uploading: false })
-
+    const [currentBudgetId, setCurrentBudgetId] = useState('')
 
     const [lineItems, setLineItems] = useState([])
     const [coreUnit, setCoreUnit] = useState();
@@ -55,6 +55,10 @@ export default function UploadToDB(props) {
         setCoreUnit(rawCoreUnit.data.coreUnit[0])
         const rawBudgetStatements = await getBudgetSatementInfo(rawCoreUnit.data.coreUnit[0].id)
         const budgetStatements = rawBudgetStatements.data.budgetStatement;
+        const [selectedBudgetId] = budgetStatements.filter(b => {
+            return b.month === selectedMonth.concat('-01')
+        })
+        setCurrentBudgetId(selectedBudgetId?.id)
         const idsWallets = await validateMonthsInApi(budgetStatements, getAllMonths(), rawCoreUnit.data.coreUnit[0], walletAddress, walletName, lineItems, userFromStore.authToken);
         setWalletIds(idsWallets);
         const wallet = idsWallets.find((wallet) => {
@@ -64,7 +68,6 @@ export default function UploadToDB(props) {
         })
         setWalletId(wallet.walletId)
     }
-
 
     function getAllMonths() {
         if (leveledMonthsByCategory !== undefined) {
@@ -245,15 +248,20 @@ export default function UploadToDB(props) {
 
     return (
         <>
-            <Card>
-                <Label onChange={handleMonthChange}>Upload {selectedMonth} actuals and forecasts to ecosystem dashboard API</Label>
-                {uploadStatus.updatingDb ? <Spinner variant="styles.spinner" title="loading"></Spinner> :
-                    <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>}
-                {uploadStatus.noChange ? <Badge sx={{ mx: '2' }}>Data is up to date</Badge> : ''}
-                {uploadStatus.overriding ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Updated</Badge> : ''}
-                {uploadStatus.uploading ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Uploaded</Badge> : ''}
-                {error ? <AlertHoC props={error.message} /> : ''}
-            </Card>
+            <Grid
+                columns={2}
+            >
+                <Card>
+                    <Label onChange={handleMonthChange}>Upload {selectedMonth} actuals and forecasts to ecosystem dashboard API</Label>
+                    {uploadStatus.updatingDb ? <Spinner variant="styles.spinner" title="loading"></Spinner> :
+                        <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>}
+                    {uploadStatus.noChange ? <Badge sx={{ mx: '2' }}>Data is up to date</Badge> : ''}
+                    {uploadStatus.overriding ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Updated</Badge> : ''}
+                    {uploadStatus.uploading ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Uploaded</Badge> : ''}
+                    {error ? <AlertHoC props={error.message} /> : ''}
+                </Card>
+                <FTE month={`${selectedMonth}-01`} budgetStatementId={currentBudgetId} />
+            </Grid>
             <Card sx={{ mt: '10px' }}>
                 <Label>
                     <Link sx={{ cursor: 'pointer' }} onClick={handleViewExpense}>View your reported data on the dashboard {arrow}</Link>
