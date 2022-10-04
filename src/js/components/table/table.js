@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Label, Input, Text, Grid, Box, Container, Badge, Link } from "theme-ui"
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { storeAuthObject } from '../actions/googleAuth';
-import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../actions/tableData';
-import processData from '../processor/index';
-import CuInfo from './cuInfo';
+import { storeAuthObject } from '../../actions/googleAuth'
+import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../../actions/tableData';
+import processData from '../../processor/index';
+import CuInfo from '../cuInfo';
+import './table.css'
 
 /**
  * Set DEBUG_TABLE_DATA=true to get debug output in the console.
@@ -104,14 +105,14 @@ export default function Table() {
 
     const dispatchNewSheet = async (walletName, walletAddress, sheetUrl, storageId) => {
         const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
-        
+
         if (error) {
             setValidatedInput({ linkError: true })
         } else {
             const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData, `${walletName} (ID:${storageId})`);
             dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress, storageId }))
         }
-        
+
         setValidatedInput({ variant: null, })
         setInputWalletName('')
         setInputWalletAddress('')
@@ -208,7 +209,12 @@ export default function Table() {
                         }}
                     >
                         <div>
-                            <Label>Enter Wallet Name</Label>
+                            <Label>
+                                <span className='tooltip'>
+                                    Enter Wallet Name
+                                    <span className='tooltiptext'>If your CU has only one wallet please keep the name as permanent team. In case you are using more wallets, feel free to name accordingly.</span>
+                                </span>
+                            </Label>
                             <Input
                                 sx={{ "::placeholder": { color: '#D3D3D3' } }}
                                 // variant={validatedInput.variant}

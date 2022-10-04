@@ -10,7 +10,7 @@ setupClient()
 async function setupClient() {
     const isDev = await electron.getIsDev();
     client = new ApolloClient({
-        uri: isDev ? 'https://publish-dev-2cx6rcfwf0t9ckrbfy.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
+        uri: isDev ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
         cache: new InMemoryCache()
     });
 }
@@ -177,6 +177,61 @@ export const deleteBudgetLineItems = async (lineItems, authToken) => {
     }
 }
 
+export const updateBudgetLineItem = async (lineItem, authToken) => {
+    try {
+        const result = await client.mutate({
+            mutation: gql`
+                mutation BudgetLineItemUpdate($input: LineItemUpdateInput) {
+                    budgetLineItemUpdate(input: $input) {
+                        id
+                        budgetCategory
+                    }
+                }
+            `,
+            variables: {
+                input: lineItem
+            },
+            fetchPolicy: 'no-cache',
+            context: {
+                headers: {
+                    authorization: `Bearer ${authToken}`
+                }
+            }
+        })
+        return result;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export const updateBudgetLineItems = async (lineItems, authToken) => {
+    try {
+        const result = await client.mutate({
+            mutation: gql`
+                mutation BudgetLineItemsBatchUpdate($input: [LineItemsBatchUpdateInput]) {
+                    budgetLineItemsBatchUpdate(input: $input) {
+                        id
+                        comments
+                        budgetCategory
+                    }
+                }
+            `,
+            variables: {
+                input: lineItems
+            },
+            fetchPolicy: 'no-cache',
+            context: {
+                headers: {
+                    authorization: `Bearer ${authToken}`
+                }
+            }
+        })
+        return result;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 export const addBudgetStatementWallets = async (budgetStatementWallets, authToken) => {
     try {
         const result = await client.mutate({
@@ -204,7 +259,7 @@ export const addBudgetStatementWallets = async (budgetStatementWallets, authToke
     }
 };
 
-export const getBudgetLineItems = async (walletId) => {
+export const getBudgetLineItems = async (walletId, month) => {
     try {
         const result = client.query({
             query: gql`
@@ -224,7 +279,8 @@ export const getBudgetLineItems = async (walletId) => {
             `,
             variables: {
                 filter: {
-                    budgetStatementWalletId: walletId
+                    budgetStatementWalletId: walletId,
+                    month: month ? month : undefined
                 }
             },
             fetchPolicy: 'no-cache'
@@ -251,5 +307,31 @@ export const getBudgetToolVersion = async () => {
         return result;
     } catch (error) {
         console.error(object)
+    }
+}
+
+export const getFte = async (budgetStatementId) => {
+    try {
+        const result = client.query({
+            query: gql`
+                query fte($filter: BudgetStatementFTEsFilter) {
+                    budgetStatementFTE(filter: $filter) {
+                        id
+                        budgetStatementId
+                        month
+                        ftes
+                }
+             }
+            `,
+            variables: {
+                filter: {
+                    budgetStatementId
+                }
+            },
+            fetchPolicy: 'no-cache'
+        });
+        return result;
+    } catch (error) {
+        console.error(error);
     }
 }

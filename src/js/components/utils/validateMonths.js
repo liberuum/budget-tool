@@ -7,7 +7,10 @@ let walletAddress;
 let walletName;
 let token;
 
-
+/**
+ *  Set DEBUG_UPLOAD = false to suppress debug output.
+ */
+const DEBUG_UPLOAD = false;
 
 export const validateMonthsInApi = async (apiBudgetStatements, months, cu, inputWalletAddress, inputWalletName, inputLineItems, authToken) => {
     budgetStatements = [...apiBudgetStatements];
@@ -24,7 +27,7 @@ export const validateMonthsInApi = async (apiBudgetStatements, months, cu, input
     spreadSheetMonths = spreadSheetMonths.map(month => {
         return month.concat('-01');
     })
-    console.log('budgetStatements', budgetStatements)
+    if(DEBUG_UPLOAD) console.log('budgetStatements', budgetStatements)
     await updateApiToMissingMonths();
     const walletIds = await validateWallets();
     // this function changes the lineItems state. no need to return new array
@@ -63,9 +66,9 @@ const updateApiToMissingMonths = async () => {
     // months.push("2021-01-01")
     // // months.push("2021-02-01")
     if (months.length == 0) {
-        console.log('no need to add new data')
+        if(DEBUG_UPLOAD) console.log('no need to add new data')
     } else {
-        console.log('adding new budgetStatements for', months)
+        if(DEBUG_UPLOAD) console.log('adding new budgetStatements for', months)
         await addBudgetStatementToApi(months)
     }
 }
@@ -122,7 +125,7 @@ const validateWallets = async () => {
         }
     }
 
-    console.log('newBudgetStatementWallets', newBudgetStatementWallets);
+    if(DEBUG_UPLOAD) console.log('newBudgetStatementWallets', newBudgetStatementWallets);
     if (newBudgetStatementWallets.length > 0) {
         const result = await addBudgetStatementWallets(newBudgetStatementWallets, token);
         const newWallets = result.data.budgetStatementWalletBatchAdd;
@@ -134,6 +137,6 @@ const validateWallets = async () => {
         }
 
     }
-    console.log('walletIdsForDataAdd', walletIdsForDataAdd)
+    if(DEBUG_UPLOAD) console.log('walletIdsForDataAdd', walletIdsForDataAdd)
     return walletIdsForDataAdd;
 }

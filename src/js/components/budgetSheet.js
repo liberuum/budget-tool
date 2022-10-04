@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container } from "theme-ui"
-import Table from './table';
+import Table from './table/table';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { storeAuthObject } from '../actions/googleAuth';
