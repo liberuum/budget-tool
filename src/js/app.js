@@ -10,7 +10,6 @@ import {
     ApolloClient, InMemoryCache, ApolloProvider
 } from "@apollo/client";
 import AppVersionAlert from './components/modal/appVersionAlert';
-import CommentTable from './components/comment/commentTable';
 
 export default function App() {
     const [isDev, setIsDev] = useState(false);
@@ -37,7 +36,6 @@ export default function App() {
                         <Route path='/json/:spreadsheetId/:tabId' element={<JSONView />} />
                         <Route path='/md/:spreadsheetId/:tabId' element={<MDView />} />
                         <Route path='/api/:spreadsheetId/:tabId' element={<ApiView />} />
-                        <Route path='/update/:walletId/:month' element={<CommentTable />} />
                     </Routes>
                 </Router>
             </ApolloProvider>
