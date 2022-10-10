@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0](https://github.com/liberuum/budget-tool/releases/tag/v1.2.0) - 2022-10-10
+
+### Added
+
+- Added app update checker so user is notified in app for new releases
+- Added commenting functionality for line items in budget statements in the tool
+- Added input update so user can update FTEs per budget statement
+
+### Changed
+
+- Fixed month selection dropdown so user can only push budget statements up to current month in the tool
+
 ## [1.1.0](https://github.com/pcatana/budget-tool/releases/tag/v1.1.0) - 2022-09-09
 
 ### Added
