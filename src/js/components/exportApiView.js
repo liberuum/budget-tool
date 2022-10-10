@@ -39,9 +39,15 @@ export default function ApiView() {
         }
     }
 
+    // Filtering months to latest current month so no future budget statements are pushed
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear()
+    const index = keys.indexOf(currentYear + '-' + currentMonth);
+    const filteredKeys = keys.slice(0, index + 1)
+
     // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
 
-    const [selectedMonth, setSelectedMonth] = useState(keys[keys.length - 1]);
+    const [selectedMonth, setSelectedMonth] = useState(filteredKeys[filteredKeys.length - 1]);
 
     const handleSelect = (value) => {
         setSelectedMonth(value)
@@ -61,8 +67,8 @@ export default function ApiView() {
         <Container >
             <Card sx={{ mx: 'auto', mb: 4, my: 2 }}>
                 <Label>Choose Month</Label>
-                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${keys[keys.length - 1]}`}>
-                    {keys.map(month => {
+                <Select onChange={e => handleSelect(e.target.value)} defaultValue={`${filteredKeys[filteredKeys.length - 1]}`}>
+                    {filteredKeys.map(month => {
                         return <option key={month}>{`${month}`}</option>
                     })}
                 </Select>
