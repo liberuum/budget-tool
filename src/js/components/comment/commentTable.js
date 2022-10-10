@@ -137,9 +137,9 @@ export default function CommentTable({ walletId, month }) {
                                         onChange={(e) => updateAll(lineItem.id, e.target.value)}
                                     />
                                 </Text>
-                                <Box sx={{ textAlign: 'center' }}>
+                                {/* <Box sx={{ textAlign: 'center' }}>
                                     <Button variant='smallOutline' onClick={() => updateLineItem(lineItem.id,)}>Update</Button>
-                                </Box>
+                                </Box> */}
                             </Grid>
                         )
                     })}
