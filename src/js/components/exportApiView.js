@@ -43,7 +43,12 @@ export default function ApiView() {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear()
     const index = keys.indexOf(currentYear + '-' + currentMonth);
-    const filteredKeys = keys.slice(0, index + 1)
+    let filteredKeys
+    if(index !== -1) {
+        filteredKeys = keys.slice(0, index + 1)
+    } else {
+        filteredKeys = keys;
+    }
 
     // console.log('leveledMonthsByCategory', leveledMonthsByCategory)
 
