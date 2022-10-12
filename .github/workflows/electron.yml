@@ -3,29 +3,28 @@ name: release
 on:
   push:
     branches:
-      - build
+      - main
 
 jobs:
   build_on_mac:
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
         with:
           ref: electron
-      - uses: actions/setup-node@master
+      - uses: actions/setup-node@main
         with:
           node-version: 10.16
       - name: see directory
         run: ls
-
-build_on_win:
-  runs-on: windows-2016
-  steps:
-    - uses: actions/checkout@master
-      with:
-        ref: feature/github-actions
-    - uses: actions/setup-node@master
-      with:
-        node-version: 10.16
-    - name: see directory
-      run: ls
+  build_on_win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@main
+        with:
+          ref: feature/github-actions
+      - uses: actions/setup-node@main
+        with:
+          node-version: 16.18.0
+      - name: see directory
+        run: ls
