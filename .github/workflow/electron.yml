@@ -9,10 +9,10 @@ jobs:
   build_on_mac:
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@build
         with:
           ref: electron
-      - uses: actions/setup-node@master
+      - uses: actions/setup-node@build
         with:
           node-version: 10.16
       - name: see directory
@@ -21,10 +21,10 @@ jobs:
 build_on_win:
   runs-on: windows-2016
   steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@build
       with:
         ref: feature/github-actions
-    - uses: actions/setup-node@master
+    - uses: actions/setup-node@build
       with:
         node-version: 10.16
     - name: see directory
