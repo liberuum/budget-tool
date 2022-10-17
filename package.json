@@ -33,7 +33,11 @@
       "category": "public.app-category.developer-tools",
       "icon": "assets/images/budgetToolLogo.png",
       "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "target": [
+        "dmg"
+      ],
+      "artifactName": "Budget-Tool-Setup-${version}-mac.${ext}"
     },
     "dmg": {
       "contents": [
@@ -53,15 +57,15 @@
       "icon": "assets/images/budgetToolLogo.png",
       "target": [
         "nsis"
-      ]
+      ],
+      "artifactName": "Budget-Tool-Setup-${version}-win.${ext}"
     },
     "linux": {
       "target": [
-        "deb",
-        "rpm",
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Development",
+      "artifactName": "Budget-Tool-Setup-${version}-linux.${ext}"
     }
   },
   "devDependencies": {
