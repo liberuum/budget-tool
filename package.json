@@ -37,7 +37,7 @@
       "target": [
         "dmg"
       ],
-      "artifactName": "Budget-Tool-Setup-${version}-mac.${ext}"
+      "artifactName": "Budget-Tool-${version}-mac.${ext}"
     },
     "dmg": {
       "contents": [
@@ -65,7 +65,7 @@
         "AppImage"
       ],
       "category": "Development",
-      "artifactName": "Budget-Tool-Setup-${version}-linux.${ext}"
+      "artifactName": "Budget-Tool-${version}-linux.${ext}"
     }
   },
   "devDependencies": {
