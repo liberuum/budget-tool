@@ -15,7 +15,7 @@ jobs:
           node-version: 16.17.1
       - name: Install Dependencies
         run: npm install
-      - run: npm build
+      - run: npm run build
 
   build_on_win:
     runs-on: windows-latest
@@ -27,4 +27,4 @@ jobs:
           node-version: 16.17.1
       - name: Install Dependencies
         run: npm install
-      - run: npm build
+      - run: npm run build
