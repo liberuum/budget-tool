@@ -20,7 +20,7 @@ jobs:
       - name: Publish app
         run: npm run make:macos
         env:
-          NODE_AUTH_TOKEN: ${{secrets.PUBLISH}}
+          GH_TOKEN: ${{secrets.PUBLISH}}
 
   build_on_win:
     runs-on: windows-latest
@@ -37,7 +37,7 @@ jobs:
       - name: Publish app
         run: npm run make:win
         env:
-          NODE_AUTH_TOKEN: ${{secrets.PUBLISH}}
+          GH_TOKEN: ${{secrets.PUBLISH}}
 
   build_on_ubuntu:
       runs-on: ubuntu-latest
@@ -54,4 +54,4 @@ jobs:
         - name: Publish app
           run: npm run make:linux
           env:
-            NODE_AUTH_TOKEN: ${{secrets.PUBLISH}}
+            GH_TOKEN: ${{secrets.PUBLISH}}
