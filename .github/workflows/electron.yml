@@ -15,7 +15,12 @@ jobs:
           node-version: 16.17.1
       - name: Install Dependencies
         run: npm install
-      - run: npm run build
+      - name: Build App 
+        run: npm run build
+      - name: Publish app
+        run: npm run make:macos
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.PUBLISH}}
 
   build_on_win:
     runs-on: windows-latest
@@ -27,4 +32,26 @@ jobs:
           node-version: 16.17.1
       - name: Install Dependencies
         run: npm install
-      - run: npm run build
+      - name: Build App 
+        run: npm run build
+      - name: Publish app
+        run: npm run make:win
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.PUBLISH}}
+
+  build_on_ubuntu:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: Using Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 16.17.1
+        - name: Install Dependencies
+          run: npm install
+        - name: Build App 
+          run: npm run build
+        - name: Publish app
+          run: npm run make:linux
+          env:
+            NODE_AUTH_TOKEN: ${{secrets.PUBLISH}}
