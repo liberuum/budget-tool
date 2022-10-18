@@ -4,17 +4,48 @@ exports.createTemplate = app => {
             label: process.platform === 'darwin' ? app.getName() : 'Menu',
             submenu: [
                 {
-                    label: "New",
-                    accelerator: "Command+N",
-                    click: () => {
-                        if (win === null) {
-                            createWindow()
+                    label: "Switch to production environment",
+                    click: async (_, focusedWindow) => {
+                        const settings = require('electron-settings');
+                        if(await settings.get('isDev') !== false) {
+                            settings.set('isDev', false)
+                            if (focusedWindow) {
+                                if (focusedWindow.id === 1) {
+                                    const { BrowserWindow } = require('electron');
+                                    BrowserWindow.getAllWindows().forEach(win => {
+                                        if (win.id > 1) {
+                                            win.close();
+                                        }
+                                    })
+                                }
+                                focusedWindow.reload()
+                            }
+                        }
+                    }
+                },
+                {
+                    label: "Switch to test environment",
+                    click: async (_, focusedWindow) => {
+                        const settings = require('electron-settings');
+                        if(await settings.get('isDev') !== true) {
+                            settings.set('isDev', true)
+                            if (focusedWindow) {
+                                if (focusedWindow.id === 1) {
+                                    const { BrowserWindow } = require('electron');
+                                    BrowserWindow.getAllWindows().forEach(win => {
+                                        if (win.id > 1) {
+                                            win.close();
+                                        }
+                                    })
+                                }
+                                focusedWindow.reload()
+                            }
                         }
                     }
                 },
                 {
                     label: 'Exit',
-                    click: () => {
+                    click: async () => {
                         app.quit();
                     }
                 }]

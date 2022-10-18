@@ -50,10 +50,9 @@ app.whenReady().then(async () => {
 
     tray = new Tray(trayIcon)
     tray.setContextMenu(menu)
-
     createWindow();
 
-    await setEnv()
+    setEnv()
 });
 
 app.on('window-all-closed', () => {
