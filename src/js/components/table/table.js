@@ -104,19 +104,20 @@ export default function Table() {
     }
 
     const dispatchNewSheet = async (walletName, walletAddress, sheetUrl, storageId) => {
-        const { error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
+        const { result, error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
 
-        if (error) {
-            setValidatedInput({ linkError: true })
+        if (result === undefined) {
+            setValidatedInput({ ...validatedInput, linkError: true, valid: false, variant: null })
+            electron.resetGsheetLinks()
         } else {
             const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData, `${walletName} (ID:${storageId})`);
             dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress, storageId }))
+            setValidatedInput({ ...validatedInput, variant: null, })
+            setInputWalletName('')
+            setInputWalletAddress('')
+            setInputSheetValue('')
         }
 
-        setValidatedInput({ variant: null, })
-        setInputWalletName('')
-        setInputWalletAddress('')
-        setInputSheetValue('')
     }
 
     const handleTableRowDelete = async (e) => {
@@ -258,14 +259,26 @@ export default function Table() {
                         onChange={e => handleLinkInput(e.target.value)}
                     ></Input>
                     {
-                        !validatedInput.valid && inputSheetValue ? (<Text sx={{ m: 0 }} variant="smallError">
+                        !validatedInput.valid && !validatedInput.linkError && inputSheetValue ? (<Text sx={{ m: 0 }} variant="smallError">
                             Link is not valid, make sure to copy full link
                         </Text>) : ''
                     }
                     {
-                        validatedInput.linkError ? (<Text sx={{ m: 0 }} variant="smallError">
-                            Can't access link, make sure you have access to your spreadsheet
-                        </Text>) : ''
+                        validatedInput.linkError ? (
+                            <div>
+                                <Text sx={{ m: 0 }} variant="smallError">
+                                    Can't access link, make sure the tool has access to your spreadsheet.
+                                </Text>
+                                <br/>
+                                <Text sx={{ m: 0 }} variant="smallError">
+                                    Verify if your google auth credentials have the Google Sheet Read Scope enabled in:
+                                </Text>
+                                <br/>
+                                <Text sx={{ m: 0 }} variant="smallError">
+                                    <b>"OAuth consent screen"</b> -{'>'} <b>"Scopes"</b>
+                                </Text>
+                            </div>
+                        ) : ''
                     }
 
                 </Box>

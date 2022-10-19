@@ -122,7 +122,11 @@ ipcMain.handle('getSheetInfo', async (evemt, args) => {
     try {
         if (DEBUG_IPC_HANDLERS) console.log('Getting Link in Main:', await args);
 
-        const { spreadSheetTitle, sheetName, spreadsheetId, tabId } = await parseSpreadSheetLink(args);
+        const result = await parseSpreadSheetLink(args);
+        if (result === undefined) {
+            return { result };
+        }
+        const { spreadSheetTitle, sheetName, spreadsheetId, tabId } = result
         const rawData = await fetchData(spreadsheetId, sheetName);
         return { spreadSheetTitle, sheetName, spreadsheetId, tabId, rawData }
 
