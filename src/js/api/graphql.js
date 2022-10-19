@@ -261,30 +261,32 @@ export const addBudgetStatementWallets = async (budgetStatementWallets, authToke
 
 export const getBudgetLineItems = async (walletId, month) => {
     try {
-        const result = client.query({
-            query: gql`
-                query BudgetStatementLineItem($filter: BudgetStatementLineItemFilter) {
-                    budgetStatementLineItem(filter: $filter) {
-                        id
-                        budgetStatementWalletId
-                        month
-                        position
-                        group
-                        budgetCategory
-                        forecast
-                        actual
-                        comments
+        if (walletId !== undefined && month !== undefined) {
+            const result = client.query({
+                query: gql`
+                    query BudgetStatementLineItem($filter: BudgetStatementLineItemFilter) {
+                        budgetStatementLineItem(filter: $filter) {
+                            id
+                            budgetStatementWalletId
+                            month
+                            position
+                            group
+                            budgetCategory
+                            forecast
+                            actual
+                            comments
+                        }
                     }
-                }
-            `,
-            variables: {
-                filter: {
-                    budgetStatementWalletId: walletId,
-                    month: month ? month : undefined
-                }
-            },
-            fetchPolicy: 'no-cache'
-        });
+                `,
+                variables: {
+                    filter: {
+                        budgetStatementWalletId: walletId,
+                        month: month ? month : undefined
+                    }
+                },
+                fetchPolicy: 'no-cache'
+            });
+        }
         return result;
     } catch (error) {
         console.error(error)
