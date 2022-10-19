@@ -261,7 +261,7 @@ export const addBudgetStatementWallets = async (budgetStatementWallets, authToke
 
 export const getBudgetLineItems = async (walletId, month) => {
     try {
-        if (walletId !== undefined && month !== undefined) {
+        if (walletId !== undefined || month !== undefined) {
             const result = client.query({
                 query: gql`
                     query BudgetStatementLineItem($filter: BudgetStatementLineItemFilter) {
