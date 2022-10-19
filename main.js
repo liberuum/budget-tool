@@ -154,8 +154,8 @@ ipcMain.handle('open-wallet-link', (event, args) => {
     require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args.address}/home`)
 })
 
-ipcMain.handle('open-dashboard-link', (event, args) => {
-    require('electron').shell.openExternal(isDev ?
+ipcMain.handle('open-dashboard-link',async (event, args) => {
+    require('electron').shell.openExternal(await settings.get('isDev') ?
         `https://expenses-dev.makerdao.network/core-unit/${args.cuName}/finances/reports`
         :
         `https://expenses.makerdao.network/core-unit/${args.cuName}/finances/reports`)
