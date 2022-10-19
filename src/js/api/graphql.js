@@ -286,8 +286,8 @@ export const getBudgetLineItems = async (walletId, month) => {
                 },
                 fetchPolicy: 'no-cache'
             });
+            return result;
         }
-        return result;
     } catch (error) {
         console.error(error)
     }
