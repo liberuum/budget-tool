@@ -280,7 +280,7 @@ export const getBudgetLineItems = async (walletId, month) => {
                 `,
                 variables: {
                     filter: {
-                        budgetStatementWalletId: walletId,
+                        budgetStatementWalletId: parseFloat(walletId),
                         month: month
                     }
                 },
@@ -307,7 +307,7 @@ export const getBudgetLineItems = async (walletId, month) => {
                 `,
                 variables: {
                     filter: {
-                        budgetStatementWalletId: walletId,
+                        budgetStatementWalletId: parseFloat(walletId),
                     }
                 },
                 fetchPolicy: 'no-cache'

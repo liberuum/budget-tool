@@ -13,7 +13,7 @@ export default function CuInfo() {
 
     const filter = {
         filter: {
-            id: userFromStore.cuId
+            id: parseFloat(userFromStore.cuId)
         }
     }
 
