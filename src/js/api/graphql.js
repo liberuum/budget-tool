@@ -64,7 +64,7 @@ export const getCoreUnit = async (id) => {
             `,
             variables: {
                 filter: {
-                    id
+                    id: parseFloat(id)
                 }
             }
         });

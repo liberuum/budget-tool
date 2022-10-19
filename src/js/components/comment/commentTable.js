@@ -77,7 +77,11 @@ export default function CommentTable({ walletId, month }) {
             {successMsg ? <GreenAlertHoc props={successMsg} /> : ''}
             {errorMsg ? <AlertHoC props={errorMsg} /> : ''}
             <Card sx={{ mt: '10px' }}>
-                <Box sx={{ textAlign: 'center', fontWeight: "bold" }}>Reported data for {month}</Box>
+                <Box sx={{ textAlign: 'center', fontWeight: "bold" }}>
+                    Reported data for {month}
+                    <br/>
+                    <Button onClick={getItems} variant='smallOutline'>Refresh</Button>
+                </Box>
                 <Grid
                     gap={1}
                     columns={[5, '1fr 0.5fr 0.5fr 2.5fr 0.5fr']}
