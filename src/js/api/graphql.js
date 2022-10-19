@@ -281,7 +281,33 @@ export const getBudgetLineItems = async (walletId, month) => {
                 variables: {
                     filter: {
                         budgetStatementWalletId: walletId,
-                        month: month ? month : undefined
+                        month: month
+                    }
+                },
+                fetchPolicy: 'no-cache'
+            });
+            return result;
+        }
+        if (walletId !== undefined) {
+            const result = client.query({
+                query: gql`
+                    query BudgetStatementLineItem($filter: BudgetStatementLineItemFilter) {
+                        budgetStatementLineItem(filter: $filter) {
+                            id
+                            budgetStatementWalletId
+                            month
+                            position
+                            group
+                            budgetCategory
+                            forecast
+                            actual
+                            comments
+                        }
+                    }
+                `,
+                variables: {
+                    filter: {
+                        budgetStatementWalletId: walletId,
                     }
                 },
                 fetchPolicy: 'no-cache'
