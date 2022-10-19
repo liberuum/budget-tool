@@ -106,7 +106,7 @@ export default function Table() {
     const dispatchNewSheet = async (walletName, walletAddress, sheetUrl, storageId) => {
         const { result, error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
 
-        if (result === undefined) {
+        if (result === 'error') {
             setValidatedInput({ ...validatedInput, linkError: true, valid: false, variant: null })
             electron.resetGsheetLinks()
         } else {

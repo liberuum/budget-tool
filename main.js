@@ -124,6 +124,7 @@ ipcMain.handle('getSheetInfo', async (evemt, args) => {
 
         const result = await parseSpreadSheetLink(args);
         if (result === undefined) {
+            const result = 'error'
             return { result };
         }
         const { spreadSheetTitle, sheetName, spreadsheetId, tabId } = result
