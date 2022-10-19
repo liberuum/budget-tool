@@ -20,10 +20,12 @@ export default function CommentTable({ walletId, month }) {
 
     const getItems = async () => {
         let items = await getBudgetLineItems(walletId, month);
-        if (items.data.budgetStatementLineItem.length === 0) {
+        if (items === undefined) {
             items = await getBudgetLineItems(walletId, month);
         }
-        setLineItems(items.data.budgetStatementLineItem);
+        if (items !== undefined) {
+            setLineItems(items.data.budgetStatementLineItem);
+        }
     }
 
     const updateLineItem = async (id) => {
