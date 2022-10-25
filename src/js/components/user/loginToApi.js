@@ -14,12 +14,12 @@ export default function LoginToApi() {
     }, [])
 
 
-    const [userName, setUserName] = useState('');
+    const [username, setusername] = useState('');
     const [password, setPassword] = useState('');
     const [stateError, setStateError] = useState('')
 
-    const handleUserName = (value) => {
-        setUserName(value)
+    const handleusername = (value) => {
+        setusername(value)
     }
 
     const handlePassword = (value) => {
@@ -34,7 +34,7 @@ export default function LoginToApi() {
                 user {
                     id
                     cuId
-                    userName
+                    username
                 }
                 authToken
             }
@@ -44,7 +44,7 @@ export default function LoginToApi() {
     const [userLogin, { data, loading, error }] = useMutation(LOGIN_USER, {
         variables: {
             input: {
-                userName,
+                username,
                 password
             }
         },
@@ -57,16 +57,16 @@ export default function LoginToApi() {
             dispatch(storeUserInfo({
                 id: result.data.userLogin.user.id,
                 cuId: result.data.userLogin.user.cuId,
-                userName: result.data.userLogin.user.userName,
+                username: result.data.userLogin.user.username,
                 authToken: result.data.userLogin.authToken
             }));
             electron.saveApiCredentials({
                 id: result.data.userLogin.user.id,
                 cuId: result.data.userLogin.user.cuId,
-                userName: result.data.userLogin.user.userName,
+                username: result.data.userLogin.user.username,
                 authToken: result.data.userLogin.authToken
             })
-            setUserName('')
+            setusername('')
             setPassword('')
         } else {
             setStateError('cannot use tool without cu id')
@@ -82,8 +82,8 @@ export default function LoginToApi() {
                 <div>
                     <Label>Username</Label>
                     <Input
-                        value={userName}
-                        onChange={e => handleUserName(e.target.value)}
+                        value={username}
+                        onChange={e => handleusername(e.target.value)}
                     ></Input>
                 </div>
                 <div>

@@ -8,6 +8,7 @@ export default function UserInfo() {
     const dispatch = useDispatch();
 
     const userFromStore = useSelector(store => store.user)
+    console.log(userFromStore);
 
     const [changePass, setChangePass] = useState(false)
 
@@ -25,7 +26,7 @@ export default function UserInfo() {
         <>
             <Card sx={{ display: 'flex', mt: '20px', justifyContent: 'space-evenly' }}>
                 <div>
-                    <Label>User: {userFromStore.userName}</Label>
+                    <Label>User: {userFromStore.username}</Label>
                 </div>
                 <div sx={{ display: 'flex', flexDirection: 'column' }}>
                     <div>

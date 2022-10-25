@@ -18,7 +18,7 @@ export function ChangePass() {
             userChangePassword(input: $input) {
                 id
                 cuId
-                userName
+                username
             }
         }
         `;
@@ -26,7 +26,7 @@ export function ChangePass() {
     const [changePassword, { data, loading, error }] = useMutation(CHANGE_PASSWORD, {
         variables: {
             input: {
-                userName: userFromStore.userName,
+                username: userFromStore.username,
                 password: oldPassword,
                 newPassword
             }
