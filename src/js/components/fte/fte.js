@@ -10,17 +10,20 @@ export default function FTE({ month, budgetStatementId }) {
     const [apiFte, setApiFte] = useState(null)
     const [readToUpload, setReadyToUpload] = useState(false);
 
-    useEffect(async () => {
-        const result = await getFte(parseFloat(budgetStatementId))
-        if (result.data.budgetStatementFTE.length > 0) {
-            setFte(`${result.data.budgetStatementFTE[0].ftes}`)
-            setApiFte(result.data.budgetStatementFTE[0])
-        } else {
-            setApiFte(null)
-            setFte('')
+    useEffect(() => {
+        const fetchFTE = async () => {
+            const result = await getFte(parseFloat(budgetStatementId))
+            if (result.data.budgetStatementFTE.length > 0) {
+                setFte(`${result.data.budgetStatementFTE[0].ftes}`)
+                setApiFte(result.data.budgetStatementFTE[0])
+            } else {
+                setApiFte(null)
+                setFte('')
+            }
         }
+        fetchFTE();
     }, [budgetStatementId, month])
-  
+
     const handleChange = (value) => {
         setFte(value)
         if (parseFloat(value) > 1000 || parseFloat(value) < 0 || value == '') {

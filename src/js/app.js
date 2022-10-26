@@ -14,9 +14,12 @@ import AppVersionAlert from './components/modal/appVersionAlert';
 export default function App() {
     const [isDev, setIsDev] = useState(false);
 
-    useEffect(async () => {
-        const dev = await electron.getIsDev();
-        setIsDev(dev)
+    useEffect(() => {
+        async function setDev() {
+            const dev = await electron.getIsDev();
+            setIsDev(dev);
+        }
+        setDev()
     }, []);
 
     const client = new ApolloClient({

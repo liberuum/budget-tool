@@ -26,7 +26,7 @@ export default function UploadToDB(props) {
     const [walletIds, setWalletIds] = useState()
     const [walletId, setWalletId] = useState();
 
-    useEffect(async () => {
+    useEffect(() => {
         parseDataForApi()
         fetchCoreUnit()
         handleMonthChange()

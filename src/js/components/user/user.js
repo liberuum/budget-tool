@@ -9,18 +9,21 @@ export default function User() {
     const dispatch = useDispatch();
     const userFromStore = useSelector(store => store.user.auth)
 
-    useEffect(async () => {
-        const userInfo = await electron.getApiCredentials();
-        if (userInfo != null) {
-            const decodedExp = jwtDecode(userInfo.authToken)
-            const currentTime = new Date().getTime() / 1000;
-            if (decodedExp.exp > currentTime) {
-                dispatch(storeUserInfo(userInfo))
-            } else {
-                dispatch(resetUserInfo())
-                electron.resetApiCredentials()
+    useEffect(() => {
+        const verifyCredentials = async () => {
+            const userInfo = await electron.getApiCredentials();
+            if (userInfo != null) {
+                const decodedExp = jwtDecode(userInfo.authToken)
+                const currentTime = new Date().getTime() / 1000;
+                if (decodedExp.exp > currentTime) {
+                    dispatch(storeUserInfo(userInfo))
+                } else {
+                    dispatch(resetUserInfo())
+                    electron.resetApiCredentials()
+                }
             }
-        }
+        };
+        verifyCredentials();
     }, [])
 
 

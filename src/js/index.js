@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './app';
 import { ThemeProvider } from 'theme-ui';
 import theme from '@makerdao/dai-ui-theme-maker';
@@ -8,8 +8,7 @@ import configureStore from './store'
 
 const store = configureStore();
 
-ReactDOM.render(
-    <Provider store={store}>
-        <ThemeProvider theme={theme}><App /></ThemeProvider>
-    </Provider>
-    , document.getElementById('app'));
+const root = createRoot(document.getElementById('app'));
+root.render(<Provider store={store}>
+    <ThemeProvider theme={theme}><App /></ThemeProvider>
+</Provider>);

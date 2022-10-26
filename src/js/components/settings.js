@@ -13,11 +13,15 @@ export default function Settings() {
 	const [credentials, setCredentials] = useState(false);
 	const [token, setToken] = useState(false)
 
-	useEffect(async () => {
-		const crd = await electron.checkCredentials();
-		setCredentials(crd);
-		const { state, authClient } = await electron.checkToken();
-		setToken(state)
+	useEffect(() => {
+		async function verifyCredentials() {
+			const crd = await electron.checkCredentials();
+			setCredentials(crd);
+			const { state } = await electron.checkToken();
+			setToken(state)
+			return state;
+		};
+		const state = verifyCredentials();
 		if (state) {
 			dispatch(storeAuthObject());
 		}

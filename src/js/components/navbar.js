@@ -5,10 +5,13 @@ import { Link, useNavigate } from 'react-router-dom'
 export default function Navbar() {
     const [isDev, setIsDev] = useState(false);
 
-    useEffect(async () => {
-        const dev = await electron.getIsDev();
-        setIsDev(dev)
-    })
+    useEffect(() => {
+        async function setDev() {
+            const dev = await electron.getIsDev();
+            setIsDev(dev);
+        }
+        setDev()
+    }, []);
 
     const navigate = useNavigate();
     return (

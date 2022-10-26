@@ -8,8 +8,11 @@ export default function AppVersionAlert() {
     const [latestVersion, setLatestVersion] = useState('');
     const [link, setLink] = useState('');
 
-    useEffect(async () => {
-        await needingUpdate()
+    useEffect(() => {
+        const checkUpdate = async () =>{
+            await needingUpdate()
+        };
+        checkUpdate()
         const interval = setInterval(async () => {
             await needingUpdate()
         }, 60000)

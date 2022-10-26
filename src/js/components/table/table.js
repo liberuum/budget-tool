@@ -25,15 +25,19 @@ export default function Table() {
     if (DEBUG_TABLE_DATA) console.log('Table initialization flagged:', initialized);
     if (DEBUG_TABLE_DATA) console.log('tableData:', tableData);
 
-    useEffect(async () => {
-        const { state, authClient } = await electron.checkToken();
+    useEffect(() => {
+        const getTokens = async () => {
+            const { state, authClient } = await electron.checkToken();
+            return { state, authClient }
+        }
+        const { authClient } = getTokens()
         dispatch(storeAuthObject(authClient));
 
     }, [electron.checkToken])
 
-    useEffect(async () => {
-        if (!initialized) {
-            await dispatch(flagLinkDataInitialization());
+    useEffect(() => {
+        const prepareSheets = async () => {
+            dispatch(flagLinkDataInitialization());
             if (DEBUG_TABLE_DATA) console.log("Initializing table data...");
 
             const gsheetLinks = await electron.getGsheetLinks();
@@ -43,6 +47,9 @@ export default function Table() {
                     await dispatchNewSheet(record.value.walletName, record.value.walletAddress, record.value.sheetUrl, record.id);
                 }
             }
+        }
+        if (!initialized) {
+            prepareSheets();
         }
     }, [initialized, electron.getGsheetLinks])
 
@@ -269,11 +276,11 @@ export default function Table() {
                                 <Text sx={{ m: 0 }} variant="smallError">
                                     Can't access link, make sure the tool has access to your spreadsheet.
                                 </Text>
-                                <br/>
+                                <br />
                                 <Text sx={{ m: 0 }} variant="smallError">
                                     Verify if your google auth credentials have the Google Sheet Read Scope enabled in:
                                 </Text>
-                                <br/>
+                                <br />
                                 <Text sx={{ m: 0 }} variant="smallError">
                                     <b>"OAuth consent screen"</b> -{'>'} <b>"Scopes"</b>
                                 </Text>

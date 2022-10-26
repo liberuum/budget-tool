@@ -12,22 +12,25 @@ export default function BudgetSheet() {
 
     const dispatch = useDispatch();
 
-    useEffect(async () => {
-        const { state } = await electron.checkToken();
-        const userInfo = await electron.getApiCredentials();
-        if (state) {
-            dispatch(storeAuthObject());
-        }
-        if (userInfo != null) {
-            const decodedExp = jwtDecode(userInfo.authToken)
-            const currentTime = new Date().getTime() / 1000;
-            if (decodedExp.exp > currentTime) {
-                dispatch(storeUserInfo(userInfo))
-            } else {
-                dispatch(resetUserInfo())
-                electron.resetApiCredentials()
+    useEffect(() => {
+        const verifyCredentials = async () => {
+            const { state } = await electron.checkToken();
+            const userInfo = await electron.getApiCredentials();
+            if (state) {
+                dispatch(storeAuthObject());
             }
-        }
+            if (userInfo != null) {
+                const decodedExp = jwtDecode(userInfo.authToken)
+                const currentTime = new Date().getTime() / 1000;
+                if (decodedExp.exp > currentTime) {
+                    dispatch(storeUserInfo(userInfo))
+                } else {
+                    dispatch(resetUserInfo())
+                    electron.resetApiCredentials()
+                }
+            }
+        };
+        verifyCredentials()
     }, [])
 
 

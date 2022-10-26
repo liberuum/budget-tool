@@ -13,7 +13,7 @@ export default function CommentTable({ walletId, month }) {
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
-    useEffect(async () => {
+    useEffect(() => {
         getItems()
 
     }, [walletId, month])
