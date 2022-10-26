@@ -3,12 +3,15 @@ import { Card, Label, Input, Grid, Text, Button, Spinner } from "theme-ui";
 import { gql, useMutation } from "@apollo/client";
 import { useSelector } from 'react-redux';
 import { getFte } from '../../api/graphql';
+import { useSnackbar } from 'notistack';
 
 export default function FTE({ month, budgetStatementId }) {
     const userFromStore = useSelector(store => store.user)
     const [fte, setFte] = useState('')
     const [apiFte, setApiFte] = useState(null)
     const [readToUpload, setReadyToUpload] = useState(false);
+
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     useEffect(() => {
         const fetchFTE = async () => {
@@ -35,10 +38,16 @@ export default function FTE({ month, budgetStatementId }) {
 
 
     const uploadFte = async () => {
-        if (apiFte !== null) {
-            await updateFte()
-        } else {
-            await addFte()
+        try {
+            if (apiFte !== null) {
+                await updateFte()
+            } else {
+                await addFte()
+            }
+            enqueueSnackbar(`Updated FTE number to ${fte}`, { variant: 'success' })
+
+        } catch (error) {
+            enqueueSnackbar(`${error}`, { variant: 'error' })
         }
     }
 
