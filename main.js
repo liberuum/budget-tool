@@ -2,7 +2,7 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, Tray } = require('electron');
 const path = require('path');
 const isDev = !app.isPackaged;
-const fs = require('fs/promises');
+const fs = require('fs').promises;
 const { fetchData, authorize, parseSpreadSheetLink } = require('./auth.js');
 const settings = require('electron-settings');
 

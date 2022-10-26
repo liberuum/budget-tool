@@ -7,9 +7,7 @@ import { resetUserInfo } from '../../actions/user';
 export default function UserInfo() {
     const dispatch = useDispatch();
 
-    const userFromStore = useSelector(store => store.user)
-    console.log(userFromStore);
-
+    const userFromStore = useSelector(store => store.user);
     const [changePass, setChangePass] = useState(false)
 
     const handleChangePasswordBtn = () => {
