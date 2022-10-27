@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import AlertHoC from './utils/alertHoC';
 import FTE from './fte/fte';
 import CommentTable from './comment/commentTable';
+import { useSnackbar } from 'notistack';
 
 /**
  *  Set DEBUG_UPLOAD = false to suppress debug output.
@@ -25,6 +26,8 @@ export default function UploadToDB(props) {
     const [coreUnit, setCoreUnit] = useState();
     const [walletIds, setWalletIds] = useState()
     const [walletId, setWalletId] = useState();
+
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     useEffect(() => {
         parseDataForApi()
@@ -223,14 +226,17 @@ export default function UploadToDB(props) {
                 await deleteBudgetLineItems(lineItemsToDelete, userFromStore.authToken)
                 await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
                 setUploadStatus({ ...uploadStatus, updatingDb: false, overriding: true })
+                enqueueSnackbar(`Updated expense report`, { variant: 'success' })
             }
             if (lineItemsToDelete.length === 0 && lineItemsToUpload.length > 0) {
                 if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] adding new lineItems')
                 await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
-                setUploadStatus({ ...uploadStatus, updatingDb: false, uploading: true })
+                setUploadStatus({ ...uploadStatus, updatingDb: false, uploading: true });
+                enqueueSnackbar(`Added a new expense report`, { variant: 'success' })
             }
         } catch (error) {
             setUploadStatus({ ...uploadStatus, updatingDb: false })
+            enqueueSnackbar(`${error}`, { variant: 'error' })
         }
         setWalletId(id)
     }
