@@ -3,15 +3,14 @@ import { Label, Button, Card, Grid, Text, Box, Input } from 'theme-ui'
 import { getBudgetLineItems } from '../../api/graphql';
 import { useSelector } from 'react-redux';
 import { updateBudgetLineItem, updateBudgetLineItems } from '../../api/graphql';
-import GreenAlertHoc from '../utils/greenAlertHoc';
-import AlertHoC from '../utils/alertHoC';
+import { useSnackbar } from 'notistack';
 
 export default function CommentTable({ walletId, month }) {
     const userFromStore = useSelector(store => store.user)
 
     const [lineItems, setLineItems] = useState([]);
-    const [successMsg, setSuccessMsg] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
+
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         getItems()
@@ -19,13 +18,19 @@ export default function CommentTable({ walletId, month }) {
     }, [walletId, month])
 
     const getItems = async () => {
-        let items = await getBudgetLineItems(walletId, month);
-        if (items === undefined) {
-            items = await getBudgetLineItems(walletId, month);
+        try {
+            let items = await getBudgetLineItems(walletId, month);
+            if (items === undefined) {
+                items = await getBudgetLineItems(walletId, month);
+            }
+            if (items !== undefined) {
+                setLineItems(items.data.budgetStatementLineItem);
+            }
+            enqueueSnackbar(`Comments fetched`, { variant: 'success' })
+        } catch (error) {
+            enqueueSnackbar(`${error}`, { variant: 'error' })
         }
-        if (items !== undefined) {
-            setLineItems(items.data.budgetStatementLineItem);
-        }
+
     }
 
     const updateLineItem = async (id) => {
@@ -65,21 +70,19 @@ export default function CommentTable({ walletId, month }) {
         })
         try {
             const result = await updateBudgetLineItems(itemsToUpdate, userFromStore.authToken);
-            setSuccessMsg(`Updated ${result.data.budgetLineItemsBatchUpdate.length} expenses`)
+            enqueueSnackbar(`Updated ${result.data.budgetLineItemsBatchUpdate.length} Comments `, { variant: 'success' })
         } catch (error) {
             console.log(error);
-            setErrorMsg('Could not update to API')
+            enqueueSnackbar(`${error}`, { variant: 'error' })
         }
     }
 
     return (
         <>
-            {successMsg ? <GreenAlertHoc props={successMsg} /> : ''}
-            {errorMsg ? <AlertHoC props={errorMsg} /> : ''}
             <Card sx={{ mt: '10px' }}>
                 <Box sx={{ textAlign: 'center', fontWeight: "bold" }}>
                     Reported data for {month}
-                    <br/>
+                    <br />
                     <Button onClick={getItems} variant='smallOutline'>Refresh</Button>
                 </Box>
                 <Grid
