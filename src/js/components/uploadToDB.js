@@ -9,6 +9,7 @@ import AlertHoC from './utils/alertHoC';
 import FTE from './fte/fte';
 import CommentTable from './comment/commentTable';
 import { useSnackbar } from 'notistack';
+import BudgetStatementComment from './bsComment/bsComment';
 
 /**
  *  Set DEBUG_UPLOAD = false to suppress debug output.
@@ -255,6 +256,7 @@ export default function UploadToDB(props) {
     return (
         <>
             <FTE month={`${selectedMonth}-01`} budgetStatementId={currentBudgetId} />
+            <BudgetStatementComment budgetStatementId={currentBudgetId ? currentBudgetId : undefined} />
             <Grid
                 columns={2}
             >
