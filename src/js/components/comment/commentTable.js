@@ -81,7 +81,7 @@ export default function CommentTable({ walletId, month }) {
         <>
             <Card sx={{ mt: '10px' }}>
                 <Box sx={{ textAlign: 'center', fontWeight: "bold" }}>
-                    Reported data for {month}
+                    Reported data for {month.substring(0, month.length - 3)}
                     <br />
                     <Button onClick={getItems} variant='smallOutline'>Refresh</Button>
                 </Box>
