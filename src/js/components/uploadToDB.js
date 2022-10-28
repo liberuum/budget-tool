@@ -254,10 +254,11 @@ export default function UploadToDB(props) {
 
     return (
         <>
+            <FTE month={`${selectedMonth}-01`} budgetStatementId={currentBudgetId} />
             <Grid
                 columns={2}
             >
-                <Card>
+                <Card sx={{ mt: '10px' }}>
                     <Label onChange={handleMonthChange}>Upload {selectedMonth} actuals and forecasts to ecosystem dashboard API</Label>
                     {uploadStatus.updatingDb ? <Spinner variant="styles.spinner" title="loading"></Spinner> :
                         <Button onClick={handleUpload} variant="smallOutline" >Upload</Button>}
@@ -266,13 +267,12 @@ export default function UploadToDB(props) {
                     {uploadStatus.uploading ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Uploaded</Badge> : ''}
                     {error ? <AlertHoC props={error.message} /> : ''}
                 </Card>
-                <FTE month={`${selectedMonth}-01`} budgetStatementId={currentBudgetId} />
+                <Card sx={{ mt: '10px' }}>
+                    <Label>
+                        <Link sx={{ cursor: 'pointer' }} onClick={handleViewExpense}>View your reported data on the dashboard {arrow}</Link>
+                    </Label>
+                </Card>
             </Grid>
-            <Card sx={{ mt: '10px' }}>
-                <Label>
-                    <Link sx={{ cursor: 'pointer' }} onClick={handleViewExpense}>View your reported data on the dashboard {arrow}</Link>
-                </Label>
-            </Card>
             <CommentTable walletId={walletId} month={`${selectedMonth}-01`} />
         </>
     )

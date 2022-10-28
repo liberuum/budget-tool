@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Label, Input, Grid, Text, Button, Spinner } from "theme-ui";
+import { Card, Label, Input, Grid, Text, Button, Spinner, Box } from "theme-ui";
 import { gql, useMutation } from "@apollo/client";
 import { useSelector } from 'react-redux';
 import { getFte } from '../../api/graphql';
@@ -110,6 +110,10 @@ export default function FTE({ month, budgetStatementId }) {
     return (
         <>
             <Card>
+                <Box sx={{ textAlign: 'center', fontWeight: "bold" }}>
+                    SES Core Unit Expense Report {month.substring(0, month.length - 3)}
+                    <br />
+                </Box>
                 <Label>Set FTE for {month.substring(0, month.length - 3)}</Label>
                 <Grid
                     columns={2}
