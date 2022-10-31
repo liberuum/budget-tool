@@ -41,10 +41,11 @@ export default function FTE({ month, budgetStatementId }) {
         try {
             if (apiFte !== null) {
                 await updateFte()
+                enqueueSnackbar(`Updated FTE number to ${fte}`, { variant: 'success' })
             } else {
                 await addFte()
+                enqueueSnackbar(`Added ${fte} FTEs`, { variant: 'success' })
             }
-            enqueueSnackbar(`Updated FTE number to ${fte}`, { variant: 'success' })
 
         } catch (error) {
             enqueueSnackbar(`${error}`, { variant: 'error' })
