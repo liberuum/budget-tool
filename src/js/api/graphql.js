@@ -10,7 +10,8 @@ setupClient()
 async function setupClient() {
     const isDev = await electron.getIsDev();
     client = new ApolloClient({
-        uri: isDev ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
+        uri: "http://localhost:4000/graphql",
+        // uri: isDev ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
         cache: new InMemoryCache()
     });
 }
@@ -362,4 +363,67 @@ export const getFte = async (budgetStatementId) => {
     } catch (error) {
         console.error(error);
     }
-}
+};
+
+export const getBudgetStatementComments = async (budgetStatementId) => {
+    try {
+        const result = client.query({
+            query: gql`
+                query BudgetStatementComments($filter: BudgetStatementCommentFilter) {
+                    budgetStatementComment(filter: $filter) {
+                        id
+                        budgetStatementId
+                        timestamp
+                        comment
+                        commentAuthor {
+                        id
+                        name
+                        }
+                    }
+                }
+            `,
+            variables: {
+                filter: {
+                    budgetStatementId
+                }
+            },
+            fetchPolicy: 'no-cache'
+        });
+        return result;
+    } catch (error) {
+        console.error(error)
+    }
+};
+
+export const createBudgetStatementComment = async (comment, authToken) => {
+    try {
+        const result = client.mutate({
+            mutation: gql`
+                mutation BudgetStatementCommentCreate($input: BudgetStatementCommentInput) {
+                    budgetStatementCommentCreate(input: $input) {
+                        id
+                        budgetStatementId
+                        timestamp
+                        comment
+                        commentAuthor {
+                        id
+                        name
+                    }
+                }
+            }
+            `,
+            variables: {
+                input: comment
+            },
+            context: {
+                headers: {
+                    authorization: `Bearer ${authToken}`
+                }
+            }
+        });
+        return result
+
+    } catch (error) {
+        console.error(error)
+    }
+};
