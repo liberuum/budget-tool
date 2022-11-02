@@ -9,8 +9,15 @@ setupClient()
 
 async function setupClient() {
     const isDev = await electron.getIsDev();
+    const isStaging = await electron.getIsStaging();
     client = new ApolloClient({
-        uri: isDev ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
+        uri: isDev && isStaging === false ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql'
+            :
+            isDev === false && isStaging === false ?
+                'https://ecosystem-dashboard.herokuapp.com/graphql'
+                :
+                isDev === false && isStaging === true && 'https://staging-ecosystem-dashboard.herokuapp.com/graphql'
+        ,
         cache: new InMemoryCache()
     });
 }

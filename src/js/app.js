@@ -13,17 +13,26 @@ import AppVersionAlert from './components/modal/appVersionAlert';
 
 export default function App() {
     const [isDev, setIsDev] = useState(false);
+    const [isStaging, setIsStaging] = useState(false);
 
     useEffect(() => {
         async function setDev() {
             const dev = await electron.getIsDev();
             setIsDev(dev);
+            const staging = await electron.getIsStaging();
+            setIsStaging(staging)
         }
         setDev()
     }, []);
 
     const client = new ApolloClient({
-        uri: isDev ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql' : 'https://ecosystem-dashboard.herokuapp.com/graphql',
+        uri: isDev && isStaging === false ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql'
+            :
+            isDev === false && isStaging === false ?
+                'https://ecosystem-dashboard.herokuapp.com/graphql'
+                :
+                isDev === false && isStaging === true && 'https://staging-ecosystem-dashboard.herokuapp.com/graphql'
+        ,
         cache: new InMemoryCache()
     });
 

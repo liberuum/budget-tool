@@ -7,8 +7,10 @@ exports.createTemplate = app => {
                     label: "Switch to production environment",
                     click: async (_, focusedWindow) => {
                         const settings = require('electron-settings');
-                        if(await settings.get('isDev') !== false) {
-                            settings.set('isDev', false)
+                        if (await settings.get('isDev') !== false || await settings.get('isStaging') !== false) {
+                            await settings.set('isDev', false);
+                            await settings.set('isStaging', false);
+                            await settings.set('api-credentials', null);
                             if (focusedWindow) {
                                 if (focusedWindow.id === 1) {
                                     const { BrowserWindow } = require('electron');
@@ -27,8 +29,32 @@ exports.createTemplate = app => {
                     label: "Switch to test environment",
                     click: async (_, focusedWindow) => {
                         const settings = require('electron-settings');
-                        if(await settings.get('isDev') !== true) {
-                            settings.set('isDev', true)
+                        if (await settings.get('isDev') !== true) {
+                            await settings.set('isDev', true);
+                            await settings.set('isStaging', false);
+                            await settings.set('api-credentials', null);
+                            if (focusedWindow) {
+                                if (focusedWindow.id === 1) {
+                                    const { BrowserWindow } = require('electron');
+                                    BrowserWindow.getAllWindows().forEach(win => {
+                                        if (win.id > 1) {
+                                            win.close();
+                                        }
+                                    })
+                                }
+                                focusedWindow.reload()
+                            }
+                        }
+                    }
+                },
+                {
+                    label: "Switch to staging environment",
+                    click: async (_, focusedWindow) => {
+                        const settings = require('electron-settings');
+                        if (await settings.get('isStaging') !== true) {
+                            await settings.set('isStaging', true);
+                            await settings.set('isDev', false);
+                            await settings.set('api-credentials', null);
                             if (focusedWindow) {
                                 if (focusedWindow.id === 1) {
                                     const { BrowserWindow } = require('electron');

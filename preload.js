@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('electron', {
   resetApiCredentials: () => ipcRenderer.invoke('reset-api-credentials'),
   openDashboardLink: (cuName) => ipcRenderer.invoke('open-dashboard-link', { cuName }),
   getIsDev: () => ipcRenderer.invoke('get-isDev'),
+  getIsStaging: () => ipcRenderer.invoke('get-isStaging'),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   openGithubRelease: (link) => ipcRenderer.invoke('open-github-release', { link }),
 

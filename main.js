@@ -10,6 +10,7 @@ const dockIcon = path.join(__dirname, 'assets', 'images', 'budgetToolLogo.png');
 const trayIcon = path.join(__dirname, 'assets', 'images', 'budget_icon.jpg');
 
 createJsonStorageVariable('isDev', false);
+createJsonStorageVariable('isStaging', false);
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -52,7 +53,7 @@ app.whenReady().then(async () => {
     tray.setContextMenu(menu)
     createWindow();
 
-    setEnv()
+    await setEnv()
 });
 
 app.on('window-all-closed', () => {
@@ -154,11 +155,15 @@ ipcMain.handle('open-wallet-link', (event, args) => {
     require('electron').shell.openExternal(`https://gnosis-safe.io/app/eth:${args.address}/home`)
 })
 
-ipcMain.handle('open-dashboard-link',async (event, args) => {
-    require('electron').shell.openExternal(await settings.get('isDev') ?
+ipcMain.handle('open-dashboard-link', async (event, args) => {
+    require('electron').shell.openExternal(await settings.get('isDev') && await settings.get('isStaging') === false ?
         `https://expenses-dev.makerdao.network/core-unit/${args.cuName}/finances/reports`
         :
-        `https://expenses.makerdao.network/core-unit/${args.cuName}/finances/reports`)
+        await settings.get('isDev') === false && await settings.get('isStaging') === false ?
+            `https://expenses.makerdao.network/core-unit/${args.cuName}/finances/reports`
+            :
+            `https://expenses-staging.makerdao.network/core-unit/${args.cuName}/finances/reports`
+    )
 });
 
 ipcMain.handle('get-app-version', () => {
@@ -285,8 +290,9 @@ function createJsonStorageVariable(name, defaultValue, isCollection = false) {
     }
 }
 
-function setEnv() {
-    settings.set('isDev', isDev)
+async function setEnv() {
+    await settings.set('isDev', isDev);
+    await settings.set('isStaging', false)
 }
 
 createJsonStorageVariable('api-credentials', null);
