@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0](https://github.com/liberuum/budget-tool/releases/tag/v1.3.0) - 2022-11-03
+
+### Added
+
+- Added expense report general comments, CU admins can now add extra information regarding their monthly CU expenses
+
+### Changed
+
+- **Breaking change**: users need to get latest version of budgtet tool in order to log in. User log in object is changed from API
+
+- General fixes and improvements
+
+- Improved notification experience when user is interacting with the tool
+
+- Improved UI in 'ToAPI" page.
+
 ## [1.2.1](https://github.com/liberuum/budget-tool/releases/tag/v1.2.1) - 2022-10-17
 
 ### Changed
