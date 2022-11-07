@@ -13,7 +13,7 @@ const root = createRoot(document.getElementById('app'));
 root.render(
     <Provider store={store}>
         <SnackbarProvider
-            autoHideDuration={3000}
+            autoHideDuration={4000}
             anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
             preventDuplicate={true}
         >

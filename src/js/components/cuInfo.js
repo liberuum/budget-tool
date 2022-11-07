@@ -19,7 +19,7 @@ export default function CuInfo() {
     });
 
 
-
+    
     if (loading) return <Spinner size={1} />
     if (error) {
         return (

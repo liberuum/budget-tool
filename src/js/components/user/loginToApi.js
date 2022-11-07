@@ -3,11 +3,12 @@ import { Card, Label, Input, Button, Spinner } from "theme-ui";
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserInfo } from '../../actions/user';
 import { useQuery, gql, useMutation } from "@apollo/client";
-import AlertHoC from '../utils/alertHoC';
+import { useSnackbar } from 'notistack';
 
 
 export default function LoginToApi() {
     const dispatch = useDispatch();
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
 
@@ -33,8 +34,12 @@ export default function LoginToApi() {
             userLogin(input: $input) {
                 user {
                     id
-                    cuId
-                    username
+                    username,
+                    roles {
+                    id
+                    name
+                    permissions
+                    }
                 }
                 authToken
             }
@@ -52,24 +57,40 @@ export default function LoginToApi() {
     });
 
     const handleLoginBtn = async () => {
-        const result = await userLogin()
-        if (result.data.userLogin.user.cuId !== null) {
-            dispatch(storeUserInfo({
-                id: result.data.userLogin.user.id,
-                cuId: result.data.userLogin.user.cuId,
-                username: result.data.userLogin.user.username,
-                authToken: result.data.userLogin.authToken
-            }));
-            electron.saveApiCredentials({
-                id: result.data.userLogin.user.id,
-                cuId: result.data.userLogin.user.cuId,
-                username: result.data.userLogin.user.username,
-                authToken: result.data.userLogin.authToken
+        try {
+            const result = await userLogin()
+            const roles = result.data.userLogin.user.roles.map(role => {
+                return role.permissions;
+            }).flat();
+            let cuId = undefined;
+            roles.forEach(role => {
+                const id = role.substring(role.length - 2);
+                const regex = /[0-9]{2}/;
+                if (regex.test(id)) {
+                    cuId = id;
+                }
             })
-            setusername('')
-            setPassword('')
-        } else {
-            setStateError('cannot use tool without cu id')
+            if (cuId !== undefined) {
+                dispatch(storeUserInfo({
+                    id: result.data.userLogin.user.id,
+                    cuId,
+                    username: result.data.userLogin.user.username,
+                    authToken: result.data.userLogin.authToken
+                }));
+                electron.saveApiCredentials({
+                    id: result.data.userLogin.user.id,
+                    cuId,
+                    username: result.data.userLogin.user.username,
+                    authToken: result.data.userLogin.authToken
+                })
+                setusername('')
+                setPassword('')
+            } else {
+                enqueueSnackbar('Cannot use tool without having assinged a CU id to your account', { variant: 'error' })
+            }
+
+        } catch (error) {
+            enqueueSnackbar(error.message, { variant: 'error' })
         }
     }
 
@@ -100,7 +121,6 @@ export default function LoginToApi() {
                 >Log In</Button>}
 
             </div>
-            {error || stateError ? <AlertHoC props={error ? error.message : stateError} /> : ''}
         </Card>
     )
 }
