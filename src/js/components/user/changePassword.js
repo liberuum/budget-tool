@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Label, Input, Button, Spinner } from 'theme-ui';
-import { useQuery, gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { useSelector } from 'react-redux';
-import AlertHoC from '../utils/alertHoC.js';
-import GreenAlertHoc from '../utils/greenAlertHoc.js';
+import { useSnackbar } from 'notistack';
 
 
 
@@ -12,12 +11,12 @@ export function ChangePass() {
     const [oldPassword, setOldPassword] = useState('')
     const [newPassword, setNewPassword] = useState('');
     const userFromStore = useSelector(store => store.user)
+    const { enqueueSnackbar } = useSnackbar();
 
     const CHANGE_PASSWORD = gql`
         mutation UserChangePassword($input: UpdatePassword!) {
             userChangePassword(input: $input) {
                 id
-                cuId
                 username
             }
         }
@@ -48,9 +47,14 @@ export function ChangePass() {
     }
 
     const handlePasswordBtn = async () => {
-        await changePassword()
-        setOldPassword('')
-        setNewPassword('')
+        try {
+            await changePassword()
+            setOldPassword('')
+            setNewPassword('')
+            enqueueSnackbar('Password changed succesfully', { variant: 'success' })
+        } catch (error) {
+            enqueueSnackbar(error.message, { variant: 'error' })
+        }
     }
 
     return (
@@ -78,8 +82,6 @@ export function ChangePass() {
                         onClick={handlePasswordBtn}
                     >Change Password</Button>}
                 </div>
-                {error ? <AlertHoC props={error.message} /> : ''}
-                {data ? <GreenAlertHoc props={'Password Changed Successfully'}/> : ''}
             </Card>
         </>
     )
