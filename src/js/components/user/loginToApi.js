@@ -59,17 +59,21 @@ export default function LoginToApi() {
     const handleLoginBtn = async () => {
         try {
             const result = await userLogin()
-            const roles = result.data.userLogin.user.roles.map(role => {
-                return role.permissions;
-            }).flat();
             let cuId = undefined;
-            roles.forEach(role => {
-                const id = role.substring(role.length - 2);
-                const regex = /[0-9]{2}/;
-                if (regex.test(id)) {
-                    cuId = id;
-                }
-            })
+            if (result.data.userLogin.user.roles != null) {
+                const roles = result.data.userLogin.user.roles.map(role => {
+                    return role.permissions;
+                }).flat();
+                roles.forEach(role => {
+                    const id = role.substring(role.length - 2);
+                    const regex = /[0-9]{2}/;
+                    if (regex.test(id)) {
+                        cuId = id;
+                    }
+                })
+            } else {
+                enqueueSnackbar('Cannot use tool without having assinged a CU id to your account', { variant: 'error' })
+            }
             if (cuId !== undefined) {
                 dispatch(storeUserInfo({
                     id: result.data.userLogin.user.id,
