@@ -7,6 +7,7 @@ import { storeLinkData, removeLinkData, flagLinkDataInitialization } from '../..
 import processData from '../../processor/index';
 import CuInfo from '../cuInfo';
 import './table.css'
+import { useSnackbar } from 'notistack';
 
 /**
  * Set DEBUG_TABLE_DATA=true to get debug output in the console.
@@ -18,6 +19,7 @@ export default function Table() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { enqueueSnackbar } = useSnackbar();
 
     const initialized = useSelector((store) => store.tableData.initialized);
     const tableData = useSelector((store) => store.tableData.links);
@@ -111,18 +113,22 @@ export default function Table() {
     }
 
     const dispatchNewSheet = async (walletName, walletAddress, sheetUrl, storageId) => {
-        const { result, error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
+        try {
+            const { result, error, rawData, spreadSheetTitle, sheetName, spreadsheetId, tabId } = await electron.getSheetInfo(sheetUrl);
 
-        if (result === 'error') {
-            setValidatedInput({ ...validatedInput, linkError: true, valid: false, variant: null })
-            electron.resetGsheetLinks()
-        } else {
-            const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData, `${walletName} (ID:${storageId})`);
-            dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress, storageId }))
-            setValidatedInput({ ...validatedInput, variant: null, })
-            setInputWalletName('')
-            setInputWalletAddress('')
-            setInputSheetValue('')
+            if (result === 'error') {
+                setValidatedInput({ ...validatedInput, linkError: true, valid: false, variant: null })
+                electron.resetGsheetLinks()
+            } else {
+                const { actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary } = await processData(rawData, `${walletName} (ID:${storageId})`);
+                dispatch(storeLinkData({ spreadSheetTitle, sheetName, spreadsheetId, tabId, actualsByMonth, leveledMonthsByCategory, mdTextByMonth, sfSummary, walletName, walletAddress, storageId }))
+                setValidatedInput({ ...validatedInput, variant: null, })
+                setInputWalletName('')
+                setInputWalletAddress('')
+                setInputSheetValue('')
+            }
+        } catch (error) {
+            enqueueSnackbar(`Make sure to use spreadsheet tab with defined tags: ${error}`, { variant: 'error' })
         }
 
     }
