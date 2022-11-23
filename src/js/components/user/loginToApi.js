@@ -65,10 +65,10 @@ export default function LoginToApi() {
                     return role.permissions;
                 }).flat();
                 roles.forEach(role => {
-                    const id = role.substring(role.length - 2);
-                    const regex = /[0-9]{2}/;
-                    if (regex.test(id)) {
-                        cuId = id;
+                    const regex = /[0-9]{1,}/;
+                    const rgxOutput = role.match(regex);
+                    if (rgxOutput !== null) {
+                        cuId = rgxOutput[0]
                     }
                 })
             } else {
