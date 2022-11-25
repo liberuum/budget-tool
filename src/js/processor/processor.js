@@ -225,10 +225,6 @@ export default class Processor {
                         selectedFilter.forecast.signMultiplier = Math.sign(arr.forecast)
                     }
 
-                    if (arr.category.toLowerCase() === 'revenue') {
-                        arr.actual = arr.actual * -1
-                    }
-
                     this.parsedRows.push(this.cleanExpenseRecord(arr, selectedFilter, this.budgets, this.filteredByCategoryMonth))
                     arr = {}
                 } else if (this.isValidBudgetRow(arr)) {
@@ -290,7 +286,8 @@ export default class Processor {
             calculatedOwed = parsedRecord.estimate
         }
         if (parsedRecord.actual !== undefined) {
-            parsedRecord.actual = this.parseNumber(parsedRecord.actual) * filter.actual.signMultiplier
+            // parsedRecord.actual = this.parseNumber(parsedRecord.actual) * filter.actual.signMultiplier
+            parsedRecord.actual = this.parseNumber(parsedRecord.actual)
             calculatedOwed = parsedRecord.actual
         }
         if (parsedRecord.owed !== undefined) {
@@ -315,6 +312,8 @@ export default class Processor {
     }
 
     buildSESView = (parsedRows) => {
+        let selectedFilter = JSON.parse(JSON.stringify(this.currentFilter()));
+
         let result = {}
         for (let i = 0; i < parsedRows.length; i++) {
             let row = parsedRows[i]
@@ -350,6 +349,20 @@ export default class Processor {
         }
 
         if (DEBUG_PROCESSOR) console.log(this.wallet, 'buildSESView() output:', result);
+        for (const [key, value] of Object.entries(result)) {
+            for (const [key1, value1] of Object.entries(result[key])) {
+                for (const [key2, value2] of Object.entries(result[key][key1])) {
+                    for (const [key3, value3] of Object.entries(result[key][key1][key2])) {
+                        if (key3 === 'actual' || key3 === 'forecast' || key3 === 'paid') {
+                            result[key][key1][key2][key3] = result[key][key1][key2][key3] * Math.sign(result[key][key1][key2][key3])
+                        }
+                        if (key.toLowerCase() === 'revenue') {
+                            result[key][key1][key2][key3] = result[key][key1][key2][key3] * -1
+                        }
+                    }
+                }
+            }
+        }
         return result;
     }
 
