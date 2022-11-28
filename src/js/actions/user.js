@@ -10,3 +10,10 @@ export const resetUserInfo = () => dispatch => {
         type: 'USER_RESET'
     })
 }
+
+export const storeListIndex = (userData) => dispatch => {
+    dispatch({
+        type: 'CU_LIST_INDEX',
+        userData
+    })
+}

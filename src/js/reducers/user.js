@@ -3,7 +3,9 @@ const INITIAL_STATE = {
     cuId: '',
     username: '',
     authToken: '',
-    auth: false
+    auth: false,
+    cuListIndex: '',
+    roles: []
 }
 
 export default function userReducer(state = INITIAL_STATE, action) {
@@ -15,7 +17,8 @@ export default function userReducer(state = INITIAL_STATE, action) {
                 cuId: action.userData.cuId,
                 username: action.userData.username,
                 authToken: action.userData.authToken,
-                auth: true
+                auth: true,
+                roles: action.userData.roles ? Array.from(action.userData.roles) : [...state.roles]
             }
         case 'USER_RESET':
             return {
@@ -24,7 +27,16 @@ export default function userReducer(state = INITIAL_STATE, action) {
                 cuId: '',
                 username: '',
                 authToken: '',
-                auth: false
+                auth: false,
+                cuListIndex: '',
+                roles: []
+            }
+        case 'CU_LIST_INDEX':
+            return {
+                ...state,
+                cuListIndex: action.userData.cuListIndex,
+                cuId: action.userData.cuId,
+                roles: state.roles
             }
         case 'USER_CHANGE_PASSWORD':
             return { ...state, authToken: '' }

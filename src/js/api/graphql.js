@@ -37,8 +37,10 @@ export async function getCoreUnits() {
         query: gql`
             query getCoreUnits {
                 coreUnits {
-                     code
-                     name
+                    id
+                    code
+                    name
+                    shortCode
                  }
             }
             `

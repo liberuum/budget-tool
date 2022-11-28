@@ -57,35 +57,39 @@ export default function LoginToApi() {
     });
 
     const handleLoginBtn = async () => {
+
+        const facilitatorRole = 'CoreUnitFacilitator';
+        const superAdminRole = 'SuperAdmin'
+
         try {
             const result = await userLogin()
             let cuId = undefined;
-            if (result.data.userLogin.user.roles != null) {
-                const roles = result.data.userLogin.user.roles.map(role => {
-                    return role.permissions;
-                }).flat();
-                roles.forEach(role => {
-                    const regex = /[0-9]{1,}/;
-                    const rgxOutput = role.match(regex);
-                    if (rgxOutput !== null) {
-                        cuId = rgxOutput[0]
-                    }
-                })
-            } else {
+            const roles = extractRoleInfo(result);
+            if (roles.length < 1) {
                 enqueueSnackbar('Cannot use tool without having assinged a CU id to your account', { variant: 'error' })
             }
-            if (cuId !== undefined) {
+            roles.map(role => {
+                if (role.name === facilitatorRole) {
+                    cuId = role.cuId
+                }
+                if (role.name === superAdminRole) {
+                    cuId = null
+                }
+            })
+            if (cuId !== undefined && roles.length > 0) {
                 dispatch(storeUserInfo({
                     id: result.data.userLogin.user.id,
                     cuId,
                     username: result.data.userLogin.user.username,
-                    authToken: result.data.userLogin.authToken
+                    authToken: result.data.userLogin.authToken,
+                    roles: roles
                 }));
                 electron.saveApiCredentials({
                     id: result.data.userLogin.user.id,
                     cuId,
                     username: result.data.userLogin.user.username,
-                    authToken: result.data.userLogin.authToken
+                    authToken: result.data.userLogin.authToken,
+                    roles: roles
                 })
                 setusername('')
                 setPassword('')
@@ -98,6 +102,24 @@ export default function LoginToApi() {
         }
     }
 
+    const extractRoleInfo = (result) => {
+        const rolesWithId = [];
+        if (result.data.userLogin.user.roles != null) {
+            const roles = result.data.userLogin.user.roles.map(role => {
+                rolesWithId.push({ name: role.name, cuId: null })
+                return role.permissions;
+            }).flat();
+            roles.forEach((role, index) => {
+                const regex = /[0-9]{1,}/;
+                const rgxOutput = role.match(regex);
+                if (rgxOutput !== null) {
+                    rolesWithId[index].cuId = rgxOutput[0]
+                }
+            })
+            return rolesWithId;
+        }
+
+    }
 
 
     return (
@@ -128,3 +150,4 @@ export default function LoginToApi() {
         </Card>
     )
 }
+
