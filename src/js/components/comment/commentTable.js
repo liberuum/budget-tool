@@ -69,6 +69,7 @@ export default function CommentTable({ walletId, month }) {
             return { ...item }
         })
         try {
+            itemsToUpdate.push({ cuId: userFromStore.cuId })
             const result = await updateBudgetLineItems(itemsToUpdate, userFromStore.authToken);
             enqueueSnackbar(`Updated ${result.data.budgetLineItemsBatchUpdate.length} Comments `, { variant: 'success' })
         } catch (error) {

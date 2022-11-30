@@ -222,6 +222,8 @@ export default function UploadToDB(props) {
             if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] data to upload:', lineItemsToUpload)
 
             if (lineItemsToDelete.length > 0 && lineItemsToUpload.length > 0) {
+                lineItemsToDelete.push({ cuId: userFromStore.cuId })
+                lineItemsToUpload.push({ cuId: userFromStore.cuId })
                 if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] deleting and updating lineItems')
                 await deleteBudgetLineItems(lineItemsToDelete, userFromStore.authToken)
                 await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
@@ -229,6 +231,7 @@ export default function UploadToDB(props) {
                 enqueueSnackbar(`Updated expense report`, { variant: 'success' })
             }
             if (lineItemsToDelete.length === 0 && lineItemsToUpload.length > 0) {
+                lineItemsToUpload.push({ cuId: userFromStore.cuId })
                 if (DEBUG_UPLOAD) console.log('[DEBUG_UPLOAD] adding new lineItems')
                 await budgetLineItemsBatchAdd({ variables: { input: lineItemsToUpload } });
                 setUploadStatus({ ...uploadStatus, updatingDb: false, uploading: true });
