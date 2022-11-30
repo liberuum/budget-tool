@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { getFte } from '../../api/graphql';
 import { useSnackbar } from 'notistack';
 
-export default function FTE({ month, budgetStatementId }) {
+export default function FTE({ month, budgetStatementId, coreUnit }) {
     const userFromStore = useSelector(store => store.user)
     const [fte, setFte] = useState('')
     const [apiFte, setApiFte] = useState(null)
@@ -79,7 +79,8 @@ export default function FTE({ month, budgetStatementId }) {
             input: {
                 budgetStatementId,
                 month,
-                ftes: parseFloat(fte)
+                ftes: parseFloat(fte),
+                coreUnitId: parseFloat(userFromStore.cuId)
             }
         },
         fetchPolicy: 'no-cache',
@@ -96,7 +97,8 @@ export default function FTE({ month, budgetStatementId }) {
                 id: apiFte?.id,
                 budgetStatementId,
                 month,
-                ftes: parseFloat(fte)
+                ftes: parseFloat(fte),
+                coreUnitId: parseFloat(userFromStore.cuId)
             }
         },
         fetchPolicy: 'no-cache',
@@ -112,7 +114,7 @@ export default function FTE({ month, budgetStatementId }) {
         <>
             <Card>
                 <Box sx={{ textAlign: 'center', fontWeight: "bold" }}>
-                    SES Core Unit Expense Report {month.substring(0, month.length - 3)}
+                    {coreUnit?.shortCode} Core Unit Expense Report {month.substring(0, month.length - 3)}
                     <br />
                 </Box>
                 <Label>Set FTE for {month.substring(0, month.length - 3)}</Label>

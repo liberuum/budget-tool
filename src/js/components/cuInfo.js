@@ -11,31 +11,43 @@ export default function CuInfo() {
     const userFromStore = useSelector(store => store.user);
     const [cus, setCus] = useState([]);
     const [adminRole, setAdminRole] = useState(false);
+
+
     useEffect(() => {
+        const admin = setRole();
+        setAdminRole(admin)
         const getCus = async () => {
             const result = await getCoreUnits();
             setCus(result.data.coreUnits);
-            if (userFromStore.cuListIndex === '') {
+            if (userFromStore.cuId === null || userFromStore.cuId === '' || userFromStore.cuListIndex === '') {
                 dispatch(storeListIndex({
                     cuListIndex: 0,
                     cuId: result.data.coreUnits[0].id
                 }));
             } else {
                 const sortedCus = moveInArray(result.data.coreUnits, userFromStore.cuListIndex, 0);
+                dispatch(storeListIndex({
+                    cuListIndex: 0,
+                    cuId: sortedCus[0].id
+                }));
                 setCus(sortedCus)
             }
 
         };
-        setRole()
-        getCus()
+        if (admin === true) {
+            getCus()
+        }
     }, []);
 
     const setRole = () => {
-        userFromStore.roles.map(role => {
+        const [admin] = userFromStore.roles.map(role => {
             if (role.name === 'SuperAdmin') {
-                setAdminRole(!adminRole)
+                return true
+            } else {
+                return false
             }
         })
+        return admin;
     }
 
     const filter = {
@@ -50,7 +62,7 @@ export default function CuInfo() {
 
     const handleSelect = (value) => {
         let index;
-        const [cu] = cus.filter((cu, i) => {
+        const coreUnits = cus.filter((cu, i) => {
             if (cu.name === value) {
                 dispatch(storeListIndex({
                     cuListIndex: i,

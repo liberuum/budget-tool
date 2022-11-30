@@ -5,7 +5,6 @@ import { getCoreUnit, getBudgetSatementInfo, deleteBudgetLineItems } from '../ap
 import { validateMonthsInApi } from './utils/validateMonths';
 import { validateLineItems, getCanonicalCategory } from './utils/validateLineItems'
 import { useSelector } from 'react-redux';
-import AlertHoC from './utils/alertHoC';
 import FTE from './fte/fte';
 import CommentTable from './comment/commentTable';
 import { useSnackbar } from 'notistack';
@@ -255,7 +254,7 @@ export default function UploadToDB(props) {
 
     return (
         <>
-            <FTE month={`${selectedMonth}-01`} budgetStatementId={currentBudgetId} />
+            <FTE month={`${selectedMonth}-01`} budgetStatementId={currentBudgetId} coreUnit={coreUnit} />
             <BudgetStatementComment budgetStatementId={currentBudgetId ? currentBudgetId : undefined} />
             <Grid
                 columns={2}
@@ -267,7 +266,6 @@ export default function UploadToDB(props) {
                     {uploadStatus.noChange ? <Badge sx={{ mx: '2' }}>Data is up to date</Badge> : ''}
                     {uploadStatus.overriding ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Updated</Badge> : ''}
                     {uploadStatus.uploading ? <Badge sx={{ mx: '2', bg: 'yellow', color: 'black' }}>Uploaded</Badge> : ''}
-                    {error ? <AlertHoC props={error.message} /> : ''}
                 </Card>
                 <Card sx={{ mt: '10px' }}>
                     <Label>

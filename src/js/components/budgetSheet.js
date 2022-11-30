@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container } from "theme-ui"
 import Table from './table/table';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { storeAuthObject } from '../actions/googleAuth';
 import { storeUserInfo, resetUserInfo } from '../actions/user';
 import NotAuthenticated from './notAuthenticated';
@@ -11,6 +10,7 @@ import jwtDecode from 'jwt-decode';
 export default function BudgetSheet() {
 
     const dispatch = useDispatch();
+    const userFromStore = useSelector(store => store.user);
 
     useEffect(() => {
         const verifyCredentials = async () => {
@@ -19,7 +19,7 @@ export default function BudgetSheet() {
             if (state) {
                 dispatch(storeAuthObject());
             }
-            if (userInfo != null) {
+            if (userInfo != null && userFromStore.id === '') {
                 const decodedExp = jwtDecode(userInfo.authToken)
                 const currentTime = new Date().getTime() / 1000;
                 if (decodedExp.exp > currentTime) {
@@ -35,7 +35,6 @@ export default function BudgetSheet() {
 
 
     const gAuth = useSelector((googleAuth) => googleAuth.googleAuth.auth);
-    const userFromStore = useSelector(store => store.user.auth);
 
     return (
         <Container>
