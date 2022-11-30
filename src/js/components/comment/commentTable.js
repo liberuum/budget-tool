@@ -25,8 +25,8 @@ export default function CommentTable({ walletId, month }) {
             }
             if (items !== undefined) {
                 setLineItems(items.data.budgetStatementLineItem);
+                enqueueSnackbar(`Comments fetched`, { variant: 'success' })
             }
-            enqueueSnackbar(`Comments fetched`, { variant: 'success' })
         } catch (error) {
             enqueueSnackbar(`${error}`, { variant: 'error' })
         }
