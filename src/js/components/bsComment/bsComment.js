@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { useSelector } from 'react-redux';
 import { getBudgetStatementComments, createBudgetStatementComment, getUsers } from '../../api/graphql';
 
-export default function BudgetStatementComment({ budgetStatementId }) {
+export default function BudgetStatementComment({ budgetStatementId, users }) {
 
     const userFromStore = useSelector(store => store.user);
 
@@ -54,17 +54,12 @@ export default function BudgetStatementComment({ budgetStatementId }) {
         setPreview(!preview)
     }
 
-    const fetchUser = async (userId) => {
-        const result = await getUsers(userId, userFromStore.authToken);
-        return result.data.users[0].username;
-    }
-
     const addUsername = (statmentComments) => {
         let comments = statmentComments;
         comments.map(async (comment) => {
-            comment.username = await fetchUser(comment.authorId, userFromStore.authToken)
+            comment.username = users.filter(user => user.id === comment.authorId)[0].username
         });
-        return comments;
+        return comments.sort((a, b) => a.id - b.id);
     }
     return (
         <>{comments.length < 1 ?

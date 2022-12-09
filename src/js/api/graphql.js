@@ -431,7 +431,7 @@ export const createBudgetStatementComment = async (comment, authToken) => {
     }
 };
 
-export const getUsers = async (userId, authToken) => {
+export const getUsers = async (userId) => {
     try {
         const result = client.query({
             query: gql`
@@ -444,12 +444,7 @@ export const getUsers = async (userId, authToken) => {
             `,
             variables: {
                 input: {
-                    id: userId
-                }
-            },
-            context: {
-                headers: {
-                    authorization: `Bearer ${authToken}`
+                    id: userId? userId : null
                 }
             }
         });

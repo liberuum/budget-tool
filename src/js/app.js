@@ -26,14 +26,14 @@ export default function App() {
     }, []);
 
     const client = new ApolloClient({
-        // uri: isDev && isStaging === false ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql'
-        //     :
-        //     isDev === false && isStaging === false ?
-        //         'https://ecosystem-dashboard.herokuapp.com/graphql'
-        //         :
-        //         isDev === false && isStaging === true && 'https://staging-ecosystem-dashboard.herokuapp.com/graphql'
-        // ,
-        uri: 'http://localhost:4000/graphql',
+        uri: isDev && isStaging === false ? 'https://publish-dev-vpighsmr70zxa92r9w.herokuapp.com/graphql'
+            :
+            isDev === false && isStaging === false ?
+                'https://ecosystem-dashboard.herokuapp.com/graphql'
+                :
+                isDev === false && isStaging === true && 'https://staging-ecosystem-dashboard.herokuapp.com/graphql'
+        ,
+        // uri: 'http://localhost:4000/graphql',
         cache: new InMemoryCache()
     });
 
