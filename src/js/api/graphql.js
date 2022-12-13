@@ -384,7 +384,11 @@ export const getBudgetStatementComments = async (budgetStatementId) => {
                         budgetStatementId
                         timestamp
                         comment
-                        authorId
+                        author {
+                            id
+                            username
+                        }
+                        status
                     }
                 }
             `,
@@ -411,7 +415,10 @@ export const createBudgetStatementComment = async (comment, authToken) => {
                         budgetStatementId
                         timestamp
                         comment
-                        authorId
+                        author{
+                            id
+                            username
+                        }
                 }
             }
             `,

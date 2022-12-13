@@ -24,7 +24,7 @@ export default function BudgetStatementComment({ budgetStatementId, users }) {
         if (budgetStatementId !== undefined) {
             try {
                 const result = await getBudgetStatementComments(budgetStatementId);
-                setComments(addUsername(result.data.budgetStatementComment))
+                setComments(result.data.budgetStatementComment)
                 enqueueSnackbar(`Comments fetched`, { variant: 'success' })
             } catch (error) {
                 enqueueSnackbar(error, { variant: 'error' })
@@ -40,7 +40,7 @@ export default function BudgetStatementComment({ budgetStatementId, users }) {
                 commentAuthorId: userFromStore.id
             }
             const result = await createBudgetStatementComment(commentObj, userFromStore.authToken)
-            setComments(prev => addUsername([...prev, result.data.budgetStatementCommentCreate[0]]))
+            setComments(prev => [...prev, result.data.budgetStatementCommentCreate[0]])
             setInputText('')
             setPreview(false)
             enqueueSnackbar('Added new expense comment', { variant: 'success' })
@@ -54,13 +54,7 @@ export default function BudgetStatementComment({ budgetStatementId, users }) {
         setPreview(!preview)
     }
 
-    const addUsername = (statmentComments) => {
-        let comments = statmentComments;
-        comments.map(async (comment) => {
-            comment.username = users.filter(user => user.id === comment.authorId)[0].username
-        });
-        return comments.sort((a, b) => a.id - b.id);
-    }
+
     return (
         <>{comments.length < 1 ?
             <Card sx={{ mt: '10px', textAlign: 'center' }}>
@@ -74,7 +68,8 @@ export default function BudgetStatementComment({ budgetStatementId, users }) {
                             <Grid
                                 columns={[2, '2fr 0.1fr']}
                             >
-                                <Text sx={{ fontWeight: 'bold' }}>{obj.username} wrote on {`${obj.timestamp?.substring(0, 10)} ${obj.timestamp?.substring(11, 16)} UTC`}</Text>
+                                <Text sx={{ fontWeight: 'bold' }}>{obj.author.username} wrote on {`${obj.timestamp?.substring(0, 10)} 
+                                ${obj.timestamp?.substring(11, 16)} UTC`} - {`${obj.status}`}</Text>
                                 {/* <Text sx={{position: 'right', color: 'red', cursor: 'pointer'}}>Delete</Text> */}
                             </Grid>
                             <ReactMarkdown children={obj.comment} remarkPlugins={[remarkGfm]} />
