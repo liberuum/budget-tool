@@ -1,3 +1,8 @@
+# ⚠️ ATENTION ⚠️
+## Next and future releases will happen under the [makerdao-ses](https://github.com/makerdao-ses/ecosystem-reporting-tool-v1) project. 
+
+- Please check the other repo [release page](https://github.com/makerdao-ses/ecosystem-reporting-tool-v1/releases) for the latest version of the budget tool. 
+
 # Budget Tool
 
 The budget tool helps to make MakerDAO's expenses transparent across the ecosystem.
